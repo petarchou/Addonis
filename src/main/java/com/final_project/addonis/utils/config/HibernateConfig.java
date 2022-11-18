@@ -22,12 +22,12 @@ public class HibernateConfig {
         this.dbPassword = env.getProperty("database.password");
     }
 
-    @Bean
+    @Bean(name = "entityManagerFactory")
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setHibernateProperties(hibernateProperties());
-        sessionFactory.setPackagesToScan("com.example.web_project.models");
+        sessionFactory.setPackagesToScan("com.final_project.addonis.models");
         return sessionFactory;
     }
 
@@ -47,3 +47,4 @@ public class HibernateConfig {
         return dataSource;
     }
 }
+
