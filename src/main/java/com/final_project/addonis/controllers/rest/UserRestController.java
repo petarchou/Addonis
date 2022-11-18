@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class UserRestController {
     }
 
     @PostMapping
-    public UserDto create(@RequestBody CreateUserDto createUserDto) {
+    public UserDto create(@Valid @RequestBody CreateUserDto createUserDto) {
         if (createUserDto.getPassword().equals(createUserDto.getConfirmPassword())) {
             try {
                 User user = mapper.fromDto(createUserDto);
@@ -58,7 +59,7 @@ public class UserRestController {
     }
 
     @PutMapping("/{id}")
-    public UserDto update(@RequestBody UpdateUserDto updateUserDto,
+    public UserDto update(@Valid @RequestBody UpdateUserDto updateUserDto,
                           @PathVariable int id) {
         try {
             User user = service.getById(id);
