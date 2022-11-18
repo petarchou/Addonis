@@ -8,12 +8,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-    private static final String DEFAULT_AVATAR = "assets/avatars/default/OIP.png";
+    private static final String DEFAULT_AVATAR = "/assets/avatars/default/OIP.png";
 
     public UserDto toDto(User user) {
-
         UserDto userDto = new UserDto();
-
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
         userDto.setEmail(user.getEmail());

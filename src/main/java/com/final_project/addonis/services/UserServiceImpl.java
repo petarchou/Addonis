@@ -44,7 +44,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        checkUsername(user.getUsername());
         checkEmail(user.getEmail());
         checkPhone(user.getPhoneNumber());
         return repository.save(user);
