@@ -5,15 +5,22 @@ import com.final_project.addonis.models.dtos.CreateUserDto;
 import com.final_project.addonis.models.dtos.UpdateUserDto;
 import com.final_project.addonis.models.dtos.UserDto;
 import com.final_project.addonis.services.contracts.UserService;
+import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.mappers.UserMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,6 +33,7 @@ public class UserRestController {
         this.service = service;
         this.mapper = mapper;
     }
+
 
     @GetMapping
     public List<UserDto> getAll() {
@@ -74,7 +82,7 @@ public class UserRestController {
     }
 
     @DeleteMapping("/{id}")
-    public UserDto delete(@PathVariable int id) {
+    public UserDto delete(@PathVariable int id, Authentication authentication) {
         try {
             User user = service.getById(id);
             user = service.delete(user);
@@ -82,5 +90,13 @@ public class UserRestController {
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
+    }
+
+    private Optional<User> getCurrentUser(Authentication authentication) {
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return Optional.empty();
+        }
+        User user = (User) authentication.getPrincipal();
+        return Optional.of(user);
     }
 }
