@@ -26,6 +26,7 @@ public class UserMapper {
         user.setUsername(createUserDto.getUsername());
         user.setEmail(createUserDto.getEmail());
         user.setPhoneNumber(createUserDto.getPhoneNumber());
+        //add encoder here  and encode pass here?
         user.setPassword(createUserDto.getPassword());
         user.setPhotoUrl(DEFAULT_AVATAR);
         return user;
@@ -34,7 +35,8 @@ public class UserMapper {
     public User fromUpdateDto(UpdateUserDto updateUserDto, User user) {
         user.setEmail(updateUserDto.getEmail());
         user.setPhoneNumber(updateUserDto.getPhoneNumber());
-        user.setPhotoUrl(updateUserDto.getPhotoUrl());
+        if(updateUserDto.getPhotoUrl()!=null)
+            user.setPhotoUrl(updateUserDto.getPhotoUrl());
         return user;
     }
 }

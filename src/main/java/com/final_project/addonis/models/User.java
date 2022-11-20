@@ -2,17 +2,19 @@ package com.final_project.addonis.models;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.Hibernate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-public class User {
+public class User implements UserDetails {
+    private static final String ROLE_PREFIX = "ROLE_";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -24,6 +26,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
+
     @Column(name = "email")
     private String email;
 
@@ -33,7 +36,7 @@ public class User {
     @Column(name = "photo_url")
     private String photoUrl;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -43,7 +46,7 @@ public class User {
     private boolean isBlocked;
 
     @Column(name = "is_verified")
-    private boolean isVerify;
+    private boolean isVerified;
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
@@ -51,7 +54,7 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return id == user.id;
     }
@@ -60,4 +63,34 @@ public class User {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX +role.getName().toUpperCase()));
+        }
+        return authorities;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !isDeleted;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return  isVerified;
+    }
+
 }
