@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -12,7 +13,9 @@ public class UpdateUserDto {
 
     @Email
     private String email;
+
     @Size(min = 10, max = 10)
+    @Pattern(regexp = "^\\d{10}")
     private String phoneNumber;
-    private String photoUrl;
+
 }
