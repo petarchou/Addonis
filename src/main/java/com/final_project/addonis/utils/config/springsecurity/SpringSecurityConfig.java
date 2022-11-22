@@ -30,7 +30,7 @@ public class SpringSecurityConfig {
         http.csrf().disable()
                 .authorizeRequests()
                 .anyRequest()
-                .authenticated()
+                .permitAll()
                 .and()
                 .httpBasic()
                 .and()

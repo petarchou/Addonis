@@ -17,10 +17,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByPhoneNumber(String phone);
 
-    User getByUsername(String username);
-
     Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
+
+    Optional<User> findByPhoneNumber(String phone);
 
     @Query("select u from User u where u.isDeleted=false ")
-    List<User> findAllByDeletedFalse();
+    List<User> getAllByDeletedFalse();
 }
