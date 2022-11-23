@@ -20,11 +20,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAll() {
+
         return repository.getAllByDeletedFalse();
     }
 
     @Override
     public User getById(int id) {
+
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User", id));
     }
@@ -42,36 +44,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        boolean exist = true;
-        User existingUser = new User();
 
-        try {
-            existingUser = getByEmail(user.getEmail());
-        } catch (EntityNotFoundException e) {
-            exist = false;
-        }
-
-        if (exist && !existingUser.equals(user)) {
-            throw new DuplicateEntityException("User", "email", user.getEmail());
-        }
-
-        try {
-            existingUser = getByPhone(user.getPhoneNumber());
-        } catch (EntityNotFoundException e) {
-            exist = false;
-        }
-
-        if (exist && !existingUser.equals(user)) {
-            throw new DuplicateEntityException("User", "phone", user.getPhoneNumber());
-        }
+        verifyIsUniqueUsername(user.getUsername());
+        verifyIsUniqueEmail(user.getEmail());
+        verifyIsUniquePhone(user.getPhoneNumber());
 
         return repository.saveAndFlush(user);
     }
 
     @Override
     public User delete(User user) {
+
         user.setDeleted(true);
         repository.saveAndFlush(user);
+
         return user;
     }
 
@@ -94,19 +80,46 @@ public class UserServiceImpl implements UserService {
     }
 
     private void verifyIsUniqueEmail(String email) {
-        if (repository.existsByEmail(email)) {
+        boolean exist = true;
+        User user = new User();
+
+        try {
+            user = getByEmail(email);
+        } catch (EntityNotFoundException e) {
+            exist = false;
+        }
+
+        if (exist && !email.equals(user.getEmail())) {
             throw new DuplicateEntityException("User", "email", email);
         }
     }
 
     private void verifyIsUniquePhone(String phone) {
-        if (repository.existsByPhoneNumber(phone)) {
+        boolean exist = true;
+        User user = new User();
+
+        try {
+            user = getByPhone(phone);
+        } catch (EntityNotFoundException e) {
+            exist = false;
+        }
+
+        if (exist && !phone.equals(user.getPhoneNumber())) {
             throw new DuplicateEntityException("User", "phone", phone);
         }
     }
 
     private void verifyIsUniqueUsername(String username) {
-        if (repository.existsByUsername(username)) {
+        boolean exist = true;
+        User user = new User();
+
+        try {
+            user = getByUsername(username);
+        } catch (EntityNotFoundException e) {
+            exist = false;
+        }
+
+        if (exist && !username.equals(user.getUsername())) {
             throw new DuplicateEntityException("User", "username", username);
         }
     }
