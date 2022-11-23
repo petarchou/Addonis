@@ -76,7 +76,7 @@ public class EmailServiceImpl implements EmailService {
         if (isAUser(invitedUser) || !wasInvitedMinFiveDaysAgo(existingOptional)) {
             throw new IllegalArgumentException("Invite was sent less than 5 days ago or user is already registered.");
         }
-        invitedUser = getIfExists(invitedUser, existingOptional);
+        invitedUser = updateDateIfExists(invitedUser, existingOptional);
 
 
         composeAndSendInvite(referrer, siteUrl, invitedUser);
@@ -111,7 +111,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private InvitedUser getIfExists(InvitedUser invitedUser, Optional<InvitedUser> optionalUser) {
+    private InvitedUser updateDateIfExists(InvitedUser invitedUser, Optional<InvitedUser> optionalUser) {
         if (optionalUser.isPresent()) {
             invitedUser = optionalUser.get();
             invitedUser.setLastInviteDate(LocalDateTime.now());
