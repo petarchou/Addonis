@@ -20,7 +20,7 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private int id;
 
-    @Column(name = "username")
+    @Column(name = "username", updatable = false)
     private String username;
 
     @Column(name = "password")
@@ -68,7 +68,7 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX +role.getName().toUpperCase()));
+            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getName().toUpperCase()));
         }
         return authorities;
     }
@@ -90,7 +90,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return  isVerified;
+        return isVerified;
     }
 
 }
