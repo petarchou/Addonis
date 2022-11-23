@@ -29,15 +29,18 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
+                .antMatchers(HttpMethod.POST,"/api/users")
+                .permitAll()
                 .anyRequest()
+                //make this authenticated when we start the front-end
                 .permitAll()
                 .and()
                 .httpBasic()
                 .and()
                 .logout()
                 .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true)
-                .permitAll();
+                .invalidateHttpSession(true);
+        //make only  single  session possible
 
         return http.build();
     }
@@ -50,13 +53,5 @@ public class SpringSecurityConfig {
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
-
-
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web
-//                .ignoring()
-//                .antMatchers("/home");
-//    }
 
 }

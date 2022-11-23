@@ -1,21 +1,42 @@
 package com.final_project.addonis.services;
 
+import com.final_project.addonis.models.InvitedUser;
 import com.final_project.addonis.models.User;
+import com.final_project.addonis.models.VerificationToken;
+import com.final_project.addonis.repositories.contracts.InvitedUserRepository;
 import com.final_project.addonis.repositories.contracts.UserRepository;
+import com.final_project.addonis.repositories.contracts.VerificationTokenRepository;
+import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
+import com.final_project.addonis.utils.config.springsecurity.PasswordEncoder;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
+    private final EmailService emailService;
+
+    private final VerificationTokenRepository tokenRepository;
+
+    private final InvitedUserRepository invitedUserRepository;
 
 
-    public UserServiceImpl(UserRepository repository) {
+    public UserServiceImpl(UserRepository repository,
+                           EmailService emailService,
+                           VerificationTokenRepository tokenRepository,
+                           InvitedUserRepository invitedUserRepository) {
         this.repository = repository;
+        this.emailService = emailService;
+        this.tokenRepository = tokenRepository;
+        this.invitedUserRepository = invitedUserRepository;
     }
 
     @Override
@@ -32,14 +53,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User user) {
-
+    public User create(User user, String siteUrl) throws UnsupportedEncodingException {
         verifyIsUniqueUsername(user.getUsername());
         verifyIsUniqueEmail(user.getEmail());
         verifyIsUniquePhone(user.getPhoneNumber());
+        user = repository.save(user);
 
-        return repository.save(user);
 
+        Optional<InvitedUser> invitedUser = invitedUserRepository.findByEmail(user.getEmail());
+        invitedUser.ifPresent(invitedUserRepository::delete);
+
+        VerificationToken token = createVerificationToken(user);
+        emailService.sendVerificationEmail(user, siteUrl, token);
+        return user;
     }
 
     @Override
@@ -78,6 +104,21 @@ public class UserServiceImpl implements UserService {
         return repository.findByPhoneNumber(phone)
                 .orElseThrow(() -> new EntityNotFoundException("User", "phone", phone));
     }
+
+    @Override
+    public void verifyUser(String tokenStr) {
+        VerificationToken token = tokenRepository.getByToken(tokenStr);
+
+        if (token == null || token.getUser().isEnabled()) {
+            throw new IllegalArgumentException("Verification failed - wrong token or user is verified");
+        } else {
+            User user = token.getUser();
+            user.setVerified(true);
+            tokenRepository.delete(token);
+            repository.saveAndFlush(user);
+        }
+    }
+
 
     private void verifyIsUniqueEmail(String email) {
         boolean exist = true;
@@ -122,5 +163,12 @@ public class UserServiceImpl implements UserService {
         if (exist && !username.equals(user.getUsername())) {
             throw new DuplicateEntityException("User", "username", username);
         }
+    }
+
+    private VerificationToken createVerificationToken(User user) {
+        VerificationToken token = new VerificationToken();
+        token.setToken(RandomString.make(64));
+        token.setUser(user);
+        return tokenRepository.saveAndFlush(token);
     }
 }
