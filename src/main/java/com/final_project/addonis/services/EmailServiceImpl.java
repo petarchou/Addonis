@@ -6,6 +6,8 @@ import com.final_project.addonis.models.VerificationToken;
 import com.final_project.addonis.repositories.contracts.InvitedUserRepository;
 import com.final_project.addonis.repositories.contracts.UserRepository;
 import com.final_project.addonis.services.contracts.EmailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,9 +26,12 @@ public class EmailServiceImpl implements EmailService {
 
     public static final String SENDER_EMAIL = "addonis.donotreply@gmail.com";
     public static final String SENDER_NAME = "Addonis Marketplace";
+    public static final String EMAIL_SEND_FAIL = "Failed to send email.";
     private final JavaMailSender mailSender;
 
     private final InvitedUserRepository invitedUserRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private final UserRepository userRepository;
 
@@ -40,7 +45,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendVerificationEmail(User user, String siteUrl, VerificationToken token) throws UnsupportedEncodingException {
+    public void sendVerificationEmail(User user, String siteUrl, VerificationToken token) {
         try {
             String toEmail = user.getEmail();
             String subject = "Please verify your registration";
@@ -65,13 +70,16 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
         }
         catch(MessagingException e) {
-            throw new IllegalStateException("Failed to send email.");
+            throw new IllegalStateException(EMAIL_SEND_FAIL);
+        }
+        catch(UnsupportedEncodingException e) {
+            logger.error("Invalid encoding for email sender name");
         }
     }
 
 
     @Override
-    public void sendInvitationEmail(User referrer, String siteUrl, InvitedUser invitedUser) throws UnsupportedEncodingException {
+    public void sendInvitationEmail(User referrer, String siteUrl, InvitedUser invitedUser) {
         Optional<InvitedUser> existingOptional = invitedUserRepository.findByEmail(invitedUser.getEmail());
         if (isAUser(invitedUser) || !wasInvitedMinFiveDaysAgo(existingOptional)) {
             throw new IllegalArgumentException("Invite was sent less than 5 days ago or user is already registered.");
@@ -83,7 +91,7 @@ public class EmailServiceImpl implements EmailService {
         invitedUserRepository.saveAndFlush(invitedUser);
     }
     @Async
-    public void composeAndSendInvite(User referrer, String siteUrl, InvitedUser invitedUser) throws UnsupportedEncodingException {
+    public void composeAndSendInvite(User referrer, String siteUrl, InvitedUser invitedUser) {
         try {
             String subject = referrer.getUsername() + " invited you to join Addonis Marketplace!";
             String content = "Hey, there!<br>" +
@@ -107,7 +115,10 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
         }
         catch(MessagingException e) {
-            throw new IllegalStateException("Failed to send email.");
+            throw new IllegalStateException(EMAIL_SEND_FAIL);
+        }
+        catch(UnsupportedEncodingException e) {
+            logger.error("Invalid encoding for email sender name");
         }
     }
 

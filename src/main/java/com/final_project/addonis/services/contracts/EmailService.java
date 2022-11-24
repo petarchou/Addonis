@@ -10,8 +10,8 @@ import java.io.UnsupportedEncodingException;
 public interface EmailService {
 
 
-    void sendInvitationEmail(User referrer, String siteUrl, InvitedUser invitedUser) throws UnsupportedEncodingException;
+    void sendInvitationEmail(User referrer, String siteUrl, InvitedUser invitedUser);
 
-    void sendVerificationEmail(User user, String siteUrl, VerificationToken token) throws UnsupportedEncodingException;
+    void sendVerificationEmail(User user, String siteUrl, VerificationToken token);
 
 }

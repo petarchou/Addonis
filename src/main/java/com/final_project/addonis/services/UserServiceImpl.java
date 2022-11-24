@@ -1,28 +1,31 @@
 package com.final_project.addonis.services;
 
 import com.final_project.addonis.models.InvitedUser;
+import com.final_project.addonis.models.Role;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.VerificationToken;
 import com.final_project.addonis.repositories.contracts.InvitedUserRepository;
+import com.final_project.addonis.repositories.contracts.RoleRepository;
 import com.final_project.addonis.repositories.contracts.UserRepository;
 import com.final_project.addonis.repositories.contracts.VerificationTokenRepository;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
-import com.final_project.addonis.utils.config.springsecurity.PasswordEncoder;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private static final String NOT_AUTHORIZED_ERROR = "You're not authorized to modify this user.";
+    public static final String INVALID_ARGUMENT_ERR = "Invalid method argument : %s";
     private final UserRepository repository;
     private final EmailService emailService;
+
+    private final RoleRepository roleRepository;
 
     private final VerificationTokenRepository tokenRepository;
 
@@ -31,10 +34,11 @@ public class UserServiceImpl implements UserService {
 
     public UserServiceImpl(UserRepository repository,
                            EmailService emailService,
-                           VerificationTokenRepository tokenRepository,
+                           RoleRepository roleRepository, VerificationTokenRepository tokenRepository,
                            InvitedUserRepository invitedUserRepository) {
         this.repository = repository;
         this.emailService = emailService;
+        this.roleRepository = roleRepository;
         this.tokenRepository = tokenRepository;
         this.invitedUserRepository = invitedUserRepository;
     }
@@ -53,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User user, String siteUrl) throws UnsupportedEncodingException {
+    public User create(User user, String siteUrl) {
         verifyIsUniqueUsername(user.getUsername());
         verifyIsUniqueEmail(user.getEmail());
         verifyIsUniquePhone(user.getPhoneNumber());
@@ -88,6 +92,62 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void verifyUser(String tokenStr) {
+        VerificationToken token = tokenRepository.getByToken(tokenStr);
+
+        if (token == null || token.getUser().isEnabled()) {
+            throw new IllegalArgumentException("Verification failed - wrong token or user is verified");
+        } else {
+            User user = token.getUser();
+            user.setVerified(true);
+            tokenRepository.delete(token);
+            repository.saveAndFlush(user);
+        }
+    }
+
+    @Override
+    public User changeUserRole(int id, String roleName, String action) {
+        User userToUpdate = getById(id);
+        Role roleToChange = roleRepository.findByName(roleName.toUpperCase())
+                .orElseThrow(() ->
+                        new UnsupportedOperationException(
+                                String.format(INVALID_ARGUMENT_ERR, "roleName")));
+
+        switch (action.toLowerCase()) {
+            case "promote":
+                tryAddRole(userToUpdate, roleToChange);
+                break;
+            case "demote":
+                tryRemoveRole(userToUpdate, roleToChange);
+                break;
+            default:
+                throw new UnsupportedOperationException(String.format(INVALID_ARGUMENT_ERR, "action"));
+
+        }
+
+        return repository.saveAndFlush(userToUpdate);
+    }
+
+    @Override
+    public User changeBlockedStatus(int id, String action) {
+        User user = getById(id);
+        switch (action.toLowerCase()) {
+            case "block":
+                tryBlockUser(user);
+                break;
+            case "unblock":
+                tryUnblockUser(user);
+                break;
+            default:
+                throw new UnsupportedOperationException("Invalid method argument: action");
+
+        }
+
+        return repository.saveAndFlush(user);
+    }
+
+
+    @Override
     public User getByUsername(String username) {
         return repository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User", "username", username));
@@ -105,20 +165,38 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User", "phone", phone));
     }
 
-    @Override
-    public void verifyUser(String tokenStr) {
-        VerificationToken token = tokenRepository.getByToken(tokenStr);
 
-        if (token == null || token.getUser().isEnabled()) {
-            throw new IllegalArgumentException("Verification failed - wrong token or user is verified");
-        } else {
-            User user = token.getUser();
-            user.setVerified(true);
-            tokenRepository.delete(token);
-            repository.saveAndFlush(user);
+    private void tryAddRole(User userToUpdate, Role roleToChange) {
+        if (userToUpdate.getRoles().contains(roleToChange)) {
+            throw new DuplicateEntityException(String.format("User with id %d is already %s.",
+                    userToUpdate.getId(),
+                    roleToChange.getName().toLowerCase()));
         }
+        userToUpdate.addRole(roleToChange);
     }
 
+    private void tryRemoveRole(User userToUpdate, Role roleToChange) {
+        if (!userToUpdate.getRoles().contains(roleToChange)) {
+            throw new DuplicateEntityException(String.format("User with id %d is not %s",
+                    userToUpdate.getId(),
+                    roleToChange.getName().toLowerCase()));
+        }
+        userToUpdate.removeRole(roleToChange);
+    }
+
+    private void tryBlockUser(User user) {
+        if (user.isBlocked())
+            throw new DuplicateEntityException(
+                    String.format("User with id %d is already blocked", user.getId()));
+        user.setBlocked(true);
+    }
+
+    private void tryUnblockUser(User user) {
+        if (!user.isBlocked())
+            throw new DuplicateEntityException(
+                    String.format("User with id %d is already unblocked", user.getId()));
+        user.setBlocked(false);
+    }
 
     private void verifyIsUniqueEmail(String email) {
         boolean exist = true;

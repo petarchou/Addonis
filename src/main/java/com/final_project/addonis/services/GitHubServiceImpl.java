@@ -14,6 +14,9 @@ public class GitHubServiceImpl implements GitHubService {
     private final RestTemplate template;
     private final static String MASTER_URL = "https://api.github.com/repos/%s/%s";
 
+    //add /commits or /commit
+    //add /pulls
+
     public GitHubServiceImpl(RestTemplateBuilder template) {
         this.template = template.build();
     }
