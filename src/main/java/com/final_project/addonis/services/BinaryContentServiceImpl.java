@@ -21,6 +21,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     @Override
     public BinaryContent store(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("You must add file to your Add-on");
+        }
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         BinaryContent binaryContent = new BinaryContent(fileName, file.getBytes());
 

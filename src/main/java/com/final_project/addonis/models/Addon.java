@@ -2,6 +2,7 @@ package com.final_project.addonis.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -42,6 +43,7 @@ public class Addon {
     private String originUrl;
 
     @Column(name = "upload_date")
+    @CreationTimestamp
     private LocalDateTime uploadedDate;
 
     @Column(name = "downloads")

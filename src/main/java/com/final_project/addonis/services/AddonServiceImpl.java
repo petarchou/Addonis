@@ -5,6 +5,7 @@ import com.final_project.addonis.models.BinaryContent;
 import com.final_project.addonis.models.Tag;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.repositories.contracts.AddonRepository;
+import com.final_project.addonis.repositories.contracts.StateRepository;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.BinaryContentService;
 import com.final_project.addonis.services.contracts.TagService;
@@ -22,16 +23,25 @@ public class AddonServiceImpl implements AddonService {
     private final AddonRepository addonRepository;
     private final TagService tagService;
     private final BinaryContentService binaryContentService;
+    private final StateRepository stateRepository;
 
-    public AddonServiceImpl(AddonRepository addonRepository, TagService tagService, BinaryContentService binaryContentService) {
+    public AddonServiceImpl(AddonRepository addonRepository,
+                            TagService tagService,
+                            BinaryContentService binaryContentService, StateRepository stateRepository) {
         this.addonRepository = addonRepository;
         this.tagService = tagService;
         this.binaryContentService = binaryContentService;
+        this.stateRepository = stateRepository;
     }
 
     @Override
-    public List<Addon> getAll() {
-        return addonRepository.findAll();
+    public List<Addon> getAllApprovedAddons() {
+        return addonRepository.getAllByStateNameApproved();
+    }
+
+    @Override
+    public List<Addon> getAllPendingAddons() {
+        return addonRepository.getAllByStateNamePending();
     }
 
     @Override
@@ -51,6 +61,7 @@ public class AddonServiceImpl implements AddonService {
         verifyIsUniqueName(addon);
         BinaryContent binaryContent = binaryContentService.store(file);
         addon.setData(binaryContent);
+        addon.setState(stateRepository.findByName("pending"));
         addTags(addon, tags);
         addon = addonRepository.saveAndFlush(addon);
         return addon;
@@ -70,9 +81,24 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public Addon addTagsToAddon(Addon addon, List<Tag> tags) {
+    public void addTagsToAddon(Addon addon, List<Tag> tags) {
         addTags(addon, tags);
+        addonRepository.saveAndFlush(addon);
+    }
+
+    @Override
+    public Addon approveAddon(int id) {
+        Addon addon = getAddonById(id);
+        addon.setState(stateRepository.findByName("approved"));
         return addonRepository.saveAndFlush(addon);
+    }
+
+    @Override
+    public BinaryContent downloadContent(int addonId) {
+        Addon addon = getAddonById(addonId);
+        addon.setDownloads(addon.getDownloads() + 1);
+        addonRepository.saveAndFlush(addon);
+        return addon.getData();
     }
 
     private void addTags(Addon addon, List<Tag> tags) {
@@ -87,8 +113,6 @@ public class AddonServiceImpl implements AddonService {
             }
         }
     }
-
-
 
     private void verifyIsUniqueName(Addon addon) {
         boolean exist = true;

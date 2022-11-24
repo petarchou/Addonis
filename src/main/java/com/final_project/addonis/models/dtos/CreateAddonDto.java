@@ -1,6 +1,5 @@
 package com.final_project.addonis.models.dtos;
 
-import com.final_project.addonis.models.State;
 import com.final_project.addonis.models.TargetIde;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,8 +25,6 @@ public class CreateAddonDto {
     private String description;
 
     private String originUrl;
-
-    private State state;
 
     @NotEmpty(message = "Addon must have at least one tag")
     private List<String> tags;
