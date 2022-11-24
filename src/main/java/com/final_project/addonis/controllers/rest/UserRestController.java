@@ -11,24 +11,22 @@ import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
+import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
 import com.final_project.addonis.utils.mappers.UserMapper;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -65,7 +63,7 @@ public class  UserRestController {
     }
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody CreateUserDto createUserDto, HttpServletRequest request) throws UnsupportedEncodingException {
+    public UserDto create(@Valid @RequestBody CreateUserDto createUserDto, HttpServletRequest request) {
         try {
             User user = mapper.fromCreateDto(createUserDto);
             user = service.create(user, getSiteUrl(request));
@@ -95,6 +93,18 @@ public class  UserRestController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+    @IsHimselfOrAdmin
+    @DeleteMapping("/{id}")
+    public UserDto delete(@PathVariable int id, Authentication authentication) {
+        try {
+            User user = service.getById(id);
+            user = service.delete(user);
+            return mapper.toDto(user);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
@@ -129,23 +139,70 @@ public class  UserRestController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
-
-    @IsHimselfOrAdmin
-    @DeleteMapping("/{id}")
-    public UserDto delete(@PathVariable int id, Authentication authentication) {
+    @Secured("ADMIN")
+    @PutMapping("/{id}/promote/admin")
+    public UserDto addAdminRole(@PathVariable int id) {
         try {
-            User user = service.getById(id);
-            user = service.delete(user);
+           User promotedUser = service.changeUserRole(id,"admin","promote");
+           return mapper.toDto(promotedUser);
+        }
+        catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+        catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+    @Secured("ADMIN")
+    @PutMapping("/{id}/demote/admin")
+    public UserDto removeAdminRole(@PathVariable int id) {
+        try {
+            User promotedUser = service.changeUserRole(id,"admin","demote");
+            return mapper.toDto(promotedUser);
+        }
+        catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+        catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+    @Secured("ADMIN")
+    @PutMapping("/{id}/block")
+    public UserDto blockUser(@PathVariable int id) {
+        try {
+            User user = service.changeBlockedStatus(id,"block");
             return mapper.toDto(user);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @Secured("ADMIN")
+    @PutMapping("/{id}/unblock")
+    public UserDto unblockUser(@PathVariable int id) {
+        try {
+            User user = service.changeBlockedStatus(id, "unblock");
+            return mapper.toDto(user);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 
 
 
     @GetMapping("/{id}/invite")
-    public String inviteFriend(@RequestParam(name = "email") String toEmail, @PathVariable int id, HttpServletRequest request) throws UnsupportedEncodingException {
+    public String inviteFriend(@RequestParam(name = "email") String toEmail, @PathVariable int id, HttpServletRequest request) {
         try {
             User user = service.getById(id);
             InvitedUser invitedUser = invitedUserMapper.fromEmail(toEmail);
