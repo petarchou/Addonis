@@ -1,7 +1,6 @@
 package com.final_project.addonis.utils.mappers;
 
 import com.final_project.addonis.models.Addon;
-import com.final_project.addonis.models.State;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.dtos.AddonDto;
 import com.final_project.addonis.models.dtos.CreateAddonDto;
@@ -32,15 +31,12 @@ public class AddonMapper {
 
     public Addon fromDto(CreateAddonDto createAddonDto, User loggedUser) {
         Addon addon = new Addon();
-        State state = new State();
-        state.setId(2);
 
         addon.setName(createAddonDto.getName());
         addon.setTargetIde(createAddonDto.getTargetIde());
         addon.setCreator(loggedUser);
         addon.setDescription(createAddonDto.getDescription());
         addon.setOriginUrl(createAddonDto.getOriginUrl());
-        addon.setState(state);
         addon.setTags(new HashSet<>());
 
         return addon;

@@ -18,7 +18,7 @@ public class State {
     private int id;
 
     @Column(name = "name")
-    private String stateName;
+    private String name;
 
     public State() {
     }

@@ -1,6 +1,7 @@
 package com.final_project.addonis.controllers.rest;
 
 import com.final_project.addonis.models.Addon;
+import com.final_project.addonis.models.BinaryContent;
 import com.final_project.addonis.models.Tag;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.dtos.AddonDto;
@@ -9,11 +10,14 @@ import com.final_project.addonis.models.dtos.TagDto;
 import com.final_project.addonis.models.dtos.UpdateAddonDto;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.UserService;
+import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
+import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import com.final_project.addonis.utils.mappers.AddonMapper;
 import com.final_project.addonis.utils.mappers.TagMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,7 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/addons")
+@RequestMapping("/api/addons")
 public class AddonRestController {
     private final AddonService addonService;
     private final AddonMapper addonMapper;
@@ -41,7 +45,15 @@ public class AddonRestController {
 
     @GetMapping
     public List<AddonDto> getAll() {
-        return addonService.getAll().stream()
+        return addonService.getAllApprovedAddons().stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Secured("ADMIN")
+    @GetMapping("/pending")
+    public List<AddonDto> getAllPending() {
+        return addonService.getAllPendingAddons().stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -70,9 +82,12 @@ public class AddonRestController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
+    @IsHimselfOrAdmin
     @PutMapping("/{id}")
     public AddonDto update(@Valid @RequestBody UpdateAddonDto updateAddonDto,
                            @PathVariable int id) {
@@ -88,6 +103,7 @@ public class AddonRestController {
         }
     }
 
+    @IsHimselfOrAdmin
     @DeleteMapping("/{id}")
     public AddonDto delete(@PathVariable int id) {
         try {
@@ -100,17 +116,40 @@ public class AddonRestController {
         }
     }
 
-    @PutMapping("/{addonId}/tags")
-    public AddonDto addTags(@PathVariable int addonId,
+    @IsHimselfOrAdmin
+    @PutMapping("/{id}/tags")
+    public AddonDto addTags(@PathVariable int id,
                             @Valid @RequestBody TagDto tagDto) {
         try {
-            Addon addon = addonService.getAddonById(addonId);
+            Addon addon = addonService.getAddonById(id);
             List<Tag> tags = tagDto.getTagNames().stream()
                     .map(tagMapper::fromTagName).collect(Collectors.toList());
             if (!tags.isEmpty()) {
                 addonService.addTagsToAddon(addon, tags);
             }
             return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @Secured("ADMIN")
+    @PutMapping("/{id}/approve")
+    public AddonDto approveAddon(@PathVariable int id) {
+        try {
+            Addon addonToApprove = addonService.approveAddon(id);
+            return addonMapper.toDto(addonToApprove);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/download")
+    public BinaryContent downloadContent(@PathVariable int id) {
+        try {
+            return addonService.downloadContent(id);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
