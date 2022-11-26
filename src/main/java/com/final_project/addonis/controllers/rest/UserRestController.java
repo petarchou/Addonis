@@ -14,24 +14,21 @@ import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
 import com.final_project.addonis.utils.mappers.UserMapper;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
-public class  UserRestController {
+public class UserRestController {
     private final UserService service;
     private final UserMapper mapper;
     private final InvitedUserMapper invitedUserMapper;
@@ -46,10 +43,14 @@ public class  UserRestController {
 
 
     @GetMapping
-    public List<UserDto> getAll() {
-        return service.getAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public List<UserDto> getAll(@RequestParam("search") String keyword,
+                                @RequestParam(value = "filter", required = false) Optional<String> filter,
+                                @RequestParam(value = "sortBy", required = false) Optional<String> sortBy,
+                                @RequestParam(value = "orderBy", required = false) Optional<String> orderBy) {
+
+        return service.getAll(keyword, filter, sortBy,orderBy).stream()
+                    .map(mapper::toDto)
+                    .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -74,12 +75,6 @@ public class  UserRestController {
     }
 
 
-
-    private String getSiteUrl(HttpServletRequest request) {
-        String siteUrl = request.getRequestURL().toString();
-        return siteUrl.replace(request.getServletPath(), "");
-    }
-
     @IsHimselfOrAdmin
     @PutMapping("/{id}")
     public UserDto update(@Valid @RequestBody UpdateUserDto updateUserDto,
@@ -93,18 +88,6 @@ public class  UserRestController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        }
-    }
-
-    @IsHimselfOrAdmin
-    @DeleteMapping("/{id}")
-    public UserDto delete(@PathVariable int id, Authentication authentication) {
-        try {
-            User user = service.getById(id);
-            user = service.delete(user);
-            return mapper.toDto(user);
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
@@ -139,17 +122,17 @@ public class  UserRestController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
-    @Secured("ADMIN")
-    @PutMapping("/{id}/promote/admin")
-    public UserDto addAdminRole(@PathVariable int id) {
+
+
+    @IsHimselfOrAdmin
+    @DeleteMapping("/{id}")
+    public UserDto delete(@PathVariable int id) {
         try {
-           User promotedUser = service.changeUserRole(id,"admin","promote");
-           return mapper.toDto(promotedUser);
-        }
-        catch (EntityNotFoundException e) {
+            User promotedUser = service.changeUserRole(id, "admin", "promote");
+            return mapper.toDto(promotedUser);
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-        catch (DuplicateEntityException e) {
+        } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
@@ -200,20 +183,24 @@ public class  UserRestController {
     }
 
 
-
     @GetMapping("/{id}/invite")
-    public String inviteFriend(@RequestParam(name = "email") String toEmail, @PathVariable int id, HttpServletRequest request) {
+    public String inviteFriend(@RequestParam(name = "email") String toEmail
+            , @PathVariable int id, HttpServletRequest request) {
         try {
             User user = service.getById(id);
             InvitedUser invitedUser = invitedUserMapper.fromEmail(toEmail);
             emailService.sendInvitationEmail(user, getSiteUrl(request), invitedUser);
             return "Invitation successful! An invitation email was  sent to " + toEmail;
-        }
-        catch(EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,  e.getMessage());
-        }
-        catch(IllegalArgumentException | IllegalStateException e) {
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException | IllegalStateException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
+
+    private String getSiteUrl(HttpServletRequest request) {
+        String siteUrl = request.getRequestURL().toString();
+        return siteUrl.replace(request.getServletPath(), "");
+    }
+
 }

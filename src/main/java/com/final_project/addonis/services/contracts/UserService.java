@@ -2,12 +2,12 @@ package com.final_project.addonis.services.contracts;
 
 import com.final_project.addonis.models.User;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
-    List<User> getAll();
+    List<User> getAll(String keyword, Optional<String> predicates, Optional<String> sortBy, Optional<String> orderBy);
 
     User getById(int id);
 
