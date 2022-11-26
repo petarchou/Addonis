@@ -13,11 +13,12 @@ import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService {
                            EmailService emailService,
                            RoleRepository roleRepository, VerificationTokenRepository tokenRepository,
                            InvitedUserRepository invitedUserRepository) {
+
         this.repository = repository;
         this.emailService = emailService;
         this.roleRepository = roleRepository;
@@ -46,18 +48,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll(String keyword,
+    public List<User> getAll(Optional<String> keyword,
                              Optional<String> filter,
                              Optional<String> sortBy,
-                             Optional<String> orderBy) {
+                             Optional<Boolean> orderBy,
+                             Optional<Integer> page,
+                             Optional<Integer> size) {
 
-        Map<String, String> arguments = new HashMap<>();
+        int pageOrDefault = page.orElse(0);
+        int sizeOrDefault = size.orElse(10);
+        String sortOrDefault = sortBy.orElse("id");
+        boolean descOrder = orderBy.orElse(false);
 
-        filter.ifPresent(value -> arguments.put("filter", value));
-        sortBy.ifPresent(value -> arguments.put("sortBy", value));
-        orderBy.ifPresent(value -> arguments.put("orderBy",value));
-
-        return repository.findAllUsersByFilteringAndSorting(keyword, arguments);
+        if (keyword.isEmpty()) {
+            Pageable pageable = PageRequest.of(pageOrDefault, sizeOrDefault,
+                    descOrder ? Sort.by(sortOrDefault).descending() : Sort.by(sortOrDefault));
+            return repository.findAllByIsDeletedFalseAndIsVerifiedTrue(pageable);
+        }
+        return repository.findAllUsersByFilteringAndSorting(keyword.get(),
+                filter,
+                sortOrDefault,
+                descOrder,
+                pageOrDefault, sizeOrDefault);
     }
 
     @Override
@@ -69,9 +81,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user, String siteUrl) {
-        verifyIsUniqueUsername(user.getUsername());
-        verifyIsUniqueEmail(user.getEmail());
-        verifyIsUniquePhone(user.getPhoneNumber());
+        verifyIsUniqueUsername(user);
+        verifyIsUniqueEmail(user);
+        verifyIsUniquePhone(user);
         user = repository.save(user);
 
 
@@ -86,9 +98,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
 
-        verifyIsUniqueUsername(user.getUsername());
-        verifyIsUniqueEmail(user.getEmail());
-        verifyIsUniquePhone(user.getPhoneNumber());
+        verifyIsUniqueUsername(user);
+        verifyIsUniqueEmail(user);
+        verifyIsUniquePhone(user);
 
         return repository.saveAndFlush(user);
     }
@@ -153,7 +165,6 @@ public class UserServiceImpl implements UserService {
                 throw new UnsupportedOperationException("Invalid method argument: action");
 
         }
-
         return repository.saveAndFlush(user);
     }
 
@@ -209,48 +220,48 @@ public class UserServiceImpl implements UserService {
         user.setBlocked(false);
     }
 
-    private void verifyIsUniqueEmail(String email) {
+    private void verifyIsUniqueEmail(User user) {
         boolean exist = true;
-        User user = new User();
+        User existingUser = new User();
 
         try {
-            user = getByEmail(email);
+            existingUser = getByEmail(user.getEmail());
         } catch (EntityNotFoundException e) {
             exist = false;
         }
 
-        if (exist && !email.equals(user.getEmail())) {
-            throw new DuplicateEntityException("User", "email", email);
+        if (exist && !user.equals(existingUser)) {
+            throw new DuplicateEntityException("User", "email", user.getEmail());
         }
     }
 
-    private void verifyIsUniquePhone(String phone) {
+    private void verifyIsUniquePhone(User user) {
         boolean exist = true;
-        User user = new User();
+        User existingUser = new User();
 
         try {
-            user = getByPhone(phone);
+            existingUser = getByPhone(user.getPhoneNumber());
         } catch (EntityNotFoundException e) {
             exist = false;
         }
 
-        if (exist && !phone.equals(user.getPhoneNumber())) {
-            throw new DuplicateEntityException("User", "phone", phone);
+        if (exist && !user.equals(existingUser)) {
+            throw new DuplicateEntityException("User", "phone", user.getPhoneNumber());
         }
     }
 
-    private void verifyIsUniqueUsername(String username) {
+    private void verifyIsUniqueUsername(User user) {
         boolean exist = true;
-        User user = new User();
+        User existingUser = new User();
 
         try {
-            user = getByUsername(username);
+            existingUser = getByUsername(user.getUsername());
         } catch (EntityNotFoundException e) {
             exist = false;
         }
 
-        if (exist && !username.equals(user.getUsername())) {
-            throw new DuplicateEntityException("User", "username", username);
+        if (exist && !user.equals(existingUser)) {
+            throw new DuplicateEntityException("User", "username", user.getUsername());
         }
     }
 

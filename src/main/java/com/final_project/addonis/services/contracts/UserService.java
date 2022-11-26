@@ -7,7 +7,12 @@ import java.util.Optional;
 
 public interface UserService {
 
-    List<User> getAll(String keyword, Optional<String> predicates, Optional<String> sortBy, Optional<String> orderBy);
+    List<User> getAll(Optional<String> keyword,
+                      Optional<String> filter,
+                      Optional<String> sortBy,
+                      Optional<Boolean> orderBy,
+                      Optional<Integer> page,
+                      Optional<Integer> size);
 
     User getById(int id);
 
