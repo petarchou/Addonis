@@ -25,6 +25,7 @@ public class AddonMapper {
         addonDto.setDownloads(addon.getDownloads());
         addonDto.setState(addon.getState());
         addonDto.setTags(addon.getTags());
+        addonDto.setRating(addon.getRating());
 
         return addonDto;
     }

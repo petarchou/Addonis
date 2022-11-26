@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -33,6 +34,8 @@ public class AddonDto {
     private State state;
 
     private Set<Tag> tags;
+
+    private Map<User,Rating> rating;
 
     public AddonDto() {
     }

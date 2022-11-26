@@ -1,10 +1,8 @@
 package com.final_project.addonis.services;
 
-import com.final_project.addonis.models.Addon;
-import com.final_project.addonis.models.BinaryContent;
-import com.final_project.addonis.models.Tag;
-import com.final_project.addonis.models.User;
+import com.final_project.addonis.models.*;
 import com.final_project.addonis.repositories.contracts.AddonRepository;
+import com.final_project.addonis.repositories.contracts.RatingRepository;
 import com.final_project.addonis.repositories.contracts.StateRepository;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.BinaryContentService;
@@ -23,14 +21,16 @@ public class AddonServiceImpl implements AddonService {
     private final AddonRepository addonRepository;
     private final TagService tagService;
     private final BinaryContentService binaryContentService;
+    private final RatingRepository ratingRepository;
     private final StateRepository stateRepository;
 
     public AddonServiceImpl(AddonRepository addonRepository,
                             TagService tagService,
-                            BinaryContentService binaryContentService, StateRepository stateRepository) {
+                            BinaryContentService binaryContentService, RatingRepository ratingRepository, StateRepository stateRepository) {
         this.addonRepository = addonRepository;
         this.tagService = tagService;
         this.binaryContentService = binaryContentService;
+        this.ratingRepository = ratingRepository;
         this.stateRepository = stateRepository;
     }
 
@@ -94,11 +94,26 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
+
+
     public BinaryContent downloadContent(int addonId) {
         Addon addon = getAddonById(addonId);
         addon.setDownloads(addon.getDownloads() + 1);
         addonRepository.saveAndFlush(addon);
         return addon.getData();
+    }
+
+    public Addon rateAddon(Addon addon, User user, int rating) {
+        Rating currentRating = ratingRepository.findById(rating)
+                .orElseThrow(() -> new EntityNotFoundException("Rating", "value", String.valueOf(rating)));
+        addon.getRating().put(user, currentRating);
+        return update(addon, user);
+    }
+
+    @Override
+    public Addon removeRate(Addon addon, User user) {
+        addon.getRating().remove(user);
+        return update(addon, user);
     }
 
     private void addTags(Addon addon, List<Tag> tags) {

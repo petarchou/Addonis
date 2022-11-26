@@ -24,9 +24,16 @@ public interface AddonService {
 
     Addon getByName(String name);
 
+
     void addTagsToAddon(Addon addon, List<Tag> tags);
 
     Addon approveAddon(int id);
 
     BinaryContent downloadContent(int addonId);
+
+
+    Addon rateAddon(Addon addon, User user, int rating);
+
+    Addon removeRate(Addon addon, User user);
+
 }
