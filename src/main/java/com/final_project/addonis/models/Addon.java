@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -58,6 +59,13 @@ public class Addon {
             joinColumns = @JoinColumn(name = "addon_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags;
+
+    @ManyToMany
+    @JoinTable(name = "addons_ratings",
+            joinColumns = @JoinColumn(name = "addon_id"),
+            inverseJoinColumns = @JoinColumn(name = "rating_id"))
+    @MapKeyJoinColumn(name = "user_id")
+    private Map<User, Rating> rating;
 
     public Addon() {
     }

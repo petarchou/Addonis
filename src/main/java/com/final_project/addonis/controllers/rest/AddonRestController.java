@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -152,6 +153,37 @@ public class AddonRestController {
             return addonService.downloadContent(id);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/{addonId}/rate/{ratingId}")
+    public AddonDto rate(@PathVariable int addonId,
+                         @PathVariable int ratingId,
+                         Principal principal) {
+        try {
+            Addon addon = addonService.getAddonById(addonId);
+            User user = userService.getByUsername(principal.getName());
+            addon = addonService.rateAddon(addon, user, ratingId);
+            return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/{addonId}/removeRate")
+    public AddonDto removeRate(@PathVariable int addonId,
+                               Principal principal) {
+        try {
+            Addon addon = addonService.getAddonById(addonId);
+            User user = userService.getByUsername(principal.getName());
+            addon = addonService.removeRate(addon, user);
+            return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
 }

@@ -15,7 +15,9 @@ import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -44,9 +46,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> getAll(String keyword,
+                             Optional<String> filter,
+                             Optional<String> sortBy,
+                             Optional<String> orderBy) {
 
-        return repository.getAllByDeletedFalse();
+        Map<String, String> arguments = new HashMap<>();
+
+        filter.ifPresent(value -> arguments.put("filter", value));
+        sortBy.ifPresent(value -> arguments.put("sortBy", value));
+        orderBy.ifPresent(value -> arguments.put("orderBy",value));
+
+        return repository.findAllUsersByFilteringAndSorting(keyword, arguments);
     }
 
     @Override
