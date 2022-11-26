@@ -94,8 +94,6 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-
-
     public BinaryContent downloadContent(int addonId) {
         Addon addon = getAddonById(addonId);
         addon.setDownloads(addon.getDownloads() + 1);
@@ -103,9 +101,9 @@ public class AddonServiceImpl implements AddonService {
         return addon.getData();
     }
 
-    public Addon rateAddon(Addon addon, User user, int rating) {
-        Rating currentRating = ratingRepository.findById(rating)
-                .orElseThrow(() -> new EntityNotFoundException("Rating", "value", String.valueOf(rating)));
+    public Addon rateAddon(Addon addon, User user, int ratingId) {
+        Rating currentRating = ratingRepository.findById(ratingId)
+                .orElseThrow(() -> new EntityNotFoundException("Rating", "value", String.valueOf(ratingId)));
         addon.getRating().put(user, currentRating);
         return update(addon, user);
     }

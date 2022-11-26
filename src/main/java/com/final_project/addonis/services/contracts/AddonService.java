@@ -32,7 +32,7 @@ public interface AddonService {
     BinaryContent downloadContent(int addonId);
 
 
-    Addon rateAddon(Addon addon, User user, int rating);
+    Addon rateAddon(Addon addon, User user, int ratingId);
 
     Addon removeRate(Addon addon, User user);
 

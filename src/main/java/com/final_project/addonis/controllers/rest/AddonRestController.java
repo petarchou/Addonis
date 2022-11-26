@@ -157,6 +157,21 @@ public class AddonRestController {
     }
 
 
+    @PutMapping("/{addonId}/rate/{ratingId}")
+    public AddonDto rate(@PathVariable int addonId,
+                         @PathVariable int ratingId,
+                         Principal principal) {
+        try {
+            Addon addon = addonService.getAddonById(addonId);
+            User user = userService.getByUsername(principal.getName());
+            addon = addonService.rateAddon(addon, user, ratingId);
+            return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+
     @PutMapping("/{addonId}/removeRate")
     public AddonDto removeRate(@PathVariable int addonId,
                                Principal principal) {
