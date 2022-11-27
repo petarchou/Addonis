@@ -34,23 +34,28 @@ public class UserRestController {
     private final InvitedUserMapper invitedUserMapper;
     private final EmailService emailService;
 
-    public UserRestController(UserService service, UserMapper mapper, InvitedUserMapper invitedUserMapper, EmailService emailService) {
+    public UserRestController(UserService service,
+                              UserMapper mapper,
+                              InvitedUserMapper invitedUserMapper,
+                              EmailService emailService) {
         this.service = service;
         this.mapper = mapper;
         this.invitedUserMapper = invitedUserMapper;
         this.emailService = emailService;
     }
 
-
+    @Secured("ROLE_ADMIN")
     @GetMapping
-    public List<UserDto> getAll(@RequestParam("search") String keyword,
+    public List<UserDto> getAll(@RequestParam(value = "search", required = false) Optional<String> keyword,
                                 @RequestParam(value = "filter", required = false) Optional<String> filter,
                                 @RequestParam(value = "sortBy", required = false) Optional<String> sortBy,
-                                @RequestParam(value = "orderBy", required = false) Optional<String> orderBy) {
+                                @RequestParam(value = "desc", required = false) Optional<Boolean> desc,
+                                @RequestParam(value = "page", required = false) Optional<Integer> page,
+                                @RequestParam(value = "size", required = false) Optional<Integer> size) {
 
-        return service.getAll(keyword, filter, sortBy,orderBy).stream()
-                    .map(mapper::toDto)
-                    .collect(Collectors.toList());
+        return service.getAll(keyword, filter, sortBy, desc,page,size).stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -128,6 +133,18 @@ public class UserRestController {
     @DeleteMapping("/{id}")
     public UserDto delete(@PathVariable int id) {
         try {
+            User user = service.getById(id);
+            user = service.delete(user);
+            return mapper.toDto(user);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @Secured("ROLE_ADMIN")
+    @PutMapping("/{id}/promote/admin")
+    public UserDto addAdminRole(@PathVariable int id) {
+        try {
             User promotedUser = service.changeUserRole(id, "admin", "promote");
             return mapper.toDto(promotedUser);
         } catch (EntityNotFoundException e) {
@@ -137,26 +154,24 @@ public class UserRestController {
         }
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/demote/admin")
     public UserDto removeAdminRole(@PathVariable int id) {
         try {
-            User promotedUser = service.changeUserRole(id,"admin","demote");
+            User promotedUser = service.changeUserRole(id, "admin", "demote");
             return mapper.toDto(promotedUser);
-        }
-        catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-        catch (DuplicateEntityException e) {
+        } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/block")
     public UserDto blockUser(@PathVariable int id) {
         try {
-            User user = service.changeBlockedStatus(id,"block");
+            User user = service.changeBlockedStatus(id, "block");
             return mapper.toDto(user);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
@@ -167,7 +182,7 @@ public class UserRestController {
         }
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/unblock")
     public UserDto unblockUser(@PathVariable int id) {
         try {

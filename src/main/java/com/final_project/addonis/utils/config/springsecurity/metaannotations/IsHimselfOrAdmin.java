@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("#id == authentication.principal.id || hasRole('ADMIN')")
+@PreAuthorize("#id == authentication.principal.id || hasRole('ROLE_ADMIN')")
 public @interface IsHimselfOrAdmin {
 }
