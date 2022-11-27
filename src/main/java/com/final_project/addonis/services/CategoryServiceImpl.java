@@ -37,10 +37,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getCategoryByName(String name) {
         Optional<Category> category = categoryRepository.findByName(name);
-        if (category.isEmpty()) {
-            throw new EntityNotFoundException("Category", "name", name);
+        
+        if (category.isPresent()) {
+            return category.get();
         }
-        return category.get();
+        throw new EntityNotFoundException("Category", "name", name);
     }
 
     @Override
