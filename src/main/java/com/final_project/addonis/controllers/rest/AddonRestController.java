@@ -76,6 +76,7 @@ public class AddonRestController {
     public AddonDto create(@Valid @RequestPart CreateAddonDto createAddonDto,
                            @RequestParam("file") MultipartFile file) {
         try {
+            // TODO Principal
             User user = userService.getById(52);
             Addon addon = addonMapper.fromDto(createAddonDto, user);
             List<Tag> tags = createAddonDto.getTags().stream()
