@@ -1,13 +1,7 @@
 package com.final_project.addonis.controllers.rest;
 
-import com.final_project.addonis.models.Addon;
-import com.final_project.addonis.models.BinaryContent;
-import com.final_project.addonis.models.Tag;
-import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.dtos.AddonDto;
-import com.final_project.addonis.models.dtos.CreateAddonDto;
-import com.final_project.addonis.models.dtos.TagDto;
-import com.final_project.addonis.models.dtos.UpdateAddonDto;
+import com.final_project.addonis.models.*;
+import com.final_project.addonis.models.dtos.*;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
@@ -15,6 +9,7 @@ import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import com.final_project.addonis.utils.mappers.AddonMapper;
+import com.final_project.addonis.utils.mappers.CategoryMapper;
 import com.final_project.addonis.utils.mappers.TagMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -26,6 +21,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,24 +30,31 @@ public class AddonRestController {
     private final AddonService addonService;
     private final AddonMapper addonMapper;
     private final TagMapper tagMapper;
+    private final CategoryMapper categoryMapper;
 
     private final UserService userService;
 
-    public AddonRestController(AddonService addonService, AddonMapper addonMapper, TagMapper tagMapper, UserService userService) {
+    public AddonRestController(AddonService addonService, AddonMapper addonMapper, TagMapper tagMapper, CategoryMapper categoryMapper, UserService userService) {
         this.addonService = addonService;
         this.addonMapper = addonMapper;
         this.tagMapper = tagMapper;
+        this.categoryMapper = categoryMapper;
         this.userService = userService;
     }
 
     @GetMapping
-    public List<AddonDto> getAll() {
-        return addonService.getAllApprovedAddons().stream()
+    public List<AddonDto> getAll(@RequestParam(value = "search", required = false) Optional<String> keyword,
+                                            @RequestParam(value = "filter", required = false) Optional<String> filter,
+                                            @RequestParam(value = "sortBy", required = false) Optional<String> sortBy,
+                                            @RequestParam(value = "desc", required = false) Optional<Boolean> desc,
+                                            @RequestParam(value = "page", required = false) Optional<Integer> page,
+                                            @RequestParam(value = "size", required = false) Optional<Integer> size) {
+        return addonService.getAll(keyword, filter, sortBy, desc, page, size).stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @GetMapping("/pending")
     public List<AddonDto> getAllPending() {
         return addonService.getAllPendingAddons().stream()
@@ -73,7 +76,8 @@ public class AddonRestController {
     public AddonDto create(@Valid @RequestPart CreateAddonDto createAddonDto,
                            @RequestParam("file") MultipartFile file) {
         try {
-            User user = userService.getById(14);
+            // TODO Principal
+            User user = userService.getById(52);
             Addon addon = addonMapper.fromDto(createAddonDto, user);
             List<Tag> tags = createAddonDto.getTags().stream()
                     .map(tagMapper::fromTagName).collect(Collectors.toList());
@@ -134,11 +138,14 @@ public class AddonRestController {
         }
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/approve")
-    public AddonDto approveAddon(@PathVariable int id) {
+    public AddonDto approveAddon(@PathVariable int id,
+                                 @Valid @RequestBody CategoryDto categoryDto) {
         try {
-            Addon addonToApprove = addonService.approveAddon(id);
+            List<Category> categories = categoryDto.getCategories().stream()
+                    .map(categoryMapper::fromCategoryName).collect(Collectors.toList());
+            Addon addonToApprove = addonService.approveAddon(id, categories);
             return addonMapper.toDto(addonToApprove);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
@@ -156,7 +163,6 @@ public class AddonRestController {
         }
     }
 
-
     @PutMapping("/{addonId}/rate/{ratingId}")
     public AddonDto rate(@PathVariable int addonId,
                          @PathVariable int ratingId,
@@ -170,7 +176,6 @@ public class AddonRestController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
-
 
     @PutMapping("/{addonId}/removeRate")
     public AddonDto removeRate(@PathVariable int addonId,

@@ -19,12 +19,13 @@ public class AddonMapper {
         addonDto.setTargetIde(addon.getTargetIde());
         addonDto.setCreator(addon.getCreator());
         addonDto.setDescription(addon.getDescription());
-        addonDto.setBinaryContent(addon.getData());
+//        addonDto.setBinaryContent(addon.getData());
         addonDto.setOriginUrl(addon.getOriginUrl());
         addonDto.setUploadedDate(addon.getUploadedDate());
         addonDto.setDownloads(addon.getDownloads());
         addonDto.setState(addon.getState());
         addonDto.setTags(addon.getTags());
+        addonDto.setCategories(addon.getCategories());
         addonDto.setRating(addon.getRating());
 
         return addonDto;

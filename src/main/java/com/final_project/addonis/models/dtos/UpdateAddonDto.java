@@ -17,6 +17,7 @@ public class UpdateAddonDto {
     private State state;
 
     private List<String> tags;
+    private List<String> categories;
 
     public UpdateAddonDto() {
     }
