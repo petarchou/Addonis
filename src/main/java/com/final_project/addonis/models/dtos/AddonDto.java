@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +24,7 @@ public class AddonDto {
 
     private String description;
 
-    private BinaryContent binaryContent;
+//    private BinaryContent binaryContent;
 
     private String originUrl;
 
@@ -34,6 +35,8 @@ public class AddonDto {
     private State state;
 
     private Set<Tag> tags;
+
+    private Set<Category> categories;
 
     private Map<User,Rating> rating;
 

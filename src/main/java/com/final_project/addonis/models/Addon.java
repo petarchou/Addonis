@@ -6,10 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "addons")
@@ -67,11 +64,21 @@ public class Addon {
     @MapKeyJoinColumn(name = "user_id")
     private Map<User, Rating> rating;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "addons_categories",
+            joinColumns = @JoinColumn(name = "addon_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> categories;
+
     public Addon() {
     }
 
     public void addTags(Tag... tagsToAdd) {
         tags.addAll(Arrays.asList(tagsToAdd));
+    }
+
+    public void addCategories(Category... categoriesToAdd) {
+        categories.addAll(Arrays.asList(categoriesToAdd));
     }
 
     @Override
@@ -86,4 +93,5 @@ public class Addon {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

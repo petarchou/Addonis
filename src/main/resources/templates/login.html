@@ -1,67 +1,69 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:insert="partials/resources :: resources">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
-    <meta name="author" content="NobleUI">
-    <meta name="keywords"
-          content="nobleui, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
+    <title>Login</title>
+    <!--    <meta charset="UTF-8">-->
+    <!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <!--    <meta http-equiv="X-UA-Compatible" content="ie=edge">-->
+    <!--    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">-->
+    <!--    <meta name="author" content="NobleUI">-->
+    <!--    <meta name="keywords"-->
+    <!--          content="nobleui, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">-->
 
-    <title>NobleUI - HTML Bootstrap 5 Admin Dashboard Template</title>
+    <!--    <title>NobleUI - HTML Bootstrap 5 Admin Dashboard Template</title>-->
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <!-- End fonts -->
+    <!--    &lt;!&ndash; Fonts &ndash;&gt;-->
+    <!--    <link rel="preconnect" href="https://fonts.googleapis.com">-->
+    <!--    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>-->
+    <!--    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">-->
+    <!--    &lt;!&ndash; End fonts &ndash;&gt;-->
 
-    <!-- core:css -->
-    <link rel="stylesheet" href="/vendors/core/core.css">
-    <!-- endinject -->
+    <!--    &lt;!&ndash; core:css &ndash;&gt;-->
+    <!--    <link rel="stylesheet" href="/vendors/core/core.css">-->
+    <!--    &lt;!&ndash; endinject &ndash;&gt;-->
 
-    <!-- Plugin css for this page -->
-    <!-- End plugin css for this page -->
+    <!--    &lt;!&ndash; Plugin css for this page &ndash;&gt;-->
+    <!--    &lt;!&ndash; End plugin css for this page &ndash;&gt;-->
 
-    <!-- inject:css -->
-    <link rel="stylesheet" href="/fonts/feather-font/css/iconfont.css">
-    <link rel="stylesheet" href="/vendors/flag-icon-css/css/flag-icon.min.css">
-    <!-- endinject -->
+    <!--    &lt;!&ndash; inject:css &ndash;&gt;-->
+    <!--    <link rel="stylesheet" href="/fonts/feather-font/css/iconfont.css">-->
+    <!--    <link rel="stylesheet" href="/vendors/flag-icon-css/css/flag-icon.min.css">-->
+    <!--    &lt;!&ndash; endinject &ndash;&gt;-->
 
-    <!-- Layout styles -->
-    <link rel="stylesheet" href="/css/demo1/style.css">
-    <!-- End layout styles -->
+    <!--    &lt;!&ndash; Layout styles &ndash;&gt;-->
+    <!--    <link rel="stylesheet" href="/css/demo1/style.css">-->
+    <!--    &lt;!&ndash; End layout styles &ndash;&gt;-->
 
-    <link rel="shortcut icon" href="/images/favicon.png"/>
+    <!--    <link rel="shortcut icon" href="/images/favicon.png"/>-->
 </head>
 <body>
 <div class="main-wrapper">
     <div class="page-wrapper full-page">
         <div class="page-content d-flex align-items-center justify-content-center">
-
             <div class="row w-100 mx-0 auth-page">
                 <div class="col-md-8 col-xl-6 mx-auto">
                     <div class="card">
                         <div class="row">
                             <div class="col-md-4 pe-md-0">
                                 <div class="auth-side-wrapper">
-
                                 </div>
                             </div>
                             <div class="col-md-8 ps-md-0">
                                 <div class="auth-form-wrapper px-4 py-5">
-                                    <a href="#" class="noble-ui-logo d-block mb-2">Noble<span>UI</span></a>
+                                    <a href="#" class="noble-ui-logo d-block mb-2">Addon<span>IN</span></a>
                                     <h5 class="text-muted fw-normal mb-4">Welcome back! Log in to your account.</h5>
-                                    <form class="forms-sample">
+<!--                                    TODO LoginDto -->
+                                    <form class="forms-sample" action="#" th:action="@{/login}" th:object="${login}" method="post">
                                         <div class="mb-3">
-                                            <label for="userEmail" class="form-label">Email address</label>
-                                            <input type="email" class="form-control" id="userEmail" placeholder="Email">
+<!--                                            TODO User label in properties -->
+                                            <label for="userEmail" class="form-label" th:text="#{user.label.email}">Email address</label>
+                                            <label><input type="email" class="form-control" id="userEmail" placeholder="Email" th:field="*{email}"/></label>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="userPassword" class="form-label">Password</label>
-                                            <input type="password" class="form-control" id="userPassword"
-                                                   autocomplete="current-password" placeholder="Password">
+                                            <label for="userPassword" class="form-label" th:text="user.label.password">Password</label>
+                                            <label><input type="password" class="form-control" id="userPassword"
+                                                   autocomplete="current-password" placeholder="Password" th:field="*{password}"/></label>
                                         </div>
                                         <div class="form-check mb-3">
                                             <input type="checkbox" class="form-check-input" id="authCheck">
@@ -70,7 +72,7 @@
                                             </label>
                                         </div>
                                         <div>
-                                            <a href="../../dashboard.html"
+                                            <a href="/dashboard"
                                                class="btn btn-primary me-2 mb-2 mb-md-0 text-white">Login</a>
                                             <button type="button"
                                                     class="btn btn-outline-primary btn-icon-text mb-2 mb-md-0">
@@ -78,7 +80,7 @@
                                                 Login with twitter
                                             </button>
                                         </div>
-                                        <a href="register.html" class="d-block mt-3 text-muted">Not a user? Sign up</a>
+                                        <a href="/register" class="d-block mt-3 text-muted">Not a user? Sign up</a>
                                     </form>
                                 </div>
                             </div>

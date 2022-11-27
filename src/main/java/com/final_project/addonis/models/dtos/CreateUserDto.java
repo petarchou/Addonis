@@ -20,6 +20,7 @@ public class CreateUserDto {
     private String confirmPassword;
 
     @Email
+    // TODO email pattern
     private String email;
 
     @Size(min = 10, max = 10)

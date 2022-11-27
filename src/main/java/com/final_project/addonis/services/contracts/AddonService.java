@@ -1,16 +1,20 @@
 package com.final_project.addonis.services.contracts;
 
-import com.final_project.addonis.models.Addon;
-import com.final_project.addonis.models.BinaryContent;
-import com.final_project.addonis.models.Tag;
-import com.final_project.addonis.models.User;
+import com.final_project.addonis.models.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public interface AddonService {
-    List<Addon> getAllApprovedAddons();
+
+    List<Addon> getAll(Optional<String> keyword,
+                       Optional<String> filter,
+                       Optional<String> sortBy,
+                       Optional<Boolean> orderBy,
+                       Optional<Integer> page,
+                       Optional<Integer> size);
 
     List<Addon> getAllPendingAddons();
 
@@ -27,7 +31,7 @@ public interface AddonService {
 
     void addTagsToAddon(Addon addon, List<Tag> tags);
 
-    Addon approveAddon(int id);
+    Addon approveAddon(int id, List<Category> categories);
 
     BinaryContent downloadContent(int addonId);
 
