@@ -37,7 +37,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getCategoryByName(String name) {
         Optional<Category> category = categoryRepository.findByName(name);
-        
         if (category.isPresent()) {
             return category.get();
         }
@@ -46,13 +45,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category create(Category category) {
-        checkName(category.getName());
+        verifyIsUniqueName(category);
         return categoryRepository.saveAndFlush(category);
     }
 
     @Override
     public Category update(Category category) {
-        checkName(category.getName());
+        verifyIsUniqueName(category);
         return categoryRepository.saveAndFlush(category);
     }
 
@@ -62,9 +61,18 @@ public class CategoryServiceImpl implements CategoryService {
         return getCategoryById(id);
     }
 
-    private void checkName(String name) {
-        if (categoryRepository.existsByName(name)) {
-            throw new DuplicateEntityException("Category", "name", name);
+    private void verifyIsUniqueName(Category category) {
+        boolean exist = true;
+        Category existingCategory = new Category();
+
+        try {
+            existingCategory = getCategoryByName(category.getName());
+        } catch (EntityNotFoundException e) {
+            exist = false;
+        }
+
+        if (exist && !category.equals(existingCategory)) {
+            throw new DuplicateEntityException("Category", "name", category.getName());
         }
     }
 }
