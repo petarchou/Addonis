@@ -1,6 +1,7 @@
 package com.final_project.addonis.services;
 
 import com.final_project.addonis.models.InvitedUser;
+import com.final_project.addonis.models.PasswordResetToken;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.VerificationToken;
 import com.final_project.addonis.repositories.contracts.InvitedUserRepository;
@@ -77,6 +78,40 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
+    public void sendPasswordResetEmail(User user, String siteUrl, PasswordResetToken token) {
+        try {
+            String toEmail = user.getEmail();
+            String subject = "Addonis Password Reset Requested";
+            String content = "Hello [[name]], <br>" +
+                    "Please click the link below and choose a new password for your account:<br>" +
+                    "<h3><a href=\"[[URL]]\" target=\"_blank\">Reset Password</a></h3>" +
+                    "If this wasn't you, be careful as somebody might be trying to steal your credential details.<br>"+
+                    "Best regards,<br>" +
+                    "The Addonis Team";
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(SENDER_EMAIL, SENDER_NAME);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+
+            content = content.replace("[[name]]", user.getUsername());
+            String verifyUrl = siteUrl + "/users/reset-password?code=" + token.getToken();
+
+            content = content.replace("[[URL]]", verifyUrl);
+
+            helper.setText(content, true);
+            mailSender.send(message);
+        }
+        catch(MessagingException e) {
+            throw new IllegalStateException(EMAIL_SEND_FAIL);
+        }
+        catch(UnsupportedEncodingException e) {
+            logger.error("Invalid encoding for email sender name");
+        }
+    }
+
 
     @Override
     public void sendInvitationEmail(User referrer, String siteUrl, InvitedUser invitedUser) {
@@ -84,7 +119,10 @@ public class EmailServiceImpl implements EmailService {
         if (isAUser(invitedUser) || !wasInvitedMinFiveDaysAgo(existingOptional)) {
             throw new IllegalArgumentException("Invite was sent less than 5 days ago or user is already registered.");
         }
-        invitedUser = updateDateIfExists(invitedUser, existingOptional);
+        if (existingOptional.isPresent()) {
+            invitedUser = existingOptional.get();
+        }
+        invitedUser.setLastInviteDate(LocalDateTime.now());
 
 
         composeAndSendInvite(referrer, siteUrl, invitedUser);
@@ -120,15 +158,6 @@ public class EmailServiceImpl implements EmailService {
         catch(UnsupportedEncodingException e) {
             logger.error("Invalid encoding for email sender name");
         }
-    }
-
-    private InvitedUser updateDateIfExists(InvitedUser invitedUser, Optional<InvitedUser> optionalUser) {
-        if (optionalUser.isPresent()) {
-            invitedUser = optionalUser.get();
-            invitedUser.setLastInviteDate(LocalDateTime.now());
-        }
-
-        return invitedUser;
     }
 
 

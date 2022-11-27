@@ -40,6 +40,14 @@ public class AddonDto {
 
     private Map<User,Rating> rating;
 
+    private int pullRequests;
+
+    private int issuesCount;
+
+    private String lastCommitMessage;
+
+    private LocalDateTime lastCommitDate;
+
     public AddonDto() {
     }
 }

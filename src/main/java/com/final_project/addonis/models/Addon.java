@@ -51,6 +51,19 @@ public class Addon {
     @JoinColumn(name = "state_id")
     private State state;
 
+    @Column(name="open_issues_count")
+    private int issuesCount;
+
+    @Column(name="pull_requests_count")
+    private int pullRequests;
+
+    @Column(name="last_commit_date")
+    private LocalDateTime lastCommitDate;
+
+    @Column(name="last_commit_message")
+    private String lastCommitMessage;
+
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "addons_tags",
             joinColumns = @JoinColumn(name = "addon_id"),

@@ -1,6 +1,7 @@
 package com.final_project.addonis.repositories.contracts;
 
 import com.final_project.addonis.models.Addon;
+import com.final_project.addonis.models.State;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +26,6 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
 
     @Query("select a from Addon a where a.state.name like 'pending'")
     List<Addon> getAllByStateNamePending();
+
+    List<Addon> getAllByStateNameEqualsIgnoreCase(String name);
 }

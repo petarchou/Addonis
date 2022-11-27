@@ -4,21 +4,21 @@ import com.final_project.addonis.models.*;
 import com.final_project.addonis.repositories.contracts.AddonRepository;
 import com.final_project.addonis.repositories.contracts.RatingRepository;
 import com.final_project.addonis.repositories.contracts.StateRepository;
-import com.final_project.addonis.services.contracts.AddonService;
-import com.final_project.addonis.services.contracts.BinaryContentService;
-import com.final_project.addonis.services.contracts.CategoryService;
-import com.final_project.addonis.services.contracts.TagService;
+import com.final_project.addonis.services.contracts.*;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AddonServiceImpl implements AddonService {
@@ -29,27 +29,27 @@ public class AddonServiceImpl implements AddonService {
     private final RatingRepository ratingRepository;
     private final StateRepository stateRepository;
     private final CategoryService categoryService;
+    private final GitHubService gitHubService;
 
     public AddonServiceImpl(AddonRepository addonRepository,
                             TagService tagService,
-                            BinaryContentService binaryContentService,
-                            RatingRepository ratingRepository,
-                            StateRepository stateRepository, CategoryService categoryService) {
+                            BinaryContentService binaryContentService, RatingRepository ratingRepository, StateRepository stateRepository, CategoryService categoryService, GitHubService gitHubService) {
         this.addonRepository = addonRepository;
         this.tagService = tagService;
         this.binaryContentService = binaryContentService;
         this.ratingRepository = ratingRepository;
         this.stateRepository = stateRepository;
         this.categoryService = categoryService;
+        this.gitHubService = gitHubService;
     }
 
     @Override
-    public List<Addon> getAll(Optional<String> keyword,
-                              Optional<String> filter,
-                              Optional<String> sortBy,
-                              Optional<Boolean> orderBy,
-                              Optional<Integer> page,
-                              Optional<Integer> size) {
+    public List<Addon> getAllApproved(Optional<String> keyword,
+                                      Optional<String> filter,
+                                      Optional<String> sortBy,
+                                      Optional<Boolean> orderBy,
+                                      Optional<Integer> page,
+                                      Optional<Integer> size) {
         int pageOrDefault = page.orElse(0);
         int sizeOrDefault = size.orElse(10);
         String sortOrDefault = sortBy.orElse("id");
@@ -89,11 +89,28 @@ public class AddonServiceImpl implements AddonService {
     public Addon create(Addon addon, List<Tag> tags, MultipartFile file) throws IOException {
         verifyIsUniqueName(addon);
         BinaryContent binaryContent = binaryContentService.store(file);
+        updateGithubDetails(addon);
+
         addon.setData(binaryContent);
         addon.setState(stateRepository.findByName("pending"));
         addTags(addon, tags);
         addon = addonRepository.saveAndFlush(addon);
         return addon;
+    }
+
+    private void updateGithubDetails(Addon addon) {
+        List<String> repoDetails = gitHubService.getRepoDetailsIfValid(addon.getOriginUrl());
+        String owner = repoDetails.get(0);
+        String repo = repoDetails.get(1);
+        GithubCommit lastCommit = gitHubService.getLastCommit(owner, repo);
+        int issuesCount = gitHubService.getIssuesCount(owner, repo);
+        int pullsCount = gitHubService.getPullRequests(owner, repo);
+
+
+        addon.setLastCommitDate(lastCommit.getDate());
+        addon.setLastCommitMessage(lastCommit.getMessage());
+        addon.setIssuesCount(issuesCount);
+        addon.setPullRequests(pullsCount);
     }
 
     @Override
@@ -170,6 +187,18 @@ public class AddonServiceImpl implements AddonService {
             }
         }
     }
+
+    @Async
+    @Scheduled(fixedRate = 30,timeUnit = TimeUnit.MINUTES)
+    @Override
+    public void updateAllAddons() {
+        List<Addon> approvedAddons = addonRepository.getAllByStateNameEqualsIgnoreCase("approved");
+        approvedAddons.forEach(addon -> {
+            updateGithubDetails(addon);
+            addonRepository.saveAndFlush(addon);
+        });
+    }
+
 
     private void verifyIsUniqueName(Addon addon) {
         boolean exist = true;

@@ -19,7 +19,7 @@ public class UserMvcController {
     }
 
     @GetMapping("/verify")
-    public String verifyUser(@RequestParam("code") String tokenStr) {
+    public String verifyUser(@RequestParam("token") String tokenStr) {
         try {
             service.verifyUser(tokenStr);
             return "verify_success";
@@ -28,5 +28,4 @@ public class UserMvcController {
             return "verify_fail";
         }
     }
-
 }
