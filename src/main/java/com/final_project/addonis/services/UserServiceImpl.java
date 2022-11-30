@@ -12,7 +12,6 @@ import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,30 +19,29 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private static final String NOT_AUTHORIZED_ERROR = "You're not authorized to modify this user.";
     public static final String INVALID_ARGUMENT_ERR = "Invalid method argument : %s";
     private final UserRepository repository;
     private final EmailService emailService;
 
     private final RoleRepository roleRepository;
 
-    private final VerificationTokenRepository tokenRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
 
     private final InvitedUserRepository invitedUserRepository;
 
 
     public UserServiceImpl(UserRepository repository,
                            EmailService emailService,
-                           RoleRepository roleRepository, VerificationTokenRepository tokenRepository,
+                           RoleRepository roleRepository, VerificationTokenRepository verificationTokenRepository,
                            InvitedUserRepository invitedUserRepository) {
-
         this.repository = repository;
         this.emailService = emailService;
         this.roleRepository = roleRepository;
-        this.tokenRepository = tokenRepository;
+        this.verificationTokenRepository = verificationTokenRepository;
         this.invitedUserRepository = invitedUserRepository;
     }
 
@@ -116,14 +114,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void verifyUser(String tokenStr) {
-        VerificationToken token = tokenRepository.getByToken(tokenStr);
+        VerificationToken token = verificationTokenRepository.getByToken(tokenStr);
 
         if (token == null || token.getUser().isEnabled()) {
-            throw new IllegalArgumentException("Verification failed - wrong token or user is verified");
+            throw new IllegalArgumentException("Verification failed - wrong token, expired token or user is verified");
         } else {
             User user = token.getUser();
             user.setVerified(true);
-            tokenRepository.delete(token);
+            verificationTokenRepository.delete(token);
             repository.saveAndFlush(user);
         }
     }
@@ -165,6 +163,7 @@ public class UserServiceImpl implements UserService {
                 throw new UnsupportedOperationException("Invalid method argument: action");
 
         }
+
         return repository.saveAndFlush(user);
     }
 
@@ -267,8 +266,8 @@ public class UserServiceImpl implements UserService {
 
     private VerificationToken createVerificationToken(User user) {
         VerificationToken token = new VerificationToken();
-        token.setToken(RandomString.make(64));
+        token.setToken(UUID.randomUUID().toString());
         token.setUser(user);
-        return tokenRepository.saveAndFlush(token);
+        return verificationTokenRepository.saveAndFlush(token);
     }
 }

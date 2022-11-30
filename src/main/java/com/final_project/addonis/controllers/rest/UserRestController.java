@@ -2,26 +2,28 @@ package com.final_project.addonis.controllers.rest;
 
 import com.final_project.addonis.models.InvitedUser;
 import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.dtos.CreateUserDto;
-import com.final_project.addonis.models.dtos.PasswordDto;
-import com.final_project.addonis.models.dtos.UpdateUserDto;
-import com.final_project.addonis.models.dtos.UserDto;
+import com.final_project.addonis.models.dtos.*;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
+import com.final_project.addonis.utils.exceptions.GithubApiException;
 import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
 import com.final_project.addonis.utils.mappers.UserMapper;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -76,6 +78,9 @@ public class UserRestController {
             return mapper.toDto(user);
         } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        } catch(GithubApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage() +
+                    "Please check your repository url for typos. If the issue persists, contact Addonis support.");
         }
     }
 

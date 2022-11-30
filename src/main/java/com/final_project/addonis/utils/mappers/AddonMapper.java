@@ -27,6 +27,10 @@ public class AddonMapper {
         addonDto.setTags(addon.getTags());
         addonDto.setCategories(addon.getCategories());
         addonDto.setRating(addon.getRating());
+        addonDto.setPullRequests(addon.getPullRequests());
+        addonDto.setLastCommitDate(addon.getLastCommitDate());
+        addonDto.setLastCommitMessage(addon.getLastCommitMessage());
+        addonDto.setIssuesCount(addon.getIssuesCount());
 
         return addonDto;
     }

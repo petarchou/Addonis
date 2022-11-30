@@ -6,11 +6,11 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "verify_account_tokens")
+
+@Table(name="password_reset_tokens")
 @Getter
 @Setter
-public class VerificationToken {
+public class PasswordResetToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +24,11 @@ public class VerificationToken {
     @JoinColumn(name="user_id")
     private User user;
 
+
+    @Column(name="expiration_date")
+    private LocalDateTime expirationDate;
+
+    public boolean isExpired() {
+        return expirationDate.isBefore(LocalDateTime.now());
+    }
 }

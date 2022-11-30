@@ -49,7 +49,7 @@ public class AddonRestController {
                                             @RequestParam(value = "desc", required = false) Optional<Boolean> desc,
                                             @RequestParam(value = "page", required = false) Optional<Integer> page,
                                             @RequestParam(value = "size", required = false) Optional<Integer> size) {
-        return addonService.getAll(keyword, filter, sortBy, desc, page, size).stream()
+        return addonService.getAllApproved(keyword, filter, sortBy, desc, page, size).stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
     }
