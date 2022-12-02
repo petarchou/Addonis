@@ -12,9 +12,6 @@ import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +21,7 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
     public static final String INVALID_ARGUMENT_ERR = "Invalid method argument : %s";
+    private static final String INVALID_FIELDS = "You can search by filter,username or phoneNumber";
     private final UserRepository repository;
     private final EmailService emailService;
 
@@ -47,32 +45,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAll(Optional<String> keyword,
-                             Optional<String> filter,
-                             Optional<String> sortBy,
-                             Optional<Boolean> orderBy,
+                             Optional<String> filterByField,
+                             Optional<String> sortByField,
+                             Optional<Boolean> order,
                              Optional<Integer> page,
                              Optional<Integer> size) {
 
+        validateFields(filterByField);
+        validateFields(sortByField);
         int pageOrDefault = page.orElse(0);
         int sizeOrDefault = size.orElse(10);
-        String sortOrDefault = sortBy.orElse("id");
-        boolean descOrder = orderBy.orElse(false);
+        String sortOrDefault = sortByField.orElse("id");
+        boolean descOrder = order.orElse(true);
 
-        if (keyword.isEmpty()) {
-            Pageable pageable = PageRequest.of(pageOrDefault, sizeOrDefault,
-                    descOrder ? Sort.by(sortOrDefault).descending() : Sort.by(sortOrDefault));
-            return repository.findAllByIsDeletedFalseAndIsVerifiedTrue(pageable);
-        }
-        return repository.findAllUsersByFilteringAndSorting(keyword.get(),
-                filter,
+        return repository.findAllUsersByFilteringAndSorting(keyword,
+                filterByField,
                 sortOrDefault,
                 descOrder,
-                pageOrDefault, sizeOrDefault);
+                pageOrDefault,
+                sizeOrDefault);
     }
 
     @Override
     public User getById(int id) {
-
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User", id));
     }
@@ -96,7 +91,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
 
-        verifyIsUniqueUsername(user);
         verifyIsUniqueEmail(user);
         verifyIsUniquePhone(user);
 
@@ -219,48 +213,30 @@ public class UserServiceImpl implements UserService {
         user.setBlocked(false);
     }
 
-    private void verifyIsUniqueEmail(User user) {
-        boolean exist = true;
-        User existingUser = new User();
-
-        try {
-            existingUser = getByEmail(user.getEmail());
-        } catch (EntityNotFoundException e) {
-            exist = false;
+    private void verifyIsUniqueUsername(User user) {
+        if (repository.existsUserByUsername(user.getUsername())) {
+            User existingUser = getByUsername(user.getUsername());
+            if (!user.equals(existingUser)) {
+                throw new DuplicateEntityException("User", "username", user.getUsername());
+            }
         }
+    }
 
-        if (exist && !user.equals(existingUser)) {
-            throw new DuplicateEntityException("User", "email", user.getEmail());
+    private void verifyIsUniqueEmail(User user) {
+        if (repository.existsUserByEmail(user.getEmail())) {
+            User existingUser = getByEmail(user.getEmail());
+            if (!user.equals(existingUser)) {
+                throw new DuplicateEntityException("User", "username", user.getUsername());
+            }
         }
     }
 
     private void verifyIsUniquePhone(User user) {
-        boolean exist = true;
-        User existingUser = new User();
-
-        try {
-            existingUser = getByPhone(user.getPhoneNumber());
-        } catch (EntityNotFoundException e) {
-            exist = false;
-        }
-
-        if (exist && !user.equals(existingUser)) {
-            throw new DuplicateEntityException("User", "phone", user.getPhoneNumber());
-        }
-    }
-
-    private void verifyIsUniqueUsername(User user) {
-        boolean exist = true;
-        User existingUser = new User();
-
-        try {
-            existingUser = getByUsername(user.getUsername());
-        } catch (EntityNotFoundException e) {
-            exist = false;
-        }
-
-        if (exist && !user.equals(existingUser)) {
-            throw new DuplicateEntityException("User", "username", user.getUsername());
+        if (repository.existsUserByPhoneNumber(user.getPhoneNumber())) {
+            User existingUser = getByPhone(user.getPhoneNumber());
+            if (!user.equals(existingUser)) {
+                throw new DuplicateEntityException("User", "username", user.getUsername());
+            }
         }
     }
 
@@ -269,5 +245,18 @@ public class UserServiceImpl implements UserService {
         token.setToken(UUID.randomUUID().toString());
         token.setUser(user);
         return verificationTokenRepository.saveAndFlush(token);
+    }
+
+    private void validateFields(Optional<String> fields) {
+        if (fields.isPresent()) {
+            switch (fields.get()) {
+                case "username":
+                case "email":
+                case "phoneNumber":
+                    break;
+                default:
+                    throw new IllegalArgumentException(INVALID_FIELDS);
+            }
+        }
     }
 }
