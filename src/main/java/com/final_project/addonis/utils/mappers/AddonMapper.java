@@ -1,34 +1,56 @@
 package com.final_project.addonis.utils.mappers;
 
 import com.final_project.addonis.models.Addon;
+import com.final_project.addonis.models.Category;
+import com.final_project.addonis.models.Tag;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.dtos.AddonDto;
 import com.final_project.addonis.models.dtos.CreateAddonDto;
 import com.final_project.addonis.models.dtos.UpdateAddonDto;
+import com.final_project.addonis.utils.helpers.TagHelper;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Component
 public class AddonMapper {
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
+    private final TagHelper tagHelper;
+    private final UserMapper userMapper;
+
+    public AddonMapper(TagHelper tagHelper, UserMapper userMapper) {
+        this.tagHelper = tagHelper;
+        this.userMapper = userMapper;
+    }
 
     public AddonDto toDto(Addon addon) {
         AddonDto addonDto = new AddonDto();
         addonDto.setId(addon.getId());
         addonDto.setName(addon.getName());
-        addonDto.setTargetIde(addon.getTargetIde());
-        addonDto.setCreator(addon.getCreator());
+        addonDto.setTargetIde(addon.getTargetIde().getTargetIdeName());
+        addonDto.setCreator(userMapper.toDto(addon.getCreator()));
         addonDto.setDescription(addon.getDescription());
-//        addonDto.setBinaryContent(addon.getData());
         addonDto.setOriginUrl(addon.getOriginUrl());
-        addonDto.setUploadedDate(addon.getUploadedDate());
+        addonDto.setUploadedDate(FORMATTER.format(addon.getUploadedDate()));
         addonDto.setDownloads(addon.getDownloads());
-        addonDto.setState(addon.getState());
-        addonDto.setTags(addon.getTags());
-        addonDto.setCategories(addon.getCategories());
-        addonDto.setRating(addon.getRating());
+        addonDto.setState(addon.getState().getName());
+        addonDto.setTags(addon.getTags().stream()
+                .map(Tag::getName)
+                .collect(Collectors.toSet()));
+        addonDto.setCategories(addon.getCategories()
+                .stream().
+                map(Category::getName)
+                .collect(Collectors.toSet()));
+        addonDto.setRating(addon.getRating()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().getUsername(),
+                        entry -> entry.getValue().getId())));
         addonDto.setPullRequests(addon.getPullRequests());
-        addonDto.setLastCommitDate(addon.getLastCommitDate());
+        addonDto.setLastCommitDate(FORMATTER.format(addon.getLastCommitDate()));
         addonDto.setLastCommitMessage(addon.getLastCommitMessage());
         addonDto.setIssuesCount(addon.getIssuesCount());
 
@@ -43,7 +65,10 @@ public class AddonMapper {
         addon.setCreator(loggedUser);
         addon.setDescription(createAddonDto.getDescription());
         addon.setOriginUrl(createAddonDto.getOriginUrl());
-        addon.setTags(new HashSet<>());
+        addon.setTags(createAddonDto.getTags().stream()
+                .map(tagHelper::fromTagName)
+                .collect(Collectors.toSet()));
+        addon.setRating(new HashMap<>());
 
         return addon;
     }

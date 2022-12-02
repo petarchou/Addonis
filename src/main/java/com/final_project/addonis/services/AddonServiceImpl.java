@@ -7,9 +7,6 @@ import com.final_project.addonis.repositories.contracts.StateRepository;
 import com.final_project.addonis.services.contracts.*;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,46 +21,50 @@ import java.util.concurrent.TimeUnit;
 public class AddonServiceImpl implements AddonService {
 
     private final AddonRepository addonRepository;
-    private final TagService tagService;
     private final BinaryContentService binaryContentService;
     private final RatingRepository ratingRepository;
     private final StateRepository stateRepository;
     private final CategoryService categoryService;
     private final GitHubService gitHubService;
+    private final TargetIdeService targetIdeService;
 
     public AddonServiceImpl(AddonRepository addonRepository,
-                            TagService tagService,
-                            BinaryContentService binaryContentService, RatingRepository ratingRepository, StateRepository stateRepository, CategoryService categoryService, GitHubService gitHubService) {
+                            BinaryContentService binaryContentService,
+                            RatingRepository ratingRepository,
+                            StateRepository stateRepository,
+                            CategoryService categoryService,
+                            GitHubService gitHubService,
+                            TargetIdeService targetIdeService1) {
+
+
         this.addonRepository = addonRepository;
-        this.tagService = tagService;
         this.binaryContentService = binaryContentService;
         this.ratingRepository = ratingRepository;
         this.stateRepository = stateRepository;
         this.categoryService = categoryService;
         this.gitHubService = gitHubService;
+        this.targetIdeService = targetIdeService1;
     }
 
     @Override
     public List<Addon> getAllApproved(Optional<String> keyword,
-                                      Optional<String> filter,
-                                      Optional<String> sortBy,
-                                      Optional<Boolean> orderBy,
+                                      Optional<String> targetIde,
+                                      Optional<String> category,
+                                      Optional<Boolean> ascending,
                                       Optional<Integer> page,
                                       Optional<Integer> size) {
+
+        validateIde(targetIde);
+        validateCategory(category);
+
         int pageOrDefault = page.orElse(0);
         int sizeOrDefault = size.orElse(10);
-        String sortOrDefault = sortBy.orElse("id");
-        boolean descOrder = orderBy.orElse(false);
+        boolean orderOrDefault = ascending.orElse(true);
 
-        if (keyword.isEmpty()) {
-            Pageable pageable = PageRequest.of(pageOrDefault, sizeOrDefault,
-                    descOrder ? Sort.by(sortOrDefault).descending() : Sort.by(sortOrDefault));
-            return addonRepository.getAllByStateNameApproved(pageable);
-        }
-        return addonRepository.findAllAddonsByFilteringAndSorting(keyword.get(),
-                filter,
-                sortOrDefault,
-                descOrder,
+        return addonRepository.findAllAddonsByFilteringAndSorting(keyword,
+                targetIde,
+                category,
+                orderOrDefault,
                 pageOrDefault,
                 sizeOrDefault);
     }
@@ -86,14 +87,13 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public Addon create(Addon addon, List<Tag> tags, MultipartFile file) throws IOException {
+    public Addon create(Addon addon, MultipartFile file) throws IOException {
         verifyIsUniqueName(addon);
         BinaryContent binaryContent = binaryContentService.store(file);
         updateGithubDetails(addon);
 
         addon.setData(binaryContent);
         addon.setState(stateRepository.findByName("pending"));
-        addTags(addon, tags);
         addon = addonRepository.saveAndFlush(addon);
         return addon;
     }
@@ -114,13 +114,13 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public Addon update(Addon addon, User user) {
+    public Addon update(Addon addon) {
         verifyIsUniqueName(addon);
         return addonRepository.saveAndFlush(addon);
     }
 
     @Override
-    public Addon delete(int id, User user) {
+    public Addon delete(int id) {
         Addon addon = getAddonById(id);
         addonRepository.delete(addon);
         return addon;
@@ -128,7 +128,7 @@ public class AddonServiceImpl implements AddonService {
 
     @Override
     public void addTagsToAddon(Addon addon, List<Tag> tags) {
-        addTags(addon, tags);
+        addon.getTags().addAll(tags);
         addonRepository.saveAndFlush(addon);
     }
 
@@ -136,8 +136,8 @@ public class AddonServiceImpl implements AddonService {
     public Addon approveAddon(int id, List<Category> categories) {
         Addon addon = addonRepository.findAddonByIdAndStateNamePending(id)
                 .orElseThrow(() -> new EntityNotFoundException("Addon", id));
-        addCategories(addon, categories);
         addon.setState(stateRepository.findByName("approved"));
+        addon.getCategories().addAll(categories);
         return addonRepository.saveAndFlush(addon);
     }
 
@@ -153,43 +153,17 @@ public class AddonServiceImpl implements AddonService {
         Rating currentRating = ratingRepository.findById(ratingId)
                 .orElseThrow(() -> new EntityNotFoundException("Rating", "value", String.valueOf(ratingId)));
         addon.getRating().put(user, currentRating);
-        return update(addon, user);
+        return update(addon);
     }
 
     @Override
     public Addon removeRate(Addon addon, User user) {
         addon.getRating().remove(user);
-        return update(addon, user);
-    }
-
-    private void addTags(Addon addon, List<Tag> tags) {
-        for (Tag tag : tags) {
-            try {
-                tag = tagService.getTagByName(tag.getName());
-            } catch (EntityNotFoundException e) {
-                tagService.create(tag);
-            }
-            if (!addon.getTags().contains(tag)) {
-                addon.addTags(tag);
-            }
-        }
-    }
-
-    private void addCategories(Addon addon, List<Category> categories) {
-        for (Category category : categories) {
-            try {
-                category = categoryService.getCategoryByName(category.getName());
-            } catch (EntityNotFoundException e) {
-                categoryService.create(category);
-            }
-            if (!addon.getCategories().contains(category)) {
-                addon.addCategories(category);
-            }
-        }
+        return update(addon);
     }
 
     @Async
-    @Scheduled(fixedRate = 30,timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedRate = 30, timeUnit = TimeUnit.MINUTES)
     @Override
     public void updateAllAddons() {
         List<Addon> approvedAddons = addonRepository.getAllByStateNameEqualsIgnoreCase("approved");
@@ -201,15 +175,29 @@ public class AddonServiceImpl implements AddonService {
 
 
     private void verifyIsUniqueName(Addon addon) {
-        boolean exist = true;
-        Addon existingAddon = new Addon();
-        try {
-            existingAddon = getByName(addon.getName());
-        } catch (EntityNotFoundException e) {
-            exist = false;
+        if (addonRepository.existsByName(addon.getName())) {
+            Addon existingAddon = getByName(addon.getName());
+            if (!addon.equals(existingAddon)) {
+                throw new DuplicateEntityException("Addon", "name", addon.getName());
+            }
         }
-        if (exist && !existingAddon.equals(addon)) {
-            throw new DuplicateEntityException("Addon", "name", addon.getName());
+    }
+
+    private void validateCategory(Optional<String> category) {
+        if (category.isPresent()) {
+            if (!categoryService.existByName(category.get())) {
+                throw new IllegalArgumentException(String.format
+                        ("Category with name %s not exist", category.get()));
+            }
+        }
+    }
+
+    private void validateIde(Optional<String> targetIde) {
+        if (targetIde.isPresent()) {
+            if (!targetIdeService.existByName(targetIde.get())) {
+                throw new IllegalArgumentException(String.format
+                        ("Ide with name %s not exist", targetIde.get()));
+            }
         }
     }
 }

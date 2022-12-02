@@ -10,11 +10,11 @@ public interface CategoryService {
 
     Category getCategoryById(int id);
 
-    Category getCategoryByName(String name);
-
     Category create(Category category);
 
     Category update(Category category);
 
     Category delete(int id);
+
+    boolean existByName(String name);
 }

@@ -10,21 +10,22 @@ import java.util.Optional;
 public interface AddonService {
 
     List<Addon> getAllApproved(Optional<String> keyword,
-                               Optional<String> filter,
-                               Optional<String> sortBy,
-                               Optional<Boolean> orderBy,
+                               Optional<String> targetIde,
+                               Optional<String> category,
+                               Optional<Boolean> ascending,
                                Optional<Integer> page,
                                Optional<Integer> size);
+
 
     List<Addon> getAllPendingAddons();
 
     Addon getAddonById(int addonId);
 
-    Addon create(Addon addon, List<Tag> tags, MultipartFile file) throws IOException;
+    Addon create(Addon addon, MultipartFile file) throws IOException;
 
-    Addon update(Addon addon, User user);
+    Addon update(Addon addon);
 
-    Addon delete(int id, User user);
+    Addon delete(int idr);
 
     Addon getByName(String name);
 
