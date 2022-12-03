@@ -6,7 +6,9 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "addons")
@@ -51,20 +53,20 @@ public class Addon {
     @JoinColumn(name = "state_id")
     private State state;
 
-    @Column(name="open_issues_count")
+    @Column(name = "open_issues_count")
     private int issuesCount;
 
-    @Column(name="pull_requests_count")
+    @Column(name = "pull_requests_count")
     private int pullRequests;
 
-    @Column(name="last_commit_date")
+    @Column(name = "last_commit_date")
     private LocalDateTime lastCommitDate;
 
-    @Column(name="last_commit_message")
+    @Column(name = "last_commit_message")
     private String lastCommitMessage;
 
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "addons_tags",
             joinColumns = @JoinColumn(name = "addon_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
@@ -77,21 +79,13 @@ public class Addon {
     @MapKeyJoinColumn(name = "user_id")
     private Map<User, Rating> rating;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "addons_categories",
             joinColumns = @JoinColumn(name = "addon_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories;
 
     public Addon() {
-    }
-
-    public void addTags(Tag... tagsToAdd) {
-        tags.addAll(Arrays.asList(tagsToAdd));
-    }
-
-    public void addCategories(Category... categoriesToAdd) {
-        categories.addAll(Arrays.asList(categoriesToAdd));
     }
 
     @Override
@@ -106,5 +100,4 @@ public class Addon {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

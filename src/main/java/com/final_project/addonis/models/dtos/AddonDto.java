@@ -1,12 +1,9 @@
 package com.final_project.addonis.models.dtos;
 
 
-import com.final_project.addonis.models.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,27 +15,25 @@ public class AddonDto {
 
     private String name;
 
-    private TargetIde targetIde;
+    private String targetIde;
 
-    private User creator;
+    private UserDto creator;
 
     private String description;
 
-//    private BinaryContent binaryContent;
-
     private String originUrl;
 
-    private LocalDateTime uploadedDate;
+    private String uploadedDate;
 
     private int downloads;
 
-    private State state;
+    private String state;
 
-    private Set<Tag> tags;
+    private Set<String> tags;
 
-    private Set<Category> categories;
+    private Set<String> categories;
 
-    private Map<User,Rating> rating;
+    private Map<String, Integer> rating;
 
     private int pullRequests;
 
@@ -46,7 +41,7 @@ public class AddonDto {
 
     private String lastCommitMessage;
 
-    private LocalDateTime lastCommitDate;
+    private String lastCommitDate;
 
     public AddonDto() {
     }

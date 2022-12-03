@@ -8,9 +8,9 @@ import java.util.Optional;
 public interface UserService {
 
     List<User> getAll(Optional<String> keyword,
-                      Optional<String> filter,
-                      Optional<String> sortBy,
-                      Optional<Boolean> orderBy,
+                      Optional<String> filterByField,
+                      Optional<String> sortByField,
+                      Optional<Boolean> order,
                       Optional<Integer> page,
                       Optional<Integer> size);
 

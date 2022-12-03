@@ -2,28 +2,24 @@ package com.final_project.addonis.controllers.rest;
 
 import com.final_project.addonis.models.InvitedUser;
 import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.dtos.*;
+import com.final_project.addonis.models.dtos.CreateUserDto;
+import com.final_project.addonis.models.dtos.PasswordDto;
+import com.final_project.addonis.models.dtos.UpdateUserDto;
+import com.final_project.addonis.models.dtos.UserDto;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
-import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
-import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
-import com.final_project.addonis.utils.exceptions.GithubApiException;
-import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
+import com.final_project.addonis.utils.exceptions.*;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
 import com.final_project.addonis.utils.mappers.UserMapper;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,15 +45,21 @@ public class UserRestController {
     @Secured("ROLE_ADMIN")
     @GetMapping
     public List<UserDto> getAll(@RequestParam(value = "search", required = false) Optional<String> keyword,
-                                @RequestParam(value = "filter", required = false) Optional<String> filter,
-                                @RequestParam(value = "sortBy", required = false) Optional<String> sortBy,
-                                @RequestParam(value = "desc", required = false) Optional<Boolean> desc,
+                                @RequestParam(value = "filterByField", required = false) Optional<String> filterByField,
+                                @RequestParam(value = "sortByField", required = false) Optional<String> sortByField,
+                                @RequestParam(value = "ascending", required = false) Optional<Boolean> order,
                                 @RequestParam(value = "page", required = false) Optional<Integer> page,
                                 @RequestParam(value = "size", required = false) Optional<Integer> size) {
+        try {
 
-        return service.getAll(keyword, filter, sortBy, desc,page,size).stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+            return service.getAll(keyword, filterByField, sortByField, order, page, size)
+                    .stream()
+                    .map(mapper::toDto)
+                    .collect(Collectors.toList());
+
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
@@ -71,16 +73,14 @@ public class UserRestController {
     }
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody CreateUserDto createUserDto, HttpServletRequest request) {
+    public UserDto create(@Valid @RequestBody CreateUserDto createUserDto,
+                          HttpServletRequest request) {
         try {
             User user = mapper.fromCreateDto(createUserDto);
             user = service.create(user, getSiteUrl(request));
             return mapper.toDto(user);
-        } catch (DuplicateEntityException e) {
+        } catch (DuplicateEntityException | PasswordNotMatchException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch(GithubApiException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage() +
-                    "Please check your repository url for typos. If the issue persists, contact Addonis support.");
         }
     }
 

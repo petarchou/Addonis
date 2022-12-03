@@ -8,7 +8,6 @@ import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -26,22 +25,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category getCategoryById(int id) {
-        Optional<Category> category = categoryRepository.findById(id);
-
-        if (category.isPresent()) {
-            return category.get();
-        }
-        throw new EntityNotFoundException("Category", id);
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category", id));
     }
 
-    @Override
-    public Category getCategoryByName(String name) {
-        Optional<Category> category = categoryRepository.findByName(name);
-        if (category.isPresent()) {
-            return category.get();
-        }
-        throw new EntityNotFoundException("Category", "name", name);
-    }
+
 
     @Override
     public Category create(Category category) {
@@ -61,18 +49,15 @@ public class CategoryServiceImpl implements CategoryService {
         return getCategoryById(id);
     }
 
+    @Override
+    public boolean existByName(String name) {
+        return categoryRepository.existsByName(name);
+    }
+
     private void verifyIsUniqueName(Category category) {
-        boolean exist = true;
-        Category existingCategory = new Category();
-
-        try {
-            existingCategory = getCategoryByName(category.getName());
-        } catch (EntityNotFoundException e) {
-            exist = false;
-        }
-
-        if (exist && !category.equals(existingCategory)) {
+        if (existByName(category.getName())) {
             throw new DuplicateEntityException("Category", "name", category.getName());
+
         }
     }
 }
