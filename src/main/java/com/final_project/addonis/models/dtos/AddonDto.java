@@ -1,6 +1,7 @@
 package com.final_project.addonis.models.dtos;
 
 
+import com.final_project.addonis.models.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,8 @@ public class AddonDto {
 
     private String description;
 
+    private BinaryContent binaryContent;
+
     private String originUrl;
 
     private String uploadedDate;
@@ -35,6 +38,8 @@ public class AddonDto {
 
     private Map<String, Integer> rating;
 
+    private Double averageRating;
+
     private int pullRequests;
 
     private int issuesCount;
@@ -42,6 +47,8 @@ public class AddonDto {
     private String lastCommitMessage;
 
     private String lastCommitDate;
+
+    private boolean isFeatured;
 
     public AddonDto() {
     }

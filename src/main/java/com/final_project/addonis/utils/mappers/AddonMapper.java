@@ -7,6 +7,7 @@ import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.dtos.AddonDto;
 import com.final_project.addonis.models.dtos.CreateAddonDto;
 import com.final_project.addonis.models.dtos.UpdateAddonDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.final_project.addonis.utils.helpers.TagHelper;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,7 @@ public class AddonMapper {
     private final TagHelper tagHelper;
     private final UserMapper userMapper;
 
+    @Autowired
     public AddonMapper(TagHelper tagHelper, UserMapper userMapper) {
         this.tagHelper = tagHelper;
         this.userMapper = userMapper;
@@ -33,6 +35,7 @@ public class AddonMapper {
         addonDto.setTargetIde(addon.getTargetIde().getTargetIdeName());
         addonDto.setCreator(userMapper.toDto(addon.getCreator()));
         addonDto.setDescription(addon.getDescription());
+        addonDto.setBinaryContent(addon.getData());
         addonDto.setOriginUrl(addon.getOriginUrl());
         addonDto.setUploadedDate(FORMATTER.format(addon.getUploadedDate()));
         addonDto.setDownloads(addon.getDownloads());
@@ -40,19 +43,23 @@ public class AddonMapper {
         addonDto.setTags(addon.getTags().stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet()));
-        addonDto.setCategories(addon.getCategories()
-                .stream().
-                map(Category::getName)
-                .collect(Collectors.toSet()));
+        if (addon.getState().getName().equalsIgnoreCase("approved")) {
+            addonDto.setCategories(addon.getCategories()
+                    .stream().
+                    map(Category::getName)
+                    .collect(Collectors.toSet()));
+        }
         addonDto.setRating(addon.getRating()
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(entry -> entry.getKey().getUsername(),
                         entry -> entry.getValue().getId())));
+        addonDto.setAverageRating(addon.getAverageRating());
         addonDto.setPullRequests(addon.getPullRequests());
         addonDto.setLastCommitDate(FORMATTER.format(addon.getLastCommitDate()));
         addonDto.setLastCommitMessage(addon.getLastCommitMessage());
         addonDto.setIssuesCount(addon.getIssuesCount());
+        addonDto.setFeatured(addon.isFeatured());
 
         return addonDto;
     }

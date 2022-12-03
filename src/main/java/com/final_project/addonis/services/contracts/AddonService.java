@@ -23,13 +23,15 @@ public interface AddonService {
 
     Addon create(Addon addon, MultipartFile file) throws IOException;
 
-    Addon update(Addon addon);
+    Addon update(Addon addon, User user);
 
-    Addon delete(int id);
+    Addon delete(int id, User user);
 
     Addon getByName(String name);
 
-    void addTagsToAddon(Addon addon, List<Tag> tags);
+    void addTagsToAddon(Addon addon, List<Tag> tags, User user);
+
+    void removeTag(Addon addon, User user, int tagId);
 
     Addon approveAddon(int id, List<Category> categories);
 
@@ -42,4 +44,13 @@ public interface AddonService {
 
 
     void updateAllAddons();
+
+    List<Addon> getAddonsFeaturedByAdmin();
+
+    Addon addAddonToFeatured(Addon addon);
+    Addon removeAddonFromFeatured(Addon addon);
+    List<Addon> getMostDownloadedAddons();
+
+    List<Addon> getNewestAddons();
+
 }

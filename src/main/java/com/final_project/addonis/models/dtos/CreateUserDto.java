@@ -19,8 +19,8 @@ public class CreateUserDto {
     private String password;
     private String confirmPassword;
 
-    @Email
-    // TODO email pattern
+    @Email(message = "Email is not valid", regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:" +
+            "[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}")
     private String email;
 
     @Size(min = 10, max = 10)

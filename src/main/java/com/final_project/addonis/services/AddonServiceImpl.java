@@ -4,9 +4,12 @@ import com.final_project.addonis.models.*;
 import com.final_project.addonis.repositories.contracts.AddonRepository;
 import com.final_project.addonis.repositories.contracts.RatingRepository;
 import com.final_project.addonis.repositories.contracts.StateRepository;
+import com.final_project.addonis.repositories.contracts.TagRepository;
 import com.final_project.addonis.services.contracts.*;
+import com.final_project.addonis.utils.exceptions.BlockedUserException;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
+import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class AddonServiceImpl implements AddonService {
-
+    private static final String NOT_AUTHORIZED_ERROR = "You are not authorized to modify this post.";
     private final AddonRepository addonRepository;
     private final BinaryContentService binaryContentService;
     private final RatingRepository ratingRepository;
@@ -27,6 +30,7 @@ public class AddonServiceImpl implements AddonService {
     private final CategoryService categoryService;
     private final GitHubService gitHubService;
     private final TargetIdeService targetIdeService;
+    private final TagRepository tagRepository;
 
     public AddonServiceImpl(AddonRepository addonRepository,
                             BinaryContentService binaryContentService,
@@ -34,7 +38,7 @@ public class AddonServiceImpl implements AddonService {
                             StateRepository stateRepository,
                             CategoryService categoryService,
                             GitHubService gitHubService,
-                            TargetIdeService targetIdeService1) {
+                            TargetIdeService targetIdeService1, TagRepository tagRepository) {
 
 
         this.addonRepository = addonRepository;
@@ -44,6 +48,7 @@ public class AddonServiceImpl implements AddonService {
         this.categoryService = categoryService;
         this.gitHubService = gitHubService;
         this.targetIdeService = targetIdeService1;
+        this.tagRepository = tagRepository;
     }
 
     @Override
@@ -75,6 +80,21 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
+    public List<Addon> getAddonsFeaturedByAdmin() {
+        return addonRepository.getAddonsByFeaturedTrue();
+    }
+
+    @Override
+    public List<Addon> getMostDownloadedAddons() {
+        return addonRepository.getAllByStateNameApprovedOrderByDownloads();
+    }
+
+    @Override
+    public List<Addon> getNewestAddons() {
+        return addonRepository.getAllByStateNameApprovedOrderByUploadedDate();
+    }
+
+    @Override
     public Addon getAddonById(int addonId) {
         return addonRepository.findAddonByIdAndStateNameApproved(addonId)
                 .orElseThrow(() -> new EntityNotFoundException("Addon", addonId));
@@ -87,7 +107,26 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
+    public Addon addAddonToFeatured(Addon addon) {
+        if (addon.isFeatured()) {
+            throw new IllegalArgumentException("Addon is already added to featured list");
+        }
+        addon.setFeatured(true);
+        return addonRepository.saveAndFlush(addon);
+    }
+
+    @Override
+    public Addon removeAddonFromFeatured(Addon addon) {
+        if (!addon.isFeatured()) {
+            throw new IllegalArgumentException("Addon is not in featured list");
+        }
+        addon.setFeatured(false);
+        return addonRepository.saveAndFlush(addon);
+    }
+
+    @Override
     public Addon create(Addon addon, MultipartFile file) throws IOException {
+        checkIfUserIsBlocked(addon);
         verifyIsUniqueName(addon);
         BinaryContent binaryContent = binaryContentService.store(file);
         updateGithubDetails(addon);
@@ -106,7 +145,6 @@ public class AddonServiceImpl implements AddonService {
         int issuesCount = gitHubService.getIssuesCount(owner, repo);
         int pullsCount = gitHubService.getPullRequests(owner, repo);
 
-
         addon.setLastCommitDate(lastCommit.getDate());
         addon.setLastCommitMessage(lastCommit.getMessage());
         addon.setIssuesCount(issuesCount);
@@ -114,21 +152,42 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public Addon update(Addon addon) {
+    public Addon update(Addon addon, User user) {
+        checkIfUserIsBlocked(addon);
+        checkModifyPermissions(addon, user);
         verifyIsUniqueName(addon);
         return addonRepository.saveAndFlush(addon);
     }
 
     @Override
-    public Addon delete(int id) {
+    public Addon delete(int id, User user) {
         Addon addon = getAddonById(id);
+        checkIfUserIsBlocked(addon);
+        checkModifyPermissions(addon, user);
+        addon.getRating().clear();
+        addon.getCategories().clear();
+        addon.getTags().clear();
         addonRepository.delete(addon);
         return addon;
     }
 
     @Override
-    public void addTagsToAddon(Addon addon, List<Tag> tags) {
+    public void addTagsToAddon(Addon addon, List<Tag> tags, User user) {
+        checkModifyPermissions(addon, user);
         addon.getTags().addAll(tags);
+        addonRepository.saveAndFlush(addon);
+    }
+
+    @Override
+    public void removeTag(Addon addon, User user, int tagId) {
+        checkModifyPermissions(addon, user);
+        Tag tag = tagRepository.getReferenceById(tagId);
+        if (!addon.getTags().contains(tag)) {
+            throw new EntityNotFoundException(String.format(
+                    "Addon with id %d doesn't have a tag '%s'", addon.getId(), tag.getName()
+            ));
+        }
+        addon.getTags().remove(tag);
         addonRepository.saveAndFlush(addon);
     }
 
@@ -149,17 +208,18 @@ public class AddonServiceImpl implements AddonService {
         return addon.getData();
     }
 
+    @Override
     public Addon rateAddon(Addon addon, User user, int ratingId) {
         Rating currentRating = ratingRepository.findById(ratingId)
                 .orElseThrow(() -> new EntityNotFoundException("Rating", "value", String.valueOf(ratingId)));
         addon.getRating().put(user, currentRating);
-        return update(addon);
+        return addonRepository.saveAndFlush(addon);
     }
 
     @Override
     public Addon removeRate(Addon addon, User user) {
         addon.getRating().remove(user);
-        return update(addon);
+        return addonRepository.saveAndFlush(addon);
     }
 
     @Async
@@ -180,6 +240,18 @@ public class AddonServiceImpl implements AddonService {
             if (!addon.equals(existingAddon)) {
                 throw new DuplicateEntityException("Addon", "name", addon.getName());
             }
+        }
+    }
+
+    private void checkModifyPermissions(Addon addon, User user) {
+        if (!addon.getCreator().equals(user) && !user.isAdmin()) {
+            throw new UnauthorizedOperationException(NOT_AUTHORIZED_ERROR);
+        }
+    }
+
+    private void checkIfUserIsBlocked(Addon addon) {
+        if (addon.getCreator().isBlocked()) {
+            throw new BlockedUserException("Blocked users cannot create posts");
         }
     }
 
