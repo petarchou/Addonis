@@ -19,8 +19,7 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
 
     Optional<Addon> findByStateEqualsAndIdEquals(State state, int id);
 
-    //TODO Make it so that there are no duplicate addons - not only approved
-    // build on stefo's implementation and remove the draft state from the possible "unique" names validation.
+    Optional<Addon> findByNameAndStateNameIgnoreCaseNot(String addonName, String stateName);
 
     @Query("select a from Addon a where a.name = :name and a.state.name like 'approved'")
     Optional<Addon> findByName(String name);
@@ -39,6 +38,4 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
     @Query("select a from Addon a where a.isFeatured = true")
     List<Addon> getAddonsByFeaturedTrue();
 
-
-    boolean existsByName(String name);
 }

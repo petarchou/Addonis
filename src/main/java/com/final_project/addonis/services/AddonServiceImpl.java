@@ -163,24 +163,21 @@ public class AddonServiceImpl implements AddonService {
 
     @Override
     public Addon createDraft(Addon addon,
-                             List<Tag> tags,
-                             MultipartFile file) throws IOException {
+                             MultipartFile file, User user) throws IOException {
 
-        BinaryContent binaryContent;
-        if (file != null && !file.isEmpty()) {
-            binaryContent = binaryContentService.store(file);
-            addon.setData(binaryContent);
-        }
+        checkModifyPermissions(addon, user);
+        updateFileIfExists(addon, file);
+
         addon.setState(stateRepository.findByName("draft"));
-        //TODO update tags here too. or do they need updates?
         return addonRepository.saveAndFlush(addon);
 
     }
 
     @Override
     public Addon createFromDraft(Addon addon, MultipartFile file, User user) {
+        checkModifyPermissions(addon, user);
         addon.setState(stateRepository.findByName("pending"));
-        Addon createdAddon = update(addon,file,user);
+        Addon createdAddon = update(addon, file, user);
         updateGithubDetails(addon);
         return createdAddon;
     }
@@ -191,18 +188,15 @@ public class AddonServiceImpl implements AddonService {
             checkIfUserIsBlocked(addon);
             checkModifyPermissions(addon, user);
             verifyIsUniqueName(addon);
-            if(file != null && !file.isEmpty()) {
-                if (addon.getData() != null) {
-                    binaryContentService.delete(addon.getData());
-                }
-                BinaryContent newFile = binaryContentService.store(file);
-                addon.setData(newFile);
-            }
+            updateFileIfExists(addon, file);
+
             return addonRepository.saveAndFlush(addon);
         } catch (IOException e) {
+            //TODO what do we do with this exception? it's thrown by the file implementation.
             throw new RuntimeException();
         }
     }
+
 
     @Override
     public Addon delete(int id, User user) {
@@ -269,7 +263,6 @@ public class AddonServiceImpl implements AddonService {
 
     @Async
     @Scheduled(fixedRate = 30, timeUnit = TimeUnit.MINUTES)
-    @Override
     public void updateAllAddons() {
         List<Addon> approvedAddons = addonRepository.getAllByStateNameEqualsIgnoreCase("approved");
         approvedAddons.forEach(addon -> {
@@ -279,13 +272,22 @@ public class AddonServiceImpl implements AddonService {
     }
 
 
-    private void verifyIsUniqueName(Addon addon) {
-        if (addonRepository.existsByName(addon.getName())) {
-            Addon existingAddon = getByName(addon.getName());
-            if (!addon.equals(existingAddon)) {
-                throw new DuplicateEntityException("Addon", "name", addon.getName());
+    private void updateFileIfExists(Addon addon, MultipartFile file) throws IOException {
+        if (file != null && !file.isEmpty()) {
+            if (addon.getData() != null) {
+                binaryContentService.delete(addon.getData());
             }
+            BinaryContent newFile = binaryContentService.store(file);
+            addon.setData(newFile);
         }
+    }
+
+    private void verifyIsUniqueName(Addon addon) {
+        Optional<Addon> optional =
+                addonRepository.findByNameAndStateNameIgnoreCaseNot(addon.getName(), "draft");
+        if (optional.isPresent() && !optional.get().equals(addon))
+            throw new DuplicateEntityException("Addon", "name", addon.getName());
+
     }
 
     private void checkModifyPermissions(Addon addon, User user) {

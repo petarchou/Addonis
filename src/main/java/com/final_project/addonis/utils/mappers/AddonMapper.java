@@ -70,16 +70,25 @@ public class AddonMapper {
         return addonDtoOut;
     }
 
-    public Addon fromDtoCreate(CreateAddonDto addonDto, User loggedUser, Addon draft) {
-        if (draft == null) {
-            draft = new Addon();
-        }
+    public Addon fromDtoCreate(CreateAddonDto addonDto, User loggedUser) {
+        Addon addon = new Addon();
+        updateBaseInformation(addonDto,addon);
+        addon.setTags(addonDto.getTags().stream()
+                .map(tagHelper::fromTagName)
+                .collect(Collectors.toSet()));
+        addon.setRating(new HashMap<>());
+        addon.setCreator(loggedUser);
+
+        return addon;
+    }
+
+
+    public Addon updateDraft(CreateAddonDto addonDto, User loggedUser, Addon draft) {
+
         updateBaseInformation(addonDto,draft);
         draft.setTags(addonDto.getTags().stream()
                 .map(tagHelper::fromTagName)
                 .collect(Collectors.toSet()));
-        draft.setRating(new HashMap<>());
-        draft.setCreator(loggedUser);
 
         return draft;
     }
@@ -94,7 +103,8 @@ public class AddonMapper {
         String name = addonDto.getName();
         String description = addonDto.getDescription();
         String originUrl = addonDto.getOriginUrl();
-        TargetIde targetIde = targetIdeService.getByName(ideName);
+
+
         if (name != null) {
             existingAddon.setName(name);
         }
@@ -104,6 +114,9 @@ public class AddonMapper {
         if (originUrl != null) {
             existingAddon.setOriginUrl(addonDto.getOriginUrl());
         }
-        existingAddon.setTargetIde(targetIde);
+        if(ideName != null) {
+            TargetIde targetIde = targetIdeService.getByName(ideName);
+            existingAddon.setTargetIde(targetIde);
+        }
     }
 }

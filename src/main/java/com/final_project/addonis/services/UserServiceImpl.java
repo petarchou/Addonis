@@ -12,11 +12,14 @@ import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -80,7 +83,6 @@ public class UserServiceImpl implements UserService {
         user = repository.save(user);
 
 
-        //TODO delete invited users table functionality
         Optional<InvitedUser> invitedUser = invitedUserRepository.findByEmail(user.getEmail());
         invitedUser.ifPresent(invitedUserRepository::delete);
 
@@ -126,7 +128,7 @@ public class UserServiceImpl implements UserService {
         User userToUpdate = getById(id);
         Role roleToChange = roleRepository.findByName(roleName.toUpperCase())
                 .orElseThrow(() ->
-                        new UnsupportedOperationException(
+                        new IllegalArgumentException(
                                 String.format(INVALID_ARGUMENT_ERR, "roleName")));
 
         switch (action.toLowerCase()) {
@@ -160,6 +162,15 @@ public class UserServiceImpl implements UserService {
         }
 
         return repository.saveAndFlush(user);
+    }
+
+    @Scheduled(fixedRate = 5, timeUnit = TimeUnit.DAYS)
+    public void deleteExpiredInvitations() {
+        invitedUserRepository.findAll().forEach(invitedUser -> {
+            if(invitedUser.getLastInviteDate().isBefore(LocalDateTime.now())) {
+                invitedUserRepository.delete(invitedUser);
+            }
+        });
     }
 
 

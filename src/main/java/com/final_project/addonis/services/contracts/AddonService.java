@@ -23,7 +23,6 @@ public interface AddonService {
 
     Addon create(Addon addon, MultipartFile file);
 
-    //TODO Make this method update the file
     Addon update(Addon addon, MultipartFile file, User user);
 
     Addon delete(int id, User user);
@@ -43,13 +42,11 @@ public interface AddonService {
 
     Addon removeRate(Addon addon, User user);
 
-    Addon createDraft(Addon addon, List<Tag> tags, MultipartFile file) throws IOException;
+    Addon createDraft(Addon addon, MultipartFile file, User user) throws IOException;
 
     Addon createFromDraft(Addon addon, MultipartFile file, User user);
 
     Addon getDraftById(int id);
-
-    void updateAllAddons();
 
     List<Addon> getAddonsFeaturedByAdmin();
 
