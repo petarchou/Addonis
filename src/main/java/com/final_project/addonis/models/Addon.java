@@ -6,9 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "addons")
@@ -85,7 +83,20 @@ public class Addon {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories;
 
+    @Column(name = "is_featured")
+    private boolean isFeatured;
+
     public Addon() {
+    }
+
+    public double getAverageRating() {
+        double avgRating = 0;
+        List<Rating> ratings = new ArrayList<>(rating.values());
+        int numberOfRatings = ratings.size();
+        for (Rating rating : ratings) {
+            avgRating += rating.getId();
+        }
+        return avgRating / numberOfRatings;
     }
 
     @Override

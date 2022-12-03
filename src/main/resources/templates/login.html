@@ -2,40 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:insert="partials/resources :: resources">
     <meta charset="UTF-8">
+    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
     <title>Login</title>
-    <!--    <meta charset="UTF-8">-->
-    <!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-    <!--    <meta http-equiv="X-UA-Compatible" content="ie=edge">-->
-    <!--    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">-->
-    <!--    <meta name="author" content="NobleUI">-->
-    <!--    <meta name="keywords"-->
-    <!--          content="nobleui, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">-->
-
-    <!--    <title>NobleUI - HTML Bootstrap 5 Admin Dashboard Template</title>-->
-
-    <!--    &lt;!&ndash; Fonts &ndash;&gt;-->
-    <!--    <link rel="preconnect" href="https://fonts.googleapis.com">-->
-    <!--    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>-->
-    <!--    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">-->
-    <!--    &lt;!&ndash; End fonts &ndash;&gt;-->
-
-    <!--    &lt;!&ndash; core:css &ndash;&gt;-->
-    <!--    <link rel="stylesheet" href="/vendors/core/core.css">-->
-    <!--    &lt;!&ndash; endinject &ndash;&gt;-->
-
-    <!--    &lt;!&ndash; Plugin css for this page &ndash;&gt;-->
-    <!--    &lt;!&ndash; End plugin css for this page &ndash;&gt;-->
-
-    <!--    &lt;!&ndash; inject:css &ndash;&gt;-->
-    <!--    <link rel="stylesheet" href="/fonts/feather-font/css/iconfont.css">-->
-    <!--    <link rel="stylesheet" href="/vendors/flag-icon-css/css/flag-icon.min.css">-->
-    <!--    &lt;!&ndash; endinject &ndash;&gt;-->
-
-    <!--    &lt;!&ndash; Layout styles &ndash;&gt;-->
-    <!--    <link rel="stylesheet" href="/css/demo1/style.css">-->
-    <!--    &lt;!&ndash; End layout styles &ndash;&gt;-->
-
-    <!--    <link rel="shortcut icon" href="/images/favicon.png"/>-->
 </head>
 <body>
 <div class="main-wrapper">
@@ -57,11 +25,11 @@
                                     <form class="forms-sample" action="#" th:action="@{/login}" th:object="${login}" method="post">
                                         <div class="mb-3">
 <!--                                            TODO User label in properties -->
-                                            <label for="userEmail" class="form-label" th:text="#{user.label.email}">Email address</label>
-                                            <label><input type="email" class="form-control" id="userEmail" placeholder="Email" th:field="*{email}"/></label>
+                                            <label for="userEmail" class="form-label" th:text="#{user.label.username}">Email address</label>
+                                            <label><input type="email" class="form-control" id="userEmail" placeholder="Email" th:field="*{username}"/></label>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="userPassword" class="form-label" th:text="user.label.password">Password</label>
+                                            <label for="userPassword" class="form-label" th:text="#{user.label.password}">Password</label>
                                             <label><input type="password" class="form-control" id="userPassword"
                                                    autocomplete="current-password" placeholder="Password" th:field="*{password}"/></label>
                                         </div>
@@ -88,7 +56,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

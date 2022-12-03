@@ -7060,6 +7060,13 @@ div.tox .btn-group-vertical > .btn-group:not(:first-child) > .tox-button,
   flex-grow: 1 !important;
 }
 
+.gallery-item-cluster {
+  border-radius: 89px;
+  background: #c0c0c0;
+  box-shadow: inset 12px 12px 24px #a3a3a3,
+  inset -12px -12px 24px #dddddd;
+}
+
 .flex-shrink-0 {
   flex-shrink: 0 !important;
 }

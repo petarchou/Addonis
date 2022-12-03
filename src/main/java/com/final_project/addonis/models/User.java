@@ -109,4 +109,9 @@ public class User implements UserDetails {
     public void removeRole(Role role) {
         roles.remove(role);
     }
+
+    public boolean isAdmin() {
+        return this.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("admin"));
+    }
 }

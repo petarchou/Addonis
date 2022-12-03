@@ -29,16 +29,15 @@ public class TagServiceImpl implements TagService {
                 () -> new EntityNotFoundException("Tag", tagId));
     }
 
-
     @Override
     public Tag create(Tag tag) {
-        checkName(tag.getName());
+        verifyIsUniqueName(tag);
         return tagRepository.saveAndFlush(tag);
     }
 
     @Override
     public Tag update(Tag tag) {
-        checkName(tag.getName());
+        verifyIsUniqueName(tag);
         return tagRepository.saveAndFlush(tag);
     }
 
@@ -48,9 +47,9 @@ public class TagServiceImpl implements TagService {
         return getTagById(id);
     }
 
-    private void checkName(String name) {
-        if (tagRepository.existsByName(name)) {
-            throw new DuplicateEntityException("Tag", "name", name);
+    private void verifyIsUniqueName(Tag tag) {
+        if (tagRepository.existsByName(tag.getName())) {
+            throw new DuplicateEntityException("Tag", "name", tag.getName());
         }
     }
 }

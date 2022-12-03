@@ -24,5 +24,15 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
 
     List<Addon> getAllByStateNameEqualsIgnoreCase(String name);
 
+    @Query("select a from Addon a where a.state.name like 'approved' order by a.downloads desc")
+    List<Addon> getAllByStateNameApprovedOrderByDownloads();
+
+    @Query("select a from Addon a where a.state.name like 'approved' order by a.uploadedDate desc")
+    List<Addon> getAllByStateNameApprovedOrderByUploadedDate();
+
+    @Query("select a from Addon a where a.isFeatured = true")
+    List<Addon> getAddonsByFeaturedTrue();
+
+
     boolean existsByName(String name);
 }

@@ -4,7 +4,6 @@ import com.final_project.addonis.models.*;
 import com.final_project.addonis.models.dtos.*;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.UserService;
-import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.GithubApiException;
@@ -65,15 +64,6 @@ public class AddonRestController {
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
-
-    }
-
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/pending")
-    public List<AddonDto> getAllPending() {
-        return addonService.getAllPendingAddons().stream()
-                .map(addonMapper::toDto)
-                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -84,6 +74,35 @@ public class AddonRestController {
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
+    }
+
+    @GetMapping("/featured")
+    public List<AddonDto> getFeaturedAddons() {
+        return addonService.getAddonsFeaturedByAdmin().stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/most-downloaded")
+    public List<AddonDto> getMostDownloadedAddons() {
+        return addonService.getMostDownloadedAddons().stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/recently-added")
+    public List<AddonDto> getRecentlyAddedAddons() {
+        return addonService.getNewestAddons().stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping("/pending")
+    public List<AddonDto> getAllPending() {
+        return addonService.getAllPendingAddons().stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
@@ -101,20 +120,21 @@ public class AddonRestController {
             throw new RuntimeException(e);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch(GithubApiException e) {
+        } catch (GithubApiException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage() +
                     "Please check your repository url for typos. If the issue persists, contact Addonis support.");
         }
     }
 
-    @IsHimselfOrAdmin
     @PutMapping("/{id}")
     public AddonDto update(@Valid @RequestBody UpdateAddonDto updateAddonDto,
-                           @PathVariable int id) {
+                           @PathVariable int id,
+                           Principal principal) {
         try {
+            User user = userService.getByUsername(principal.getName());
             Addon addon = addonService.getAddonById(id);
             addon = addonMapper.fromUpdateDto(updateAddonDto, addon);
-            addon = addonService.update(addon);
+            addon = addonService.update(addon, user);
             return addonMapper.toDto(addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
@@ -123,30 +143,49 @@ public class AddonRestController {
         }
     }
 
-    @IsHimselfOrAdmin
     @DeleteMapping("/{id}")
-    public AddonDto delete(@PathVariable int id) {
+    public AddonDto delete(@PathVariable int id, Principal principal) {
         try {
+            User user = userService.getByUsername(principal.getName());
             Addon addon = addonService.getAddonById(id);
-            addon = addonService.delete(addon.getId());
+            addon = addonService.delete(addon.getId(), user);
             return addonMapper.toDto(addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
-    @IsHimselfOrAdmin
     @PutMapping("/{id}/tags")
     public AddonDto addTags(@PathVariable int id,
-                            @Valid @RequestBody TagDto tagDto) {
+                            @Valid @RequestBody TagDto tagDto,
+                            Principal principal) {
         try {
+            User user = userService.getByUsername(principal.getName());
             Addon addon = addonService.getAddonById(id);
             List<Tag> tags = tagDto.getTagNames().stream()
                     .map(tagHelper::fromTagName).collect(Collectors.toList());
-            addonService.addTagsToAddon(addon, tags);
+            addonService.addTagsToAddon(addon, tags, user);
             return addonMapper.toDto(addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{addonId}/tags/{tagId}")
+    public AddonDto removeTag(@PathVariable int addonId,
+                              @PathVariable int tagId,
+                              Principal principal) {
+        try {
+            User user = userService.getByUsername(principal.getName());
+            Addon addon = addonService.getAddonById(addonId);
+            addonService.removeTag(addon, user, tagId);
+            return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 
@@ -163,6 +202,34 @@ public class AddonRestController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (UnauthorizedOperationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @Secured("ROLE_ADMIN")
+    @PutMapping("/{id}/featured-add")
+    public AddonDto addAddonToFeatured(@PathVariable int id) {
+        try {
+            Addon addon = addonService.getAddonById(id);
+            addon = addonService.addAddonToFeatured(addon);
+            return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+    @Secured("ROLE_ADMIN")
+    @PutMapping("/{id}/featured-remove")
+    public AddonDto removeAddonFromFeatured(@PathVariable int id) {
+        try {
+            Addon addon = addonService.getAddonById(id);
+            addon = addonService.removeAddonFromFeatured(addon);
+            return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
 
