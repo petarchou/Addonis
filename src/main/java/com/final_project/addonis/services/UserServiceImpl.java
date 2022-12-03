@@ -80,6 +80,7 @@ public class UserServiceImpl implements UserService {
         user = repository.save(user);
 
 
+        //TODO delete invited users table functionality
         Optional<InvitedUser> invitedUser = invitedUserRepository.findByEmail(user.getEmail());
         invitedUser.ifPresent(invitedUserRepository::delete);
 

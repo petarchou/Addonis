@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class AddonDto {
+public class AddonDtoOut {
 
     private int id;
 
@@ -50,6 +50,6 @@ public class AddonDto {
 
     private boolean isFeatured;
 
-    public AddonDto() {
+    public AddonDtoOut() {
     }
 }

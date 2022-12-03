@@ -22,7 +22,7 @@ public class TargetIdeServiceImplTests {
     @Mock
     private TargetIdeRepository targetIdeRepository;
     @InjectMocks
-    private TargetIdeServiceImp targetIdeServiceImp;
+    private TargetIdeServiceImpl targetIdeServiceImp;
 
     @Test
     public void getAll_should_callRepository() {
@@ -68,8 +68,8 @@ public class TargetIdeServiceImplTests {
     public void create_should_createTargetIde_when_TargetIdeNameNotExist() {
         // Assert
         TargetIde targetIde = new TargetIde();
-        targetIde.setTargetIdeName("testName");
-        when(targetIdeRepository.existsByTargetIdeName(anyString())).thenReturn(false);
+        targetIde.setName("testName");
+        when(targetIdeRepository.existsByName(anyString())).thenReturn(false);
         when(targetIdeRepository.save(any())).thenReturn(null);
 
         // Act
@@ -83,8 +83,8 @@ public class TargetIdeServiceImplTests {
     public void create_should_throwsException_when_TargetIdeNameExist() {
         // Assert
         TargetIde targetIde = new TargetIde();
-        targetIde.setTargetIdeName("testName");
-        when(targetIdeRepository.existsByTargetIdeName(anyString())).thenReturn(true);
+        targetIde.setName("testName");
+        when(targetIdeRepository.existsByName(anyString())).thenReturn(true);
 
         // Assert
         assertThrows(DuplicateEntityException.class,
@@ -95,8 +95,8 @@ public class TargetIdeServiceImplTests {
     public void update_should_updateTargetIde_when_TargetIdeNameNotExist() {
         // Arrange
         TargetIde targetIde = new TargetIde();
-        targetIde.setTargetIdeName("testName");
-        when(targetIdeRepository.existsByTargetIdeName(anyString())).thenReturn(false);
+        targetIde.setName("testName");
+        when(targetIdeRepository.existsByName(anyString())).thenReturn(false);
         when(targetIdeRepository.saveAndFlush(any())).thenReturn(null);
 
         // Act

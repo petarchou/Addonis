@@ -101,6 +101,13 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
+    public Addon getDraftById(int id) {
+        State state = stateRepository.findByName("draft");
+        return addonRepository.findByStateEqualsAndIdEquals(state, id).orElseThrow(
+                () -> new EntityNotFoundException("Draft", id));
+    }
+
+    @Override
     public Addon getByName(String name) {
         return addonRepository.findByName(name)
                 .orElseThrow(() -> new EntityNotFoundException("Addon", "name", name));
@@ -125,16 +132,19 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public Addon create(Addon addon, MultipartFile file) throws IOException {
-        checkIfUserIsBlocked(addon);
-        verifyIsUniqueName(addon);
-        BinaryContent binaryContent = binaryContentService.store(file);
-        updateGithubDetails(addon);
+    public Addon create(Addon addon, MultipartFile file) {
+        try {
+            checkIfUserIsBlocked(addon);
+            verifyIsUniqueName(addon);
+            BinaryContent binaryContent = binaryContentService.store(file);
+            updateGithubDetails(addon);
 
-        addon.setData(binaryContent);
-        addon.setState(stateRepository.findByName("pending"));
-        addon = addonRepository.saveAndFlush(addon);
-        return addon;
+            addon.setData(binaryContent);
+            addon.setState(stateRepository.findByName("pending"));
+            return addonRepository.saveAndFlush(addon);
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
     }
 
     private void updateGithubDetails(Addon addon) {
@@ -152,11 +162,46 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public Addon update(Addon addon, User user) {
-        checkIfUserIsBlocked(addon);
-        checkModifyPermissions(addon, user);
-        verifyIsUniqueName(addon);
+    public Addon createDraft(Addon addon,
+                             List<Tag> tags,
+                             MultipartFile file) throws IOException {
+
+        BinaryContent binaryContent;
+        if (file != null && !file.isEmpty()) {
+            binaryContent = binaryContentService.store(file);
+            addon.setData(binaryContent);
+        }
+        addon.setState(stateRepository.findByName("draft"));
+        //TODO update tags here too. or do they need updates?
         return addonRepository.saveAndFlush(addon);
+
+    }
+
+    @Override
+    public Addon createFromDraft(Addon addon, MultipartFile file, User user) {
+        addon.setState(stateRepository.findByName("pending"));
+        Addon createdAddon = update(addon,file,user);
+        updateGithubDetails(addon);
+        return createdAddon;
+    }
+
+    @Override
+    public Addon update(Addon addon, MultipartFile file, User user) {
+        try {
+            checkIfUserIsBlocked(addon);
+            checkModifyPermissions(addon, user);
+            verifyIsUniqueName(addon);
+            if(file != null && !file.isEmpty()) {
+                if (addon.getData() != null) {
+                    binaryContentService.delete(addon.getData());
+                }
+                BinaryContent newFile = binaryContentService.store(file);
+                addon.setData(newFile);
+            }
+            return addonRepository.saveAndFlush(addon);
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
     }
 
     @Override

@@ -18,7 +18,7 @@ public class TargetIde {
     private int id;
 
     @Column(name = "name")
-    private String targetIdeName;
+    private String name;
 
     public TargetIde() {
     }

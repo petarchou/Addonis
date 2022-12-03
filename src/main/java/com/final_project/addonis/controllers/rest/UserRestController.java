@@ -146,6 +146,7 @@ public class UserRestController {
         }
     }
 
+    //TODO make  it receive role  dynamically
     @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/promote/admin")
     public UserDto addAdminRole(@PathVariable int id) {
@@ -159,6 +160,7 @@ public class UserRestController {
         }
     }
 
+    //TODO make  it receive role dynamically
     @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/demote/admin")
     public UserDto removeAdminRole(@PathVariable int id) {

@@ -9,6 +9,8 @@ public interface TargetIdeService {
 
     TargetIde getById(int id);
 
+    TargetIde getByName(String name);
+
     TargetIde create(TargetIde targetIde);
 
     TargetIde update(TargetIde targetIde);

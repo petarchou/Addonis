@@ -51,8 +51,8 @@ public class GitHubServiceImpl implements GitHubService {
             throw new IllegalArgumentException(INVALID_REPOSITORY);
         }
 
-        url = url.substring(GITHUB_PREFIX.length());
-        List<String> repoDetails = Arrays.stream(url.split("/")).collect(Collectors.toList());
+        String details = url.substring(GITHUB_PREFIX.length());
+        List<String> repoDetails = Arrays.stream(details.split("/")).collect(Collectors.toList());
         if (repoDetails.size() != 2) {
             throw new IllegalArgumentException(INVALID_REPOSITORY);
         }
@@ -68,7 +68,7 @@ public class GitHubServiceImpl implements GitHubService {
     @Override
     public int getPullRequests(String owner, String repo) {
         try {
-            String url = String.format(MASTER_URL, owner, repo) + "/pulls?state=all";
+            String url = String.format(MASTER_URL, owner, repo) + "/pulls?state=open&per_page=100";
             ResponseEntity<String> raw = template.exchange(url, HttpMethod.GET, githubGetEntity, String.class);
             return countPullRequests(raw.getBody());
         } catch (JSONException | RestClientException e) {
