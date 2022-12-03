@@ -90,6 +90,9 @@ public class Addon {
     }
 
     public double getAverageRating() {
+        if (rating.isEmpty()) {
+            return 0;
+        }
         double avgRating = 0;
         List<Rating> ratings = new ArrayList<>(rating.values());
         int numberOfRatings = ratings.size();
