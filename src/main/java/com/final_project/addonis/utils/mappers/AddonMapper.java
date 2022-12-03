@@ -5,10 +5,7 @@ import com.final_project.addonis.models.Category;
 import com.final_project.addonis.models.Tag;
 import com.final_project.addonis.models.TargetIde;
 import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.dtos.BaseAddonDtoIn;
-import com.final_project.addonis.models.dtos.AddonDtoOut;
-import com.final_project.addonis.models.dtos.CreateAddonDto;
-import com.final_project.addonis.models.dtos.UpdateAddonDto;
+import com.final_project.addonis.models.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.final_project.addonis.utils.helpers.TagHelper;
 import com.final_project.addonis.services.contracts.TargetIdeService;
@@ -34,21 +31,18 @@ public class AddonMapper {
         this.targetIdeService = targetIdeService;
     }
 
+
+    public DraftDtoOut toDraftDto(Addon addon) {
+        DraftDtoOut draftDtoOut = new DraftDtoOut();
+        updateBaseDtoOut(draftDtoOut,addon);
+
+        return draftDtoOut;
+
+    }
+
     public AddonDtoOut toDto(Addon addon) {
         AddonDtoOut addonDtoOut = new AddonDtoOut();
-        addonDtoOut.setId(addon.getId());
-        addonDtoOut.setName(addon.getName());
-        addonDtoOut.setTargetIde(addon.getTargetIde().getName());
-        addonDtoOut.setCreator(userMapper.toDto(addon.getCreator()));
-        addonDtoOut.setDescription(addon.getDescription());
-        addonDtoOut.setBinaryContent(addon.getData());
-        addonDtoOut.setOriginUrl(addon.getOriginUrl());
-        addonDtoOut.setUploadedDate(FORMATTER.format(addon.getUploadedDate()));
-        addonDtoOut.setDownloads(addon.getDownloads());
-        addonDtoOut.setState(addon.getState().getName());
-        addonDtoOut.setTags(addon.getTags().stream()
-                .map(Tag::getName)
-                .collect(Collectors.toSet()));
+        updateBaseDtoOut(addonDtoOut,addon);
         if (addon.getState().getName().equalsIgnoreCase("approved")) {
             addonDtoOut.setCategories(addon.getCategories()
                     .stream().
@@ -60,6 +54,7 @@ public class AddonMapper {
                 .stream()
                 .collect(Collectors.toMap(entry -> entry.getKey().getUsername(),
                         entry -> entry.getValue().getId())));
+        addonDtoOut.setDownloads(addon.getDownloads());
         addonDtoOut.setAverageRating(addon.getAverageRating());
         addonDtoOut.setPullRequests(addon.getPullRequests());
         addonDtoOut.setLastCommitDate(FORMATTER.format(addon.getLastCommitDate()));
@@ -72,7 +67,7 @@ public class AddonMapper {
 
     public Addon fromDtoCreate(CreateAddonDto addonDto, User loggedUser) {
         Addon addon = new Addon();
-        updateBaseInformation(addonDto,addon);
+        updateBaseDtoIn(addonDto,addon);
         addon.setTags(addonDto.getTags().stream()
                 .map(tagHelper::fromTagName)
                 .collect(Collectors.toSet()));
@@ -85,7 +80,7 @@ public class AddonMapper {
 
     public Addon updateDraft(CreateAddonDto addonDto, User loggedUser, Addon draft) {
 
-        updateBaseInformation(addonDto,draft);
+        updateBaseDtoIn(addonDto,draft);
         draft.setTags(addonDto.getTags().stream()
                 .map(tagHelper::fromTagName)
                 .collect(Collectors.toSet()));
@@ -94,11 +89,11 @@ public class AddonMapper {
     }
 
     public Addon fromDtoUpdate(UpdateAddonDto addonDto, Addon existingAddon) {
-        updateBaseInformation(addonDto, existingAddon);
+        updateBaseDtoIn(addonDto, existingAddon);
         return existingAddon;
     }
 
-    private void updateBaseInformation(BaseAddonDtoIn addonDto, Addon existingAddon) {
+    private void updateBaseDtoIn(BaseAddonDtoIn addonDto, Addon existingAddon) {
         String ideName = addonDto.getTargetIde();
         String name = addonDto.getName();
         String description = addonDto.getDescription();
@@ -118,5 +113,21 @@ public class AddonMapper {
             TargetIde targetIde = targetIdeService.getByName(ideName);
             existingAddon.setTargetIde(targetIde);
         }
+    }
+
+    private void updateBaseDtoOut(BaseAddonDtoOut addonDtoOut, Addon addon) {
+        addonDtoOut.setId(addon.getId());
+        addonDtoOut.setName(addon.getName());
+        if(addon.getTargetIde() != null)
+            addonDtoOut.setTargetIde(addon.getTargetIde().getName());
+        addonDtoOut.setCreator(userMapper.toDto(addon.getCreator()));
+        addonDtoOut.setDescription(addon.getDescription());
+        addonDtoOut.setBinaryContent(addon.getData());
+        addonDtoOut.setOriginUrl(addon.getOriginUrl());
+        addonDtoOut.setUploadedDate(FORMATTER.format(addon.getUploadedDate()));
+        addonDtoOut.setState(addon.getState().getName());
+        addonDtoOut.setTags(addon.getTags().stream()
+                .map(Tag::getName)
+                .collect(Collectors.toSet()));
     }
 }

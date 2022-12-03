@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -177,6 +178,7 @@ public class AddonServiceImpl implements AddonService {
     public Addon createFromDraft(Addon addon, MultipartFile file, User user) {
         checkModifyPermissions(addon, user);
         addon.setState(stateRepository.findByName("pending"));
+        addon.setUploadedDate(LocalDateTime.now());
         Addon createdAddon = update(addon, file, user);
         updateGithubDetails(addon);
         return createdAddon;
@@ -263,6 +265,7 @@ public class AddonServiceImpl implements AddonService {
 
     @Async
     @Scheduled(fixedRate = 30, timeUnit = TimeUnit.MINUTES)
+    @Override
     public void updateAllAddons() {
         List<Addon> approvedAddons = addonRepository.getAllByStateNameEqualsIgnoreCase("approved");
         approvedAddons.forEach(addon -> {

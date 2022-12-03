@@ -94,14 +94,14 @@ public class AddonRestController {
 
 
     @PostMapping("/drafts")
-    public AddonDtoOut createDraft(@RequestPart(value = "json", required = false) CreateAddonDto createAddonDto,
+    public DraftDtoOut createDraft(@RequestPart(value = "json", required = false) CreateAddonDto createAddonDto,
                                    @RequestParam(value = "file", required = false) MultipartFile file,
                                    Principal principal) {
         try {
             User user = userService.getByUsername(principal.getName());
             Addon addon = addonMapper.fromDtoCreate(createAddonDto, user);
             addon = addonService.createDraft(addon, file, user);
-            return addonMapper.toDto(addon);
+            return addonMapper.toDraftDto(addon);
             //TODO make it so that all exceptions are handled in the same place ( service )
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -113,7 +113,7 @@ public class AddonRestController {
 
 
     @PutMapping("/drafts/{id}")
-    public AddonDtoOut updateDraft(@PathVariable int id,
+    public DraftDtoOut updateDraft(@PathVariable int id,
                                    @RequestPart(value = "json") CreateAddonDto addonDto,
                                    @RequestParam(value = "file", required = false) MultipartFile file,
                                    Principal principal) {
@@ -122,7 +122,7 @@ public class AddonRestController {
             Addon addon = addonService.getDraftById(id);
             addon = addonMapper.updateDraft(addonDto, user, addon);
             addon = addonService.update(addon, file, addon.getCreator());
-            return addonMapper.toDto(addon);
+            return addonMapper.toDraftDto(addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DuplicateEntityException e) {
@@ -138,10 +138,10 @@ public class AddonRestController {
                                             Principal principal) {
         try {
             User user = userService.getByUsername(principal.getName());
-            Addon draft = addonService.getDraftById(id);
-            draft = addonMapper.updateDraft(createAddonDto, user, draft);
-            draft = addonService.createFromDraft(draft, file, user);
-            return addonMapper.toDto(draft);
+            Addon addon = addonService.getDraftById(id);
+            addon = addonMapper.updateDraft(createAddonDto, user, addon);
+            addon = addonService.createFromDraft(addon, file, user);
+            return addonMapper.toDto(addon);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

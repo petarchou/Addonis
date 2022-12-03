@@ -48,6 +48,8 @@ public interface AddonService {
 
     Addon getDraftById(int id);
 
+    void updateAllAddons();
+
     List<Addon> getAddonsFeaturedByAdmin();
 
     Addon addAddonToFeatured(Addon addon);
