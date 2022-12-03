@@ -25,7 +25,7 @@ public interface AddonService {
 
     Addon update(Addon addon);
 
-    Addon delete(int idr);
+    Addon delete(int id);
 
     Addon getByName(String name);
 
