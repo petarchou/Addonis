@@ -8,4 +8,6 @@ import java.io.IOException;
 public interface BinaryContentService {
 
     BinaryContent store(MultipartFile file) throws IOException;
+
+    void delete(BinaryContent content) throws IOException;
 }

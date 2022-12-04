@@ -21,9 +21,9 @@ public interface AddonService {
 
     Addon getAddonById(int addonId);
 
-    Addon create(Addon addon, MultipartFile file) throws IOException;
+    Addon create(Addon addon, MultipartFile file);
 
-    Addon update(Addon addon, User user);
+    Addon update(Addon addon, MultipartFile file, User user);
 
     Addon delete(int id, User user);
 
@@ -42,6 +42,11 @@ public interface AddonService {
 
     Addon removeRate(Addon addon, User user);
 
+    Addon createDraft(Addon addon, MultipartFile file, User user) throws IOException;
+
+    Addon createFromDraft(Addon addon, MultipartFile file, User user);
+
+    Addon getDraftById(int id);
 
     void updateAllAddons();
 

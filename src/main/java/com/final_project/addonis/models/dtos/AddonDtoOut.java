@@ -10,29 +10,9 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class AddonDto {
-
-    private int id;
-
-    private String name;
-
-    private String targetIde;
-
-    private UserDto creator;
-
-    private String description;
-
-    private BinaryContent binaryContent;
-
-    private String originUrl;
-
-    private String uploadedDate;
+public class AddonDtoOut extends BaseAddonDtoOut {
 
     private int downloads;
-
-    private String state;
-
-    private Set<String> tags;
 
     private Set<String> categories;
 
@@ -50,6 +30,6 @@ public class AddonDto {
 
     private boolean isFeatured;
 
-    public AddonDto() {
+    public AddonDtoOut() {
     }
 }

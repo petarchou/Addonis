@@ -8,12 +8,14 @@ import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class TargetIdeServiceImp implements TargetIdeService {
+public class TargetIdeServiceImpl implements TargetIdeService {
+
     private final TargetIdeRepository repository;
 
-    public TargetIdeServiceImp(TargetIdeRepository repository) {
+    public TargetIdeServiceImpl(TargetIdeRepository repository) {
         this.repository = repository;
     }
 
@@ -30,13 +32,13 @@ public class TargetIdeServiceImp implements TargetIdeService {
 
     @Override
     public TargetIde create(TargetIde targetIde) {
-        verifyTargetIdeNameIsUnique(targetIde.getTargetIdeName());
+        verifyTargetIdeNameIsUnique(targetIde.getName());
         return repository.save(targetIde);
     }
 
     @Override
     public TargetIde update(TargetIde targetIde) {
-        verifyTargetIdeNameIsUnique(targetIde.getTargetIdeName());
+        verifyTargetIdeNameIsUnique(targetIde.getName());
         return repository.saveAndFlush(targetIde);
     }
 
@@ -47,12 +49,23 @@ public class TargetIdeServiceImp implements TargetIdeService {
 
     @Override
     public boolean existByName(String name) {
-        return repository.existsByTargetIdeName(name);
+        return repository.existsByName(name);
     }
 
     private void verifyTargetIdeNameIsUnique(String targetIdeName) {
         if (existByName(targetIdeName)) {
             throw new DuplicateEntityException("Target ide", "name", targetIdeName);
         }
+    }
+
+    @Override
+    public TargetIde getByName(String name) {
+        Optional<TargetIde> targetIde = repository.findByNameIgnoreCase(name);
+
+        if(targetIde.isEmpty()) {
+            throw new EntityNotFoundException("TargetIde", "name", name);
+        }
+
+        return targetIde.get();
     }
 }

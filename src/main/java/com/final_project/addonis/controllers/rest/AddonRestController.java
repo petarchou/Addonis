@@ -2,6 +2,10 @@ package com.final_project.addonis.controllers.rest;
 
 import com.final_project.addonis.models.*;
 import com.final_project.addonis.models.dtos.*;
+import com.final_project.addonis.models.Addon;
+import com.final_project.addonis.models.BinaryContent;
+import com.final_project.addonis.models.Tag;
+import com.final_project.addonis.models.User;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
@@ -20,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,12 +53,12 @@ public class AddonRestController {
     }
 
     @GetMapping
-    public List<AddonDto> getAll(@RequestParam(value = "search", required = false) Optional<String> keyword,
-                                 @RequestParam(value = "targetIde", required = false) Optional<String> targetIde,
-                                 @RequestParam(value = "category", required = false) Optional<String> category,
-                                 @RequestParam(value = "order", required = false) Optional<Boolean> order,
-                                 @RequestParam(value = "page", required = false) Optional<Integer> page,
-                                 @RequestParam(value = "size", required = false) Optional<Integer> size) {
+    public List<AddonDtoOut> getAll(@RequestParam(value = "search", required = false) Optional<String> keyword,
+                                    @RequestParam(value = "targetIde", required = false) Optional<String> targetIde,
+                                    @RequestParam(value = "category", required = false) Optional<String> category,
+                                    @RequestParam(value = "order", required = false) Optional<Boolean> order,
+                                    @RequestParam(value = "page", required = false) Optional<Integer> page,
+                                    @RequestParam(value = "size", required = false) Optional<Integer> size) {
         try {
 
             return addonService.getAllApproved(keyword, targetIde, category, order, page, size)
@@ -67,7 +72,7 @@ public class AddonRestController {
     }
 
     @GetMapping("/{id}")
-    public AddonDto get(@PathVariable int id) {
+    public AddonDtoOut get(@PathVariable int id) {
         try {
             Addon addon = addonService.getAddonById(id);
             return addonMapper.toDto(addon);
@@ -76,22 +81,89 @@ public class AddonRestController {
         }
     }
 
+    @GetMapping("/drafts/{id}")
+    public AddonDtoOut getDraft(@PathVariable int  id) {
+        try {
+            Addon addon = addonService.getAddonById(id);
+            return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+
+
+    @PostMapping("/drafts")
+    public DraftDtoOut createDraft(@RequestPart(value = "json", required = false) CreateAddonDto createAddonDto,
+                                   @RequestParam(value = "file", required = false) MultipartFile file,
+                                   Principal principal) {
+        try {
+            User user = userService.getByUsername(principal.getName());
+            Addon addon = addonMapper.fromDtoCreate(createAddonDto, user);
+            addon = addonService.createDraft(addon, file, user);
+            return addonMapper.toDraftDto(addon);
+            //TODO handle all IOExceptions in the same place ( service? )
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/drafts/{id}")
+    public DraftDtoOut updateDraft(@PathVariable int id,
+                                   @RequestPart(value = "json") CreateAddonDto addonDto,
+                                   @RequestParam(value = "file", required = false) MultipartFile file,
+                                   Principal principal) {
+        try {
+            User user = userService.getByUsername(principal.getName());
+            Addon addon = addonService.getDraftById(id);
+            addon = addonMapper.updateDraft(addonDto, user, addon);
+            addon = addonService.update(addon, file, addon.getCreator());
+            return addonMapper.toDraftDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/from-draft/{id}")
+    public AddonDtoOut createAddonFromDraft(@PathVariable int id,
+                                            @Valid @RequestPart(value = "json") CreateAddonDto createAddonDto,
+                                            @RequestParam(value = "file") MultipartFile file,
+                                            Principal principal) {
+        try {
+            User user = userService.getByUsername(principal.getName());
+            Addon addon = addonService.getDraftById(id);
+            addon = addonMapper.updateDraft(createAddonDto, user, addon);
+            addon = addonService.createFromDraft(addon, file, user);
+            return addonMapper.toDto(addon);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+
     @GetMapping("/featured")
-    public List<AddonDto> getFeaturedAddons() {
+    public List<AddonDtoOut> getFeaturedAddons() {
         return addonService.getAddonsFeaturedByAdmin().stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/most-downloaded")
-    public List<AddonDto> getMostDownloadedAddons() {
+    public List<AddonDtoOut> getMostDownloadedAddons() {
         return addonService.getMostDownloadedAddons().stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/recently-added")
-    public List<AddonDto> getRecentlyAddedAddons() {
+    public List<AddonDtoOut> getRecentlyAddedAddons() {
         return addonService.getNewestAddons().stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
@@ -99,25 +171,23 @@ public class AddonRestController {
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/pending")
-    public List<AddonDto> getAllPending() {
+    public List<AddonDtoOut> getAllPending() {
         return addonService.getAllPendingAddons().stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @PostMapping
-    public AddonDto create(@Valid @RequestPart CreateAddonDto createAddonDto,
-                           @RequestParam("file") MultipartFile file,
-                           Principal principal) {
+    public AddonDtoOut create(@Valid @RequestPart(value = "json") CreateAddonDto createAddonDto,
+                              @RequestParam("file") MultipartFile file,
+                              Principal principal) {
         try {
             User user = userService.getByUsername(principal.getName());
-            Addon addon = addonMapper.fromDto(createAddonDto, user);
+            Addon addon = addonMapper.fromDtoCreate(createAddonDto, user);
             addon = addonService.create(addon, file);
             return addonMapper.toDto(addon);
         } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (GithubApiException e) {
@@ -127,14 +197,14 @@ public class AddonRestController {
     }
 
     @PutMapping("/{id}")
-    public AddonDto update(@Valid @RequestBody UpdateAddonDto updateAddonDto,
-                           @PathVariable int id,
-                           Principal principal) {
+    public AddonDtoOut update(@PathVariable int id, @Valid @RequestPart(value = "json") UpdateAddonDto addonDto,
+                              @RequestParam(value = "file", required = false) MultipartFile file,
+                              Principal principal) {
         try {
             User user = userService.getByUsername(principal.getName());
             Addon addon = addonService.getAddonById(id);
-            addon = addonMapper.fromUpdateDto(updateAddonDto, addon);
-            addon = addonService.update(addon, user);
+            addon = addonMapper.fromDtoUpdate(addonDto, addon);
+            addon = addonService.update(addon,file, user);
             return addonMapper.toDto(addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
@@ -144,7 +214,7 @@ public class AddonRestController {
     }
 
     @DeleteMapping("/{id}")
-    public AddonDto delete(@PathVariable int id, Principal principal) {
+    public AddonDtoOut delete(@PathVariable int id, Principal principal) {
         try {
             User user = userService.getByUsername(principal.getName());
             Addon addon = addonService.getAddonById(id);
@@ -156,9 +226,9 @@ public class AddonRestController {
     }
 
     @PutMapping("/{id}/tags")
-    public AddonDto addTags(@PathVariable int id,
-                            @Valid @RequestBody TagDto tagDto,
-                            Principal principal) {
+    public AddonDtoOut addTags(@PathVariable int id,
+                               @Valid @RequestBody TagDto tagDto,
+                               Principal principal) {
         try {
             User user = userService.getByUsername(principal.getName());
             Addon addon = addonService.getAddonById(id);
@@ -174,9 +244,9 @@ public class AddonRestController {
     }
 
     @DeleteMapping("/{addonId}/tags/{tagId}")
-    public AddonDto removeTag(@PathVariable int addonId,
-                              @PathVariable int tagId,
-                              Principal principal) {
+    public AddonDtoOut removeTag(@PathVariable int addonId,
+                                 @PathVariable int tagId,
+                                 Principal principal) {
         try {
             User user = userService.getByUsername(principal.getName());
             Addon addon = addonService.getAddonById(addonId);
@@ -191,8 +261,8 @@ public class AddonRestController {
 
     @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/approve")
-    public AddonDto approveAddon(@PathVariable int id,
-                                 @Valid @RequestBody CategoryDto categoryDto) {
+    public AddonDtoOut approveAddon(@PathVariable int id,
+                                    @Valid @RequestBody CategoryDto categoryDto) {
         try {
             List<Category> categories = categoryDto.getCategories().stream()
                     .map(categoryHelper::fromCategoryName).collect(Collectors.toList());
@@ -207,7 +277,7 @@ public class AddonRestController {
 
     @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/featured-add")
-    public AddonDto addAddonToFeatured(@PathVariable int id) {
+    public AddonDtoOut addAddonToFeatured(@PathVariable int id) {
         try {
             Addon addon = addonService.getAddonById(id);
             addon = addonService.addAddonToFeatured(addon);
@@ -221,7 +291,7 @@ public class AddonRestController {
 
     @Secured("ROLE_ADMIN")
     @PutMapping("/{id}/featured-remove")
-    public AddonDto removeAddonFromFeatured(@PathVariable int id) {
+    public AddonDtoOut removeAddonFromFeatured(@PathVariable int id) {
         try {
             Addon addon = addonService.getAddonById(id);
             addon = addonService.removeAddonFromFeatured(addon);
@@ -243,9 +313,9 @@ public class AddonRestController {
     }
 
     @PutMapping("/{addonId}/rate/{ratingId}")
-    public AddonDto rate(@PathVariable int addonId,
-                         @PathVariable int ratingId,
-                         Principal principal) {
+    public AddonDtoOut rate(@PathVariable int addonId,
+                            @PathVariable int ratingId,
+                            Principal principal) {
         try {
             Addon addon = addonService.getAddonById(addonId);
             User user = userService.getByUsername(principal.getName());
@@ -257,8 +327,8 @@ public class AddonRestController {
     }
 
     @PutMapping("/{addonId}/removeRate")
-    public AddonDto removeRate(@PathVariable int addonId,
-                               Principal principal) {
+    public AddonDtoOut removeRate(@PathVariable int addonId,
+                                  Principal principal) {
         try {
             Addon addon = addonService.getAddonById(addonId);
             User user = userService.getByUsername(principal.getName());

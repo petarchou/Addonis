@@ -1,7 +1,7 @@
 package com.final_project.addonis.controllers.mvc;
 
 import com.final_project.addonis.models.BinaryContent;
-import com.final_project.addonis.models.dtos.AddonDto;
+import com.final_project.addonis.models.dtos.AddonDtoOut;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.utils.mappers.AddonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +44,11 @@ public class HomeMvcController {
     }
     @GetMapping("/")
     public String showHomepage(Model model) {
-        List<AddonDto> mostDownloadedAddons = addonService.getMostDownloadedAddons().stream()
+        List<AddonDtoOut> mostDownloadedAddons = addonService.getMostDownloadedAddons().stream()
                 .map(addonMapper::toDto).collect(Collectors.toList());
-        List<AddonDto> newestAddons = addonService.getNewestAddons().stream()
+        List<AddonDtoOut> newestAddons = addonService.getNewestAddons().stream()
                 .map(addonMapper::toDto).collect(Collectors.toList());
-        List<AddonDto> featuredAddons = addonService.getAddonsFeaturedByAdmin().stream()
+        List<AddonDtoOut> featuredAddons = addonService.getAddonsFeaturedByAdmin().stream()
                 .map(addonMapper::toDto).collect(Collectors.toList());
         model.addAttribute("mostDownloadedAddons", mostDownloadedAddons);
         model.addAttribute("newestAddons", newestAddons);

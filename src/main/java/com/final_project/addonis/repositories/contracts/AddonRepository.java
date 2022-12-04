@@ -1,6 +1,7 @@
 package com.final_project.addonis.repositories.contracts;
 
 import com.final_project.addonis.models.Addon;
+import com.final_project.addonis.models.State;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,6 +16,10 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
 
     @Query("select a from Addon a where a.id = :id and a.state.name like 'pending'")
     Optional<Addon> findAddonByIdAndStateNamePending(int id);
+
+    Optional<Addon> findByStateEqualsAndIdEquals(State state, int id);
+
+    Optional<Addon> findByNameAndStateNameIgnoreCaseNot(String addonName, String stateName);
 
     @Query("select a from Addon a where a.name = :name and a.state.name like 'approved'")
     Optional<Addon> findByName(String name);
@@ -33,6 +38,4 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
     @Query("select a from Addon a where a.isFeatured = true")
     List<Addon> getAddonsByFeaturedTrue();
 
-
-    boolean existsByName(String name);
 }

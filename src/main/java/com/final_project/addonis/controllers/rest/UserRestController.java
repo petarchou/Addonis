@@ -9,7 +9,10 @@ import com.final_project.addonis.models.dtos.UserDto;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
-import com.final_project.addonis.utils.exceptions.*;
+import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
+import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
+import com.final_project.addonis.utils.exceptions.PasswordNotMatchException;
+import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
 import com.final_project.addonis.utils.mappers.UserMapper;
 import org.springframework.http.HttpStatus;
@@ -147,26 +150,30 @@ public class UserRestController {
     }
 
     @Secured("ROLE_ADMIN")
-    @PutMapping("/{id}/promote/admin")
-    public UserDto addAdminRole(@PathVariable int id) {
+    @PutMapping("/{id}/promote/{role}")
+    public UserDto addRole(@PathVariable int id, @PathVariable String role) {
         try {
-            User promotedUser = service.changeUserRole(id, "admin", "promote");
+            User promotedUser = service.changeUserRole(id, role, "promote");
             return mapper.toDto(promotedUser);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
 
     @Secured("ROLE_ADMIN")
-    @PutMapping("/{id}/demote/admin")
-    public UserDto removeAdminRole(@PathVariable int id) {
+    @PutMapping("/{id}/demote/{role}")
+    public UserDto removeRole(@PathVariable int id, @PathVariable String role) {
         try {
-            User promotedUser = service.changeUserRole(id, "admin", "demote");
+            User promotedUser = service.changeUserRole(id, role, "demote");
             return mapper.toDto(promotedUser);
-        } catch (EntityNotFoundException e) {
+        }catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
