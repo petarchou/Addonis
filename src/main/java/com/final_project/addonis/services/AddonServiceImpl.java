@@ -179,9 +179,8 @@ public class AddonServiceImpl implements AddonService {
         checkModifyPermissions(addon, user);
         addon.setState(stateRepository.findByName("pending"));
         addon.setUploadedDate(LocalDateTime.now());
-        Addon createdAddon = update(addon, file, user);
         updateGithubDetails(addon);
-        return createdAddon;
+        return update(addon, file, user);
     }
 
     @Override
@@ -277,11 +276,13 @@ public class AddonServiceImpl implements AddonService {
 
     private void updateFileIfExists(Addon addon, MultipartFile file) throws IOException {
         if (file != null && !file.isEmpty()) {
-            if (addon.getData() != null) {
+            BinaryContent newFile = binaryContentService.store(file);
+            BinaryContent oldFile = addon.getData();
+            if (oldFile != null && !oldFile.equals(newFile)) {
                 binaryContentService.delete(addon.getData());
             }
-            BinaryContent newFile = binaryContentService.store(file);
             addon.setData(newFile);
+
         }
     }
 

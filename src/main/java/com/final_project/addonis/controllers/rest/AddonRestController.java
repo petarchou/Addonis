@@ -102,7 +102,7 @@ public class AddonRestController {
             Addon addon = addonMapper.fromDtoCreate(createAddonDto, user);
             addon = addonService.createDraft(addon, file, user);
             return addonMapper.toDraftDto(addon);
-            //TODO make it so that all exceptions are handled in the same place ( service )
+            //TODO handle all IOExceptions in the same place ( service? )
         } catch (IOException e) {
             throw new RuntimeException(e);
 

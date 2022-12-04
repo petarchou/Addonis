@@ -31,11 +31,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         Optional<BinaryContent> optional = binaryContentRepository.findByData(file.getBytes());
 
         BinaryContent binaryContent = new BinaryContent(fileName, file.getBytes());
-        if(optional.isPresent()) {
-            binaryContent =   optional.get();
-        }
 
-        return binaryContentRepository.save(binaryContent);
+        return optional.orElseGet(() -> binaryContentRepository.save(binaryContent));
+
     }
 
     public void delete(BinaryContent binaryContent) throws IOException {
