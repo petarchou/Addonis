@@ -1,15 +1,16 @@
 package com.final_project.addonis.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Table(name = "states")
-@Getter
-@Setter
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class State {
 
     @Id
@@ -19,9 +20,6 @@ public class State {
 
     @Column(name = "name")
     private String name;
-
-    public State() {
-    }
 
     @Override
     public boolean equals(Object o) {

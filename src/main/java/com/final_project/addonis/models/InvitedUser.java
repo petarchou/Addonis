@@ -1,15 +1,19 @@
 package com.final_project.addonis.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="invited_users")
-@Getter
-@Setter
+@Table(name = "invited_users")
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class InvitedUser {
 
     @Id
@@ -17,10 +21,10 @@ public class InvitedUser {
     @Column(name = "id")
     private int id;
 
-    @Column(name="email")
+    @Column(name = "email")
     private String email;
 
-    @Column(name ="invitation_date")
+    @Column(name = "invitation_date")
     private LocalDateTime lastInviteDate;
 
 }

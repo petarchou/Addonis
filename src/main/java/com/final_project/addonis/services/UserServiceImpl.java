@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,15 +81,15 @@ public class UserServiceImpl implements UserService {
         verifyIsUniqueUsername(user);
         verifyIsUniqueEmail(user);
         verifyIsUniquePhone(user);
-        user = repository.save(user);
+        User clone = repository.save(user);
 
 
-        Optional<InvitedUser> invitedUser = invitedUserRepository.findByEmail(user.getEmail());
+        Optional<InvitedUser> invitedUser = invitedUserRepository.findByEmail(clone.getEmail());
         invitedUser.ifPresent(invitedUserRepository::delete);
 
-        VerificationToken token = createVerificationToken(user);
-        emailService.sendVerificationEmail(user, siteUrl, token);
-        return user;
+        VerificationToken token = createVerificationToken(clone);
+        emailService.sendVerificationEmail(clone, siteUrl, token);
+        return clone;
     }
 
     @Override
@@ -102,11 +103,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User delete(User user) {
-
-        user.setDeleted(true);
-        repository.saveAndFlush(user);
-
-        return user;
+        User clone = user.toBuilder().isDeleted(true).build();
+        return repository.saveAndFlush(clone);
     }
 
     @Override
@@ -133,10 +131,10 @@ public class UserServiceImpl implements UserService {
 
         switch (action.toLowerCase()) {
             case "promote":
-                tryAddRole(userToUpdate, roleToChange);
+                userToUpdate = tryAddRole(userToUpdate, roleToChange);
                 break;
             case "demote":
-                tryRemoveRole(userToUpdate, roleToChange);
+                userToUpdate = tryRemoveRole(userToUpdate, roleToChange);
                 break;
             default:
                 throw new UnsupportedOperationException(String.format(INVALID_ARGUMENT_ERR, "action"));
@@ -151,23 +149,22 @@ public class UserServiceImpl implements UserService {
         User user = getById(id);
         switch (action.toLowerCase()) {
             case "block":
-                tryBlockUser(user);
+                user = tryBlockUser(user);
                 break;
             case "unblock":
-                tryUnblockUser(user);
+                user = tryUnblockUser(user);
                 break;
             default:
                 throw new UnsupportedOperationException("Invalid method argument: action");
 
         }
-
         return repository.saveAndFlush(user);
     }
 
     @Scheduled(fixedRate = 5, timeUnit = TimeUnit.DAYS)
     public void deleteExpiredInvitations() {
         invitedUserRepository.findAll().forEach(invitedUser -> {
-            if(invitedUser.getLastInviteDate().isBefore(LocalDateTime.now())) {
+            if (invitedUser.getLastInviteDate().isBefore(LocalDateTime.now())) {
                 invitedUserRepository.delete(invitedUser);
             }
         });
@@ -193,36 +190,46 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void tryAddRole(User userToUpdate, Role roleToChange) {
-        if (userToUpdate.getRoles().contains(roleToChange)) {
+    private User tryAddRole(User userToUpdate, Role roleToChange) {
+        User clone = userToUpdate.toBuilder()
+                .roles(new HashSet<>(userToUpdate.getRoles())).build();
+        if (clone.getRoles().contains(roleToChange)) {
             throw new DuplicateEntityException(String.format("User with id %d is already %s.",
                     userToUpdate.getId(),
                     roleToChange.getName().toLowerCase()));
         }
-        userToUpdate.addRole(roleToChange);
+        clone.addRole(roleToChange);
+        return clone;
     }
 
-    private void tryRemoveRole(User userToUpdate, Role roleToChange) {
-        if (!userToUpdate.getRoles().contains(roleToChange)) {
+    private User tryRemoveRole(User userToUpdate, Role roleToChange) {
+        User clone = userToUpdate.toBuilder()
+                .roles(new HashSet<>(userToUpdate.getRoles())).build();
+        if (!clone.getRoles().contains(roleToChange)) {
             throw new DuplicateEntityException(String.format("User with id %d is not %s",
                     userToUpdate.getId(),
                     roleToChange.getName().toLowerCase()));
         }
-        userToUpdate.removeRole(roleToChange);
+        clone.removeRole(roleToChange);
+        return clone;
     }
 
-    private void tryBlockUser(User user) {
-        if (user.isBlocked())
+    private User tryBlockUser(User user) {
+        User clone = user.toBuilder().build();
+        if (clone.isBlocked())
             throw new DuplicateEntityException(
                     String.format("User with id %d is already blocked", user.getId()));
-        user.setBlocked(true);
+        clone.setBlocked(true);
+        return clone;
     }
 
-    private void tryUnblockUser(User user) {
-        if (!user.isBlocked())
+    private User tryUnblockUser(User user) {
+        User clone = user.toBuilder().build();
+        if (!clone.isBlocked())
             throw new DuplicateEntityException(
                     String.format("User with id %d is already unblocked", user.getId()));
-        user.setBlocked(false);
+        clone.setBlocked(false);
+        return clone;
     }
 
     private void verifyIsUniqueUsername(User user) {

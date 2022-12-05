@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 @Component
 public class SaveFileHelper {
-    private static final String INVALID_IMAGE = "Could not save image file: ";
+    private static final String INVALID_IMAGE = "Could not read image file: ";
 
     public void saveFile(String uploadDir, String fileName,
                                 MultipartFile multipartFile) {
@@ -24,7 +24,7 @@ public class SaveFileHelper {
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ioe) {
-            throw new UnsupportedOperationException(INVALID_IMAGE + fileName);
+            throw new IllegalArgumentException(INVALID_IMAGE + fileName);
         }
 
     }

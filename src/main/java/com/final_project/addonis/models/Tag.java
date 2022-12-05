@@ -1,15 +1,19 @@
 package com.final_project.addonis.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Table(name = "tags")
-@Getter
-@Setter
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tag {
 
     @Id
@@ -20,8 +24,6 @@ public class Tag {
     @Column(name = "name")
     private String name;
 
-    public Tag() {
-    }
 
     public Tag(String name) {
         this.name = name;

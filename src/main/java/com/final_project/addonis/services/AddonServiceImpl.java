@@ -15,8 +15,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -119,8 +120,8 @@ public class AddonServiceImpl implements AddonService {
         if (addon.isFeatured()) {
             throw new IllegalArgumentException("Addon is already added to featured list");
         }
-        addon.setFeatured(true);
-        return addonRepository.saveAndFlush(addon);
+        Addon clone = addon.toBuilder().isFeatured(true).build();
+        return addonRepository.saveAndFlush(clone);
     }
 
     @Override
@@ -128,27 +129,24 @@ public class AddonServiceImpl implements AddonService {
         if (!addon.isFeatured()) {
             throw new IllegalArgumentException("Addon is not in featured list");
         }
-        addon.setFeatured(false);
-        return addonRepository.saveAndFlush(addon);
+        Addon clone = addon.toBuilder()
+                .isFeatured(false)
+                .build();
+        return addonRepository.saveAndFlush(clone);
     }
 
     @Override
     public Addon create(Addon addon, MultipartFile file) {
-        try {
-            checkIfUserIsBlocked(addon);
-            verifyIsUniqueName(addon);
-            BinaryContent binaryContent = binaryContentService.store(file);
-            updateGithubDetails(addon);
-
-            addon.setData(binaryContent);
-            addon.setState(stateRepository.findByName("pending"));
-            return addonRepository.saveAndFlush(addon);
-        } catch (IOException e) {
-            throw new RuntimeException();
-        }
+        checkIfUserIsBlocked(addon);
+        verifyIsUniqueName(addon);
+        BinaryContent binaryContent = binaryContentService.store(file);
+        Addon clone = updateGithubDetails(addon).toBuilder()
+                .data(binaryContent)
+                .state(stateRepository.findByName("pending")).build();
+        return addonRepository.saveAndFlush(clone);
     }
 
-    private void updateGithubDetails(Addon addon) {
+    private Addon updateGithubDetails(Addon addon) {
         List<String> repoDetails = gitHubService.getRepoDetailsIfValid(addon.getOriginUrl());
         String owner = repoDetails.get(0);
         String repo = repoDetails.get(1);
@@ -156,46 +154,42 @@ public class AddonServiceImpl implements AddonService {
         int issuesCount = gitHubService.getIssuesCount(owner, repo);
         int pullsCount = gitHubService.getPullRequests(owner, repo);
 
-        addon.setLastCommitDate(lastCommit.getDate());
-        addon.setLastCommitMessage(lastCommit.getMessage());
-        addon.setIssuesCount(issuesCount);
-        addon.setPullRequests(pullsCount);
+        return addon.toBuilder().lastCommitDate(lastCommit.getDate())
+                .lastCommitMessage(lastCommit.getMessage())
+                .issuesCount(issuesCount)
+                .pullRequests(pullsCount).build();
     }
 
     @Override
     public Addon createDraft(Addon addon,
-                             MultipartFile file, User user) throws IOException {
+                             MultipartFile file, User user) {
 
         checkModifyPermissions(addon, user);
-        updateFileIfExists(addon, file);
-
-        addon.setState(stateRepository.findByName("draft"));
-        return addonRepository.saveAndFlush(addon);
+        Addon clone = updateFileIfExists(addon, file).toBuilder()
+                .state(stateRepository.findByName("draft")).build();
+        return addonRepository.saveAndFlush(clone);
 
     }
 
     @Override
     public Addon createFromDraft(Addon addon, MultipartFile file, User user) {
         checkModifyPermissions(addon, user);
-        addon.setState(stateRepository.findByName("pending"));
-        addon.setUploadedDate(LocalDateTime.now());
-        updateGithubDetails(addon);
-        return update(addon, file, user);
+        Addon clone = addon.toBuilder()
+                .state(stateRepository.findByName("pending"))
+                .uploadedDate(LocalDateTime.now()).build();
+        clone = updateGithubDetails(clone);
+        return update(clone, file, user);
     }
 
     @Override
     public Addon update(Addon addon, MultipartFile file, User user) {
-        try {
-            checkIfUserIsBlocked(addon);
-            checkModifyPermissions(addon, user);
-            verifyIsUniqueName(addon);
-            updateFileIfExists(addon, file);
+        checkIfUserIsBlocked(addon);
+        checkModifyPermissions(addon, user);
+        verifyIsUniqueName(addon);
+        Addon clone = updateFileIfExists(addon, file);
 
-            return addonRepository.saveAndFlush(addon);
-        } catch (IOException e) {
-            //TODO what do we do with this exception? it's thrown by the file implementation.
-            throw new RuntimeException();
-        }
+        return addonRepository.saveAndFlush(clone);
+
     }
 
 
@@ -212,10 +206,13 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public void addTagsToAddon(Addon addon, List<Tag> tags, User user) {
+    public Addon addTagsToAddon(Addon addon, List<Tag> tags, User user) {
         checkModifyPermissions(addon, user);
-        addon.getTags().addAll(tags);
-        addonRepository.saveAndFlush(addon);
+        Addon clone = addon.toBuilder()
+                .tags(new HashSet<>(addon.getTags()))
+                .build();
+        clone.getTags().addAll(tags);
+        return addonRepository.saveAndFlush(clone);
     }
 
     @Override
@@ -227,8 +224,11 @@ public class AddonServiceImpl implements AddonService {
                     "Addon with id %d doesn't have a tag '%s'", addon.getId(), tag.getName()
             ));
         }
-        addon.getTags().remove(tag);
-        addonRepository.saveAndFlush(addon);
+        Addon clone = addon.toBuilder()
+                .tags(new HashSet<>(addon.getTags()))
+                .build();
+        clone.getTags().remove(tag);
+        addonRepository.saveAndFlush(clone);
     }
 
     @Override
@@ -250,16 +250,21 @@ public class AddonServiceImpl implements AddonService {
 
     @Override
     public Addon rateAddon(Addon addon, User user, int ratingId) {
+        Addon clone = addon.toBuilder()
+                .rating(new HashMap<>(addon.getRating())).build();
         Rating currentRating = ratingRepository.findById(ratingId)
                 .orElseThrow(() -> new EntityNotFoundException("Rating", "value", String.valueOf(ratingId)));
-        addon.getRating().put(user, currentRating);
-        return addonRepository.saveAndFlush(addon);
+        clone.getRating().put(user, currentRating);
+        return addonRepository.saveAndFlush(clone);
     }
 
     @Override
     public Addon removeRate(Addon addon, User user) {
-        addon.getRating().remove(user);
-        return addonRepository.saveAndFlush(addon);
+        Addon clone = addon.toBuilder()
+                .rating(new HashMap<>(addon.getRating())).build();
+        clone.getRating().remove(user);
+        return addonRepository.saveAndFlush(clone);
+
     }
 
     @Async
@@ -268,30 +273,30 @@ public class AddonServiceImpl implements AddonService {
     public void updateAllAddons() {
         List<Addon> approvedAddons = addonRepository.getAllByStateNameEqualsIgnoreCase("approved");
         approvedAddons.forEach(addon -> {
-            updateGithubDetails(addon);
+            addon = updateGithubDetails(addon);
             addonRepository.saveAndFlush(addon);
         });
     }
 
 
-    private void updateFileIfExists(Addon addon, MultipartFile file) throws IOException {
+    private Addon updateFileIfExists(Addon addon, MultipartFile file) {
         if (file != null && !file.isEmpty()) {
             BinaryContent newFile = binaryContentService.store(file);
             BinaryContent oldFile = addon.getData();
             if (oldFile != null && !oldFile.equals(newFile)) {
                 binaryContentService.delete(addon.getData());
             }
-            addon.setData(newFile);
-
+            return addon.toBuilder().data(newFile).build();
         }
+        return addon;
     }
 
     private void verifyIsUniqueName(Addon addon) {
         Optional<Addon> optional =
                 addonRepository.findByNameAndStateNameIgnoreCaseNot(addon.getName(), "draft");
-        if (optional.isPresent() && !optional.get().equals(addon))
+        if (optional.isPresent() && !optional.get().equals(addon)) {
             throw new DuplicateEntityException("Addon", "name", addon.getName());
-
+        }
     }
 
     private void checkModifyPermissions(Addon addon, User user) {

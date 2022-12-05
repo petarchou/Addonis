@@ -1,9 +1,7 @@
 package com.final_project.addonis.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -12,8 +10,10 @@ import java.util.*;
 
 @Entity
 @Table(name = "addons")
-@Getter
-@Setter
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Addon {
 
     @Id
@@ -72,14 +72,14 @@ public class Addon {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "addons_ratings",
             joinColumns = @JoinColumn(name = "addon_id"),
             inverseJoinColumns = @JoinColumn(name = "rating_id"))
     @MapKeyJoinColumn(name = "user_id")
     private Map<User, Rating> rating;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "addons_categories",
             joinColumns = @JoinColumn(name = "addon_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
@@ -87,9 +87,6 @@ public class Addon {
 
     @Column(name = "is_featured")
     private boolean isFeatured;
-
-    public Addon() {
-    }
 
     public double getAverageRating() {
         if (rating.isEmpty()) {

@@ -29,8 +29,8 @@ public class GitHubServiceImpl implements GitHubService {
     private static final String GITHUB_PREFIX = "https://github.com/";
     public static final String INVALID_REPOSITORY = "Invalid repository url";
     public static final String GITHUB_API_ERROR = "Error retrieving %s from git hub";
-    private final RestTemplate template;
     private final static String MASTER_URL = "https://api.github.com/repos/%s/%s";
+    private final RestTemplate template;
 
     private final HttpEntity<String> githubGetEntity;
 
