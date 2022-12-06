@@ -1,15 +1,19 @@
 package com.final_project.addonis.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 
-@Table(name="password_reset_tokens")
-@Getter
-@Setter
+@Table(name = "password_reset_tokens")
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class PasswordResetToken {
 
     @Id

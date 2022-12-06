@@ -3,7 +3,6 @@ package com.final_project.addonis.services.contracts;
 import com.final_project.addonis.models.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +28,7 @@ public interface AddonService {
 
     Addon getByName(String name);
 
-    void addTagsToAddon(Addon addon, List<Tag> tags, User user);
+    Addon addTagsToAddon(Addon addon, List<Tag> tags, User user);
 
     void removeTag(Addon addon, User user, int tagId);
 
@@ -42,20 +41,22 @@ public interface AddonService {
 
     Addon removeRate(Addon addon, User user);
 
-    Addon createDraft(Addon addon, MultipartFile file, User user) throws IOException;
-
-    Addon createFromDraft(Addon addon, MultipartFile file, User user);
-
-    Addon getDraftById(int id);
 
     void updateAllAddons();
 
     List<Addon> getAddonsFeaturedByAdmin();
 
     Addon addAddonToFeatured(Addon addon);
+
     Addon removeAddonFromFeatured(Addon addon);
+
     List<Addon> getMostDownloadedAddons();
 
     List<Addon> getNewestAddons();
 
+    Addon createFromDraft(Addon addon, MultipartFile file, User user);
+
+    Addon getDraftById(int id);
+
+    Addon createDraft(Addon addon, MultipartFile file, User user);
 }

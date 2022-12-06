@@ -8,7 +8,6 @@ import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TargetIdeServiceImpl implements TargetIdeService {
@@ -60,12 +59,8 @@ public class TargetIdeServiceImpl implements TargetIdeService {
 
     @Override
     public TargetIde getByName(String name) {
-        Optional<TargetIde> targetIde = repository.findByNameIgnoreCase(name);
+        return repository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new EntityNotFoundException("TargetIde", "name", name));
 
-        if(targetIde.isEmpty()) {
-            throw new EntityNotFoundException("TargetIde", "name", name);
-        }
-
-        return targetIde.get();
     }
 }

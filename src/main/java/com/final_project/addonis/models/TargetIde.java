@@ -1,15 +1,17 @@
 package com.final_project.addonis.models;
 
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Table(name = "target_ides")
-@Getter
-@Setter
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class TargetIde {
 
     @Id
@@ -20,8 +22,6 @@ public class TargetIde {
     @Column(name = "name")
     private String name;
 
-    public TargetIde() {
-    }
 
     @Override
     public boolean equals(Object o) {

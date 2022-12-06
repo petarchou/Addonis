@@ -1,14 +1,18 @@
 package com.final_project.addonis.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "binary_contents")
-@Getter
-@Setter
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class BinaryContent {
 
     @Id
@@ -22,9 +26,6 @@ public class BinaryContent {
     @Lob
     @Column(name = "data")
     private byte[] data;
-
-    public BinaryContent() {
-    }
 
     public BinaryContent(String name, byte[] data) {
         this.name = name;
