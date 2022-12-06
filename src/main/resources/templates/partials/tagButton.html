@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tags</title>
+</head>
+<body>
+
+<div th:fragment="tag-button-create" class="mb-3">
+  <h4>Select Tags</h4>
+  <select class="form-control " id="category" multiple="multiple" th:field="*{tags}">
+
+    <option th:each="tag : ${allTags}"
+            th:value="${tag.getName()}"
+            th:text="${tag.getName()}"> Tag Options
+    </option>
+  </select>
+</div>
+</body>
+</html>

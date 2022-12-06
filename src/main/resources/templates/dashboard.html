@@ -31,7 +31,7 @@
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
                         <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                             th:src="@{${'/assets/pictures/' + addon.binaryContent.name}}">
+                             th:src="@{${'/assets/pictures/' + addon.data.name}}">
                         <div class="card-content">
                             <div class="d-flex justify-content-center align-items-center">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
@@ -69,7 +69,7 @@
                     <div id="Most-popular" class="section-header gallery-element-focus-style-light name">
                         Most popular
                     </div>
-                    <a class="see-more">
+                    <a class="see-more" th:href="@{/addons}">
                         <span>See more</span>
                     </a>
                 </h4>
@@ -79,7 +79,7 @@
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
                         <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                             th:src="@{${'/assets/pictures/' + addon.binaryContent.name}}">
+                             th:src="@{${'/assets/pictures/' + addon.data.name}}">
                         <div class="card-content">
                             <div class="d-flex justify-content-center align-items-center">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
@@ -117,7 +117,7 @@
                     <div id="Recently-added" class="section-header gallery-element-focus-style-light name">
                         Recently added
                     </div>
-                    <a class="see-more">
+                    <a class="see-more" th:href="@{/addons}">
                         <span>See more</span>
                     </a>
                 </h4>
@@ -127,7 +127,7 @@
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
                         <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                             th:src="@{${'/assets/pictures/' + addon.binaryContent.name}}">
+                             th:src="@{${'/assets/pictures/' + addon.data.name}}">
                         <div class="card-content">
                             <div class="d-flex justify-content-center align-items-center">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">

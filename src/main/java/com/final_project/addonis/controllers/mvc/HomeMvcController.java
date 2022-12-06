@@ -1,9 +1,8 @@
 package com.final_project.addonis.controllers.mvc;
 
+import com.final_project.addonis.models.Addon;
 import com.final_project.addonis.models.BinaryContent;
-import com.final_project.addonis.models.dtos.AddonDtoOut;
 import com.final_project.addonis.services.contracts.AddonService;
-import com.final_project.addonis.utils.mappers.AddonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -29,12 +27,10 @@ import java.util.stream.Collectors;
 public class HomeMvcController {
 
     private final AddonService addonService;
-    private final AddonMapper addonMapper;
 
     @Autowired
-    public HomeMvcController(AddonService addonService, AddonMapper addonMapper) {
+    public HomeMvcController(AddonService addonService) {
         this.addonService = addonService;
-        this.addonMapper = addonMapper;
     }
 
 
@@ -44,15 +40,12 @@ public class HomeMvcController {
     }
     @GetMapping("/")
     public String showHomepage(Model model) {
-        List<AddonDtoOut> mostDownloadedAddons = addonService.getMostDownloadedAddons().stream()
-                .map(addonMapper::toDto).collect(Collectors.toList());
-        List<AddonDtoOut> newestAddons = addonService.getNewestAddons().stream()
-                .map(addonMapper::toDto).collect(Collectors.toList());
-        List<AddonDtoOut> featuredAddons = addonService.getAddonsFeaturedByAdmin().stream()
-                .map(addonMapper::toDto).collect(Collectors.toList());
+        List<Addon> mostDownloadedAddons = addonService.getMostDownloadedAddons();
+        List<Addon> newestAddons = addonService.getNewestAddons();
+        List<Addon> featuredAddons = addonService.getAddonsFeaturedByAdmin();
+        model.addAttribute("featuredAddons", featuredAddons);
         model.addAttribute("mostDownloadedAddons", mostDownloadedAddons);
         model.addAttribute("newestAddons", newestAddons);
-        model.addAttribute("featuredAddons", featuredAddons);
         return "dashboard";
     }
 

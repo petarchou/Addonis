@@ -10,6 +10,7 @@ import com.final_project.addonis.utils.exceptions.BlockedUserException;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
+import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public List<Addon> getAllApproved(Optional<String> keyword,
+    public Page<Addon> getAllApproved(Optional<String> keyword,
                                       Optional<String> targetIde,
                                       Optional<String> category,
                                       Optional<Boolean> ascending,
@@ -64,8 +65,8 @@ public class AddonServiceImpl implements AddonService {
         validateIde(targetIde);
         validateCategory(category);
 
-        int pageOrDefault = page.orElse(0);
-        int sizeOrDefault = size.orElse(10);
+        int pageOrDefault = page.orElse(1);
+        int sizeOrDefault = size.orElse(8);
         boolean orderOrDefault = ascending.orElse(true);
 
         return addonRepository.findAllAddonsByFilteringAndSorting(keyword,

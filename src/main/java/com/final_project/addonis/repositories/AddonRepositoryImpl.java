@@ -5,6 +5,9 @@ import com.final_project.addonis.models.Category;
 import com.final_project.addonis.models.TargetIde;
 import com.final_project.addonis.repositories.contracts.CustomAddonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -26,7 +29,7 @@ public class AddonRepositoryImpl implements CustomAddonRepository {
     }
 
     @Override
-    public List<Addon> findAllAddonsByFilteringAndSorting(Optional<String> keyword,
+    public Page<Addon> findAllAddonsByFilteringAndSorting(Optional<String> keyword,
                                                           Optional<String> targetIde,
                                                           Optional<String> category,
                                                           boolean order,
@@ -43,7 +46,7 @@ public class AddonRepositoryImpl implements CustomAddonRepository {
         keyword.ifPresent(value -> predicates.add(criteriaBuilder
                 .like(addon.get("name"), "%" + value + "%")));
         targetIde.ifPresent(value -> predicates.add(criteriaBuilder
-                .like(targetIdeJoin.get("targetIdeName"), "%" + value + "%")));
+                .like(targetIdeJoin.get("name"), "%" + value + "%")));
         category.ifPresent(value -> predicates.add(criteriaBuilder
                 .like(categoryJoin.get("name"), "%" + value + "%")));
 
@@ -58,9 +61,15 @@ public class AddonRepositoryImpl implements CustomAddonRepository {
         }
 
         TypedQuery<Addon> query = entityManager.createQuery(criteriaQuery)
-                .setFirstResult(page * size)
+                .setFirstResult((page-1) * size)
                 .setMaxResults(size);
 
-        return query.getResultList();
+        long totalCount = 0;
+        List<Addon> resultList = entityManager.createQuery(criteriaQuery).getResultList();
+        if(resultList != null) {
+            totalCount = resultList.size();
+        }
+
+        return new PageImpl<>(query.getResultList(), PageRequest.of(page-1, size), totalCount);
     }
 }

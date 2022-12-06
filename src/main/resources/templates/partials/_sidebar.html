@@ -19,9 +19,9 @@
         <ul class="nav">
             <li class="nav-item nav-category">Main</li>
             <li class="nav-item">
-                <a href="/dashboard" class="nav-link">
+                <a th:href="@{/}" class="nav-link">
                     <i class="link-icon" data-feather="box"></i>
-                    <span class="link-title">Dashboard</span>
+                    <span class="link-title">Home</span>
                 </a>
             </li>
             <li class="nav-item nav-category">web apps</li>
@@ -50,7 +50,7 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a href="../pages/apps/chat.html" class="nav-link">
+                <a th:href="@{/addons/create}" class="nav-link">
                     <i class="link-icon" data-feather="upload"></i>
                     <span class="link-title">Create Addon</span>
                 </a>
@@ -310,7 +310,7 @@
                 <div class="collapse" id="errorPages">
                     <ul class="nav sub-menu">
                         <li class="nav-item">
-                            <a href="../pages/error/404.html" class="nav-link">404</a>
+                            <a href="../error/404.html" class="nav-link">404</a>
                         </li>
                         <li class="nav-item">
                             <a href="../pages/error/500.html" class="nav-link">500</a>
