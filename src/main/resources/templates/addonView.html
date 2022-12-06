@@ -137,7 +137,7 @@
                                                                     <h3 class="section-header right">
                                                                         Works with</h3>
                                                                     <div class="capabilities-list-item"
-                                                                         th:text="${addon.targetIde.targetIdeName}">
+                                                                         th:text="${addon.targetIde.name}">
                                                                         Target IDE
                                                                     </div>
                                                                 </div>
@@ -225,34 +225,22 @@
                                                 <div class="rating-tab">
                                                     <div>
                                                         <div class="rating-top-container">
-                                                            <div class="ms-Grid rating-container-grid">
-                                                                <div class="ms-Grid-row rating-container-row">
-                                                                    <h2 id="rating-details-header"
-                                                                        class="ms-Grid-col user-ratings-section-header">
-                                                                        User Ratings
-                                                                    </h2>
-                                                                    <div class="ms-Grid-col"></div>
-<!--                                                                    TODO rating stars maybe here-->
-                                                                </div>
-                                                                <div class="ms-Grid-row ratings-container">
-                                                                    <div class="ms-Grid ratings-table"
-                                                                         th:each="rating : ${addon.rating}">
-                                                                        <div class="ms-Grid-row ratings-row">
-                                                                            <div class="ms-Grid rating-container">
-                                                                                <div class="ms-Grid-col rating-user-image-column ms-sm1">
-<!--                                                                                    TODO image for user-->
-                                                                                    <img class="rating-user-image" alt="user image" src="/assets/others/logo-placeholder.png"
-                                                                                         th:src="${rating.key.photoUrl}">
-                                                                                </div>
-<!--                                                                                <div class="ms-Grid-col rating-column ms-sm1">-->
-<!--                                                                                    <div class="ms-Grid-row">-->
-<!--                                                                                        -->
-<!--                                                                                    </div>-->
-<!--                                                                                </div>-->
-                                                                            </div>
+                                                            <div class="col-md-12 grid-margin">
+                                                                <br/><h3>Users ratings</h3><br/>
+                                                                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom"
+                                                                     th:each="rating : ${addon.rating}">
+                                                                    <div class="d-flex align-items-center hover-pointer">
+                                                                        <img class="img-xs rounded-circle"
+                                                                             alt="user image" src="/assets/others/logo-placeholder.png"
+                                                                             th:src="${rating.key.photoUrl}">
+                                                                        <div class="ms-2">
+                                                                            <p th:text="${rating.key.username}"></p>
+                                                                            <p class="tx-11 text-muted" th:text="${rating.key.email}"></p>
                                                                         </div>
                                                                     </div>
+                                                                    <button class="btn btn-icon border-0"><i data-feather="star"></i><div th:title="${'Rating ' + rating.value + ' from 5'}" th:text="${rating.value + ''}"></div></button>
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     </div>

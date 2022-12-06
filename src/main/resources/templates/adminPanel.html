@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="/partials/resources::resources">
+    <meta charset="UTF-8">
+    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
+    <title>Add-ons Plugins for your IDE</title>
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:partials/_sidebar.html -->
+    <nav th:replace="/partials/_sidebar::_sidebar"></nav>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+        <section class="py-4">
+            <div class="card-body px-4 px-lg-5 mt-5">
+                <div class="d-flex justify-content-between align-items-baseline mb-2">
+                    <h6 class="card-title mb-0">Pending Addons</h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th class="pt-0">#</th>
+                            <th class="pt-0">Addon Name</th>
+                            <th class="pt-0">Creator</th>
+                            <th class="pt-0">Uploaded Date</th>
+                            <th class="pt-0">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(pendingAddons)}">
+                            <td colspan="7">No Records found.</td>
+                        </tr>
+                        <tr th:each="addon : ${pendingAddons}">
+                            <td th:text="${pendingAddons.indexOf(addon)} + 1"></td>
+                            <td>
+                                <a th:href="@{/addons/{id}(id=${addon.id})}">
+                                    <span th:text="${addon.name}">Addon Name</span>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
+                                    <span th:text="${addon.creator.username}">Creator</span>
+                                </a>
+                            </td>
+                            <td th:text="${addon.uploadedDate}"></td>
+                            <td>
+                                <form method="post" action="#"
+                                      th:action="@{/approve/{id}(id=${addon.id})}">
+                                    <input type="submit" class="btn btn-primary" style="margin-right: 10px;"
+                                           value="Approve">
+                                </form>
+                                <!--                                TODO Notify user -->
+                                <!--                                <form class="badge bg-success" method="post"-->
+                                <!--                                      th:action="@{admin-panel/notify/{id}(id=${addon.id})}">-->
+                                <!--                                    <input type="submit" class="btn btn-primary" value="Notify user">-->
+                                <!--                                </form>-->
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <!-- partial:partials/_navbar.html -->
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
+    </div>
+</div>
+<footer th:replace="/partials/_footer::_footer"></footer>
+</body>
+</html>

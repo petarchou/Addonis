@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="/partials/resources::resources">
+    <meta charset="UTF-8">
+    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
+    <title>Add-ons Plugins for your IDE</title>
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:partials/_sidebar.html -->
+    <nav th:replace="/partials/_sidebar::_sidebar"></nav>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+        <section class="py-4">
+            <div class="card-container px-4 px-lg-5 mt-5">
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    <div th:each="addon : ${page.content}" class="col mb-5"
+                         data-toggle="modal"
+                         th:attr="data-target='#addonModal' + ${addon.id}">
+                        <div class="product-card">
+                            <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
+                                 th:src="@{${'/assets/pictures/' + addon.data.name}}">
+                            <div class="addon-details">
+                                <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
+                                    <span class="addon_name" th:text="${addon.name}">Addon Name</span>
+                                </a>
+                                <div class="stars">
+                                    <i class="star">&#9734;</i>
+                                    <i class="star">&#9734;</i>
+                                    <i class="star">&#9734;</i>
+                                    <i class="star">&#9733;</i>
+                                    <i class="star">&#9733;</i>
+                                </div>
+                            </div>
+                            <div class="user-downloads">
+                                <div class="user">
+                                    <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
+                                        <span class="username-creator"
+                                              th:text="${addon.creator.username}">Creator</span>
+                                    </a>
+                                </div>
+                                <div class="addon-downloads">
+                                    <p class="text-success">
+                                        <i data-feather="download" class="icon-sm mb-1"></i>
+                                        <span th:text="${addon.downloads}">Downloads</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="button">
+                                <div class="button-layer"></div>
+                                <a th:href="@{'/download?id=' + ${addon.id}}">
+                                    <button type="button" class="btn btn-primary btn-xs">Download
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item"
+                                th:each="pageNumber : ${pageNumbers}"
+                                th:class="${pageNumber==page.number + 1} ? active"
+                                th:if="${page.totalPages > 0}"><a class="page-link"
+                                                                  th:href="@{/addons(size=${page.size}, page=${pageNumber})}"
+                                                                  th:text="${pageNumber}"></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+        <!-- partial:partials/_navbar.html -->
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
+    </div>
+</div>
+<footer th:replace="/partials/_footer::_footer"></footer>
+</body>
+</html>

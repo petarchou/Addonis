@@ -1,4 +1,6 @@
 @charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
 /*
 * NobleUI - HTML Bootstrap 5 Admin Dashboard Template v2.0.3 (https://nobleui.com/)
 * Copyright © 2022 NobleUI
@@ -4435,8 +4437,6 @@ div.tox .btn-group-vertical > .btn-group:not(:first-child) > .tox-button,
   --bs-card-cap-padding-x: 1.5rem;
   --bs-card-cap-bg: rgba(0, 0, 0, 0.01);
   /*--bs-card-cap-color: ;*/
-  --bs-card-height: 200px;
-  --bs-card-width: 200px;
   /*--bs-card-color: ;*/
   --bs-card-bg: #fff;
   --bs-card-img-overlay-padding: 1rem;
@@ -19762,6 +19762,7 @@ body {
   border-collapse: collapse;
   padding-top: 5px;
   text-align: center;
+  vertical-align: top;
 }
 
 .ratings-row .rating-user-image-column .rating-user-image {
@@ -19771,6 +19772,10 @@ body {
 
 .ms-sm1 {
   width: 8.32%;
+}
+
+.ms-sm11 {
+  width: 91.68%;
 }
 
 .ratings-row .rating-container {
@@ -19813,6 +19818,16 @@ body {
 
 .rating-top-container .rating-container-row {
   border-collapse: collapse;
+}
+
+.ratings-row .user-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.ratings-row .rating-container .rating-control {
+  font-size: 11px;
+  padding-top: 1px;
 }
 
 .ms-Grid-row {
@@ -19861,7 +19876,6 @@ body {
 }
 
 .gallery-centered-content {
-  width: 1160px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 10px;
@@ -23041,4 +23055,176 @@ div.tox .tox-dialog__body {
 .wizard.vertical > .actions > ul > li {
   margin: 0 0 0 0.7em;
 }
+
+/*TODO START REMOVE IMPORT FROM TOP OF THE CSS*/
+
+
+
+.card-container {
+  max-width: 2000px;
+  width: 100%;
+  padding: 80px 0;
+}
+
+.product-card {
+  position: relative;
+  max-width: 230px;
+  width: 100%;
+  border-radius: 25px;
+  padding: 10px 20px;
+  background: #fff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+  overflow: hidden;
+  margin: 0 10px;
+}
+.product-card .logo-cart{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.product-card .logo-cart img{
+  height: 60px;
+  width: 60px;
+  object-fit: cover;
+}
+.product-card .logo-cart i{
+  font-size: 27px;
+  color: #707070;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.product-card .logo-cart i:hover{
+  color: #333;
+}
+.product-card .main-images{
+  position: relative;
+  height: 150px;
+}
+.product-card .main-images img{
+  position: absolute;
+  height: 70px;
+  width: 70px;
+  object-fit: cover;
+  left: 45px;
+  top: 50px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.product-card .main-images img.active{
+  opacity: 1;
+}
+.product-card .addon-details .addon_name{
+  font-size: 12px;
+  font-weight: 500;
+  color: #161616;
+}
+.product-card .addon-details p{
+  font-size: 12px;
+  font-weight: 400;
+  color: #333;
+  text-align: justify;
+}
+.product-card .addon-details .stars i{
+  margin: 0 -1px;
+  color: #333;
+}
+.product-card .user-downloads .user{
+  display: flex;
+  align-items: center;
+}
+.user-downloads{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+.user-downloads .user .username-creator{
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  margin-right: 8px;
+}
+.user  .circles{
+  display: flex;
+}
+.user  .circles .circle{
+  height: 18px;
+  width: 18px;
+  background: #0071C7;
+  border-radius: 50%;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+.user  .circles .circle.blue.active{
+  box-shadow: 0 0 0 2px #fff,
+  0 0 0 4px #0071C7;
+}
+.user  .circles .circle.pink{
+  background: #FA1795;
+}
+.user  .circles .circle.pink.active{
+  box-shadow: 0 0 0 2px #fff,
+  0 0 0 4px #FA1795;
+}
+.user  .circles .circle.yellow{
+  background: #F5DA00;
+}
+.user  .circles .circle.yellow.active{
+  box-shadow: 0 0 0 2px #fff,
+  0 0 0 4px #F5DA00;
+}
+.user-downloads .addon-downloads{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.user-downloads .addon-downloads .price_num{
+  font-size: 12px;
+  font-weight: 600;
+  color: #707070;
+}
+.user-downloads .addon-downloads .price_letter{
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: -4px;
+  color: #707070;
+}
+.product-card .button{
+  position: relative;
+  height: 40px;
+  width: 50%;
+  border-radius: 25px;
+  margin-top: 30px;
+  overflow: hidden;
+}
+.product-card .button .button-layer{
+  position: absolute;
+  height: 100%;
+  width: 225%;
+  left: -100%;
+  background-image: linear-gradient(135deg, #1769bb, #64a1e1, #1769bb, #64a1e1);
+  transition: all 0.4s ease;
+  border-radius: 25PX;
+}
+.product-card .button:hover .button-layer{
+  left: 0;
+}
+.product-card .button button{
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: none;
+  outline: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #fff;
+}
+/*TODO END*/
+
 /*# sourceMappingURL=../maps/demo1/style.css.map */

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="/partials/resources::resources">
+    <meta charset="UTF-8">
+    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
+    <title>Add-ons Plugins for your IDE</title>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <!-- partial:partials/_sidebar.html -->
+    <nav th:replace="/partials/_sidebar::_sidebar"></nav>
+
+    <div class="page-wrapper">
+        <!-- partial:partials/_navbar.html -->
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
+        <!-- partial -->
+        <div class="page-content">
+
+            <nav class="page-breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/addons">Addons</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Create addon</li>
+                </ol>
+            </nav>
+            <div class="row">
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Create addon</h6>
+                            <form th:object="${addon}" enctype="multipart/form-data"
+                                  th:action="@{__${#httpServletRequest.requestURI}__}"
+                                  method="post">
+                                <div class="mb-3">
+                                    <label for="addonName" class="form-label">Addon Name</label>
+                                    <input type="text"
+                                           class="${#fields.hasErrors('addonName')} ? 'form-control is-invalid' : form-control"
+                                           id="addonName" value="" th:field="*{name}"
+                                           placeholder="Write the name of your Addon here">
+
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
+                                         th:errors="*{name}">Name Error
+                                    </div>
+                                </div>
+                                <!--                                    new-->
+                                <div class="mb-3">
+                                    <div class="form-group col-md">
+                                        <label>Description</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                            </div>
+                                            <input class="form-control"
+                                                   maxlength="5000"
+                                                   minlength="3"
+                                                   placeholder="Description"
+                                                   required th:field="*{description}" type="text">
+                                            <label class="error error-color" th:errors="*{description}">
+                                                Username name error placeholder</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--                                                                    new end-->
+
+                                <div class="mb-3">
+                                    <label class="form-label" th:text="#{addon.label.tags}">Tags</label>
+                                    <select class="form-select" id="category" multiple="multiple"
+                                            th:field="*{tags}">
+                                        <option disabled selected value="">Select Tags</option>
+                                        <option th:each="tag : ${allTags}"
+                                                th:text="${tag.name}"
+                                                th:value="${tag.name}">Tags</option>
+
+                                    </select>
+<!--                                    <label for="tags" class="form-label">Tags</label>-->
+<!--                                    <select class="form-select" id="tags" multiple="multiple"-->
+<!--                                            th:field="*{tags}">-->
+<!--                                        <option disabled selected value="">Select Tags-->
+<!--                                        </option>-->
+<!--                                        <option class="dropdown-item"-->
+<!--                                                th:each="tag : ${allTags}"-->
+<!--                                                th:text="${tag.name}"-->
+<!--                                                th:value="${tag.name}">Tags-->
+<!--                                        </option>-->
+<!--                                        <label for="tags"></label><input name="category" id="tags"/>-->
+<!--                                    </select>-->
+                                </div>
+                                <!--                                <div th:replace="/partials/tagButton::tag-button-create"></div>-->
+                                <div class="mb-3">
+                                    <div class="form-group col-md">
+                                        <label for="exampleFormControlSelect1" class="form-label">Select Target
+                                            IDE</label>
+                                        <select class="form-select" id="exampleFormControlSelect1"
+                                                th:field="*{targetIde}">
+                                            <option disabled selected value="">Select IDE</option>
+                                            <option class="dropdown-item" th:each="ide : ${allIdes}"
+                                                    th:text="${ide.name}"
+                                                    th:value="${ide.name}">Select IDE
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-group col-md">
+                                        <label>Origin URL</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                            </div>
+                                            <input class="form-control"
+                                                   placeholder="Origin URL"
+                                                   required
+                                                   th:field="*{originUrl}"
+                                                   type="text">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check form-switch mb-2">
+                                        <input type="checkbox" class="form-check-input" id="formSwitch1">
+                                        <label class="form-check-label" for="formSwitch1">Upload as a draft, publish it
+                                            later</label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="formFile">Addon content</label>
+                                    <input class="form-control" type="file" name="binaryContent" id="formFile">
+<!--                                    <label class="error" th:errors="*{data}">Username name error placeholder</label>-->
+                                </div>
+                                <button class="btn btn-primary" type="submit">Create Addon</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="/partials/_footer::_footer"></footer>
+
+<!-- core:js -->
+<script src="/vendors/core/core.js"></script>
+<!-- endinject -->
+
+<!-- Plugin js for this page -->
+<script src="/vendors/flatpickr/flatpickr.min.js"></script>
+<script src="/vendors/apexcharts/apexcharts.min.js"></script>
+<!-- End plugin js for this page -->
+
+<!-- inject:js -->
+<script src="/vendors/feather-icons/feather.min.js"></script>
+<script src="/js/template.js"></script>
+<!-- endinject -->
+
+
+<script src="/vendors/jquery-tags-input/jquery.tagsinput.min.js"></script>
+<link rel="stylesheet" href="/vendors/jquery-tags-input/jquery.tagsinput.min.css">
+<script src="/js/tags-input.js"></script>
+<script type="text/javascript">
+    $('#tags').tagsInput({
+            'height': '50px',
+            'width': '100%',
+            'placeholderColor': '#666666'
+    });
+    $(document).ready(function () {
+        $("#category").select2({
+            tags: true
+        });
+    });
+</script>
+
+<!-- Custom js for this page -->
+<script src="/js/dashboard-light.js"></script>
+<!--            Swipper JS-->
+<script src="/vendors/swiper/swiper-bundle.min.js"></script>
+<!--            JacaScript-->
+<script src="/js/script.js"></script>
+<!-- End custom js for this page -->
+</body>
+</html>

@@ -1,6 +1,7 @@
 package com.final_project.addonis.services.contracts;
 
 import com.final_project.addonis.models.*;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 public interface AddonService {
 
-    List<Addon> getAllApproved(Optional<String> keyword,
+    Page<Addon> getAllApproved(Optional<String> keyword,
                                Optional<String> targetIde,
                                Optional<String> category,
                                Optional<Boolean> ascending,
