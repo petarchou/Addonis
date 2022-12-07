@@ -50,12 +50,13 @@ public class AddonRestController {
     public List<AddonDtoOut> getAll(@RequestParam(value = "search", required = false) Optional<String> keyword,
                                     @RequestParam(value = "targetIde", required = false) Optional<String> targetIde,
                                     @RequestParam(value = "category", required = false) Optional<String> category,
+                                    @RequestParam(value = "sortBy", required = false) Optional<String> sortBy,
                                     @RequestParam(value = "ascending", required = false) Optional<Boolean> order,
                                     @RequestParam(value = "page", required = false) Optional<Integer> page,
                                     @RequestParam(value = "size", required = false) Optional<Integer> size) {
         try {
 
-            return addonService.getAllApproved(keyword, targetIde, category, order, page, size)
+            return addonService.getAllApproved(keyword, targetIde, category, sortBy, order, page, size)
                     .stream()
                     .map(addonMapper::toDto)
                     .collect(Collectors.toList());

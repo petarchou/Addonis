@@ -12,7 +12,7 @@ public interface AddonService {
     Page<Addon> getAllApproved(Optional<String> keyword,
                                Optional<String> targetIde,
                                Optional<String> category,
-                               Optional<Boolean> ascending,
+                               Optional<String> sortBy, Optional<Boolean> ascending,
                                Optional<Integer> page,
                                Optional<Integer> size);
 

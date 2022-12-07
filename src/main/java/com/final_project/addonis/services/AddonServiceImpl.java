@@ -60,20 +60,24 @@ public class AddonServiceImpl implements AddonService {
     public Page<Addon> getAllApproved(Optional<String> keyword,
                                       Optional<String> targetIde,
                                       Optional<String> category,
+                                      Optional<String> sortBy,
                                       Optional<Boolean> ascending,
                                       Optional<Integer> page,
                                       Optional<Integer> size) {
 
         validateIde(targetIde);
         validateCategory(category);
+        validateSortBy(sortBy);
 
         int pageOrDefault = page.orElse(1);
         int sizeOrDefault = size.orElse(8);
-        boolean orderOrDefault = ascending.orElse(true);
+        boolean orderOrDefault = ascending.orElse(false);
+        String sortByField = sortBy.orElse("name");
 
         return addonRepository.findAllAddonsByFilteringAndSorting(keyword,
                 targetIde,
                 category,
+                sortByField,
                 orderOrDefault,
                 pageOrDefault,
                 sizeOrDefault);
@@ -185,9 +189,7 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
-    public Addon createDraft(Addon addon,
-                             MultipartFile file, User user) {
-
+    public Addon createDraft(Addon addon, MultipartFile file, User user) {
         checkModifyPermissions(addon, user);
         Addon clone = updateFileIfExists(addon, file).toBuilder()
                 .state(stateRepository.findByName("draft")).build();
@@ -211,9 +213,7 @@ public class AddonServiceImpl implements AddonService {
         checkModifyPermissions(addon, user);
         verifyIsUniqueName(addon);
         Addon clone = updateFileIfExists(addon, file);
-
         return addonRepository.saveAndFlush(clone);
-
     }
 
     @Override
@@ -244,8 +244,7 @@ public class AddonServiceImpl implements AddonService {
         Tag tag = tagRepository.getReferenceById(tagId);
         if (!addon.getTags().contains(tag)) {
             throw new EntityNotFoundException(String.format(
-                    "Addon with id %d doesn't have a tag '%s'", addon.getId(), tag.getName()
-            ));
+                    "Addon with id %d doesn't have a tag '%s'", addon.getId(), tag.getName()));
         }
         Addon clone = addon.toBuilder()
                 .tags(new HashSet<>(addon.getTags()))
@@ -294,7 +293,8 @@ public class AddonServiceImpl implements AddonService {
     @Scheduled(fixedRate = 30, timeUnit = TimeUnit.MINUTES)
     @Override
     public void updateAllAddons() {
-        List<Addon> approvedAddons = addonRepository.getAllByStateNameEqualsIgnoreCase("approved");
+        List<Addon> approvedAddons = addonRepository
+                .getAllByStateNameEqualsIgnoreCase("approved");
         approvedAddons.forEach(addon -> {
             addon = updateGithubDetails(addon);
             addonRepository.saveAndFlush(addon);
@@ -424,6 +424,21 @@ public class AddonServiceImpl implements AddonService {
             if (!targetIdeService.existByName(targetIde.get())) {
                 throw new IllegalArgumentException(String.format
                         ("Ide with name %s not exist", targetIde.get()));
+            }
+        }
+    }
+
+    private void validateSortBy(Optional<String> sortBy) {
+        if (sortBy.isPresent()) {
+            switch (sortBy.get()) {
+                case "name":
+                case "downloads":
+                case "uploadedDate":
+                case "lastCommitDate":
+                    break;
+                default:
+                    throw new IllegalArgumentException("You can sort only by name, downloads, " +
+                            "uploadedDate and lastCommitDate ");
             }
         }
     }

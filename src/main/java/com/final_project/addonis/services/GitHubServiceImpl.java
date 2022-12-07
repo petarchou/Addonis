@@ -7,9 +7,8 @@ import com.final_project.addonis.utils.exceptions.GithubApiException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,13 +33,11 @@ public class GitHubServiceImpl implements GitHubService {
 
     private final HttpEntity<String> githubGetEntity;
 
-
-    public GitHubServiceImpl(RestTemplateBuilder template) {
-
-        this.template = template.build();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(System.getenv("GITHUBTOKEN"));
-        this.githubGetEntity = new HttpEntity<>("", headers);
+    @Autowired
+    public GitHubServiceImpl(RestTemplate template,
+                             HttpEntity<String> githubGetEntity) {
+        this.template = template;
+        this.githubGetEntity = githubGetEntity;
     }
 
 

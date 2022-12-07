@@ -32,6 +32,7 @@ public class AddonRepositoryImpl implements CustomAddonRepository {
     public Page<Addon> findAllAddonsByFilteringAndSorting(Optional<String> keyword,
                                                           Optional<String> targetIde,
                                                           Optional<String> category,
+                                                          String sortBy,
                                                           boolean order,
                                                           int page,
                                                           int size) {
@@ -54,10 +55,10 @@ public class AddonRepositoryImpl implements CustomAddonRepository {
 
         if (order) {
             criteriaQuery.select(addon).where(predicates.toArray(new Predicate[0]))
-                    .orderBy(criteriaBuilder.asc(addon.get("name"))).distinct(true);
+                    .orderBy(criteriaBuilder.asc(addon.get(sortBy))).distinct(true);
         } else {
             criteriaQuery.select(addon).where(predicates.toArray(new Predicate[0]))
-                    .orderBy(criteriaBuilder.desc(addon.get("name"))).distinct(true);
+                    .orderBy(criteriaBuilder.desc(addon.get(sortBy))).distinct(true);
         }
 
         TypedQuery<Addon> query = entityManager.createQuery(criteriaQuery)
