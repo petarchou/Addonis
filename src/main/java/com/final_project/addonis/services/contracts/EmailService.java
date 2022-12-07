@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 
 public interface EmailService {
 
+    void sendEmailForRejectedAddon(String toUser, String email);
 
     void sendInvitationEmail(User referrer, String siteUrl, InvitedUser invitedUser);
 

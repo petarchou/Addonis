@@ -11,6 +11,8 @@
     <!-- partial:partials/_sidebar.html -->
     <nav th:replace="/partials/_sidebar::_sidebar"></nav>
     <!-- partial -->
+    <!-- partial:partials/_navbar.html -->
+    <nav th:replace="/partials/_navbar::_navbar"></nav>
 
     <div class="page-wrapper">
         <section class="py-4">
@@ -58,23 +60,44 @@
                         </div>
                     </div>
                 </div>
-                <div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item"
-                                th:each="pageNumber : ${pageNumbers}"
-                                th:class="${pageNumber==page.number + 1} ? active"
-                                th:if="${page.totalPages > 0}"><a class="page-link"
-                                                                  th:href="@{/addons(size=${page.size}, page=${pageNumber})}"
-                                                                  th:text="${pageNumber}"></a></li>
-                        </ul>
-                    </nav>
-                </div>
+
             </div>
         </section>
-        <!-- partial:partials/_navbar.html -->
-        <nav th:replace="/partials/_navbar::_navbar"></nav>
     </div>
+</div>
+<div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item"
+                th:each="pageNumber : ${pageNumbers}"
+                th:class="${pageNumber==page.number + 1} ? active"
+                th:if="${page.totalPages > 0}"><a class="page-link"
+                                                  th:href="@{/addons(size=${page.size}, page=${pageNumber})}"
+                                                  th:text="${pageNumber}"></a></li>
+        </ul>
+    </nav>
+    <!-- core:js -->
+    <script src="/vendors/core/core.js"></script>
+    <!-- endinject -->
+
+    <!-- Plugin js for this page -->
+    <script src="/vendors/flatpickr/flatpickr.min.js"></script>
+    <script src="/vendors/apexcharts/apexcharts.min.js"></script>
+    <!-- End plugin js for this page -->
+
+    <!-- inject:js -->
+    <script src="/vendors/feather-icons/feather.min.js"></script>
+    <script src="/js/template.js"></script>
+    <!-- endinject -->
+
+    <!-- Custom js for this page -->
+    <script src="/js/dashboard-light.js"></script>
+    <!--            Swipper JS-->
+    <script src="/vendors/swiper/swiper-bundle.min.js"></script>
+    <!--            JacaScript-->
+    <script src="/js/script.js"></script>
+    <!-- End custom js for this page -->
+
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
 </body>

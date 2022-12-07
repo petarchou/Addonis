@@ -76,10 +76,12 @@ public class AddonRestController {
         }
     }
 
+
+
     @GetMapping("/drafts/{id}")
     public AddonDtoOut getDraft(@PathVariable int id) {
         try {
-            Addon addon = addonService.getAddonById(id);
+            Addon addon = addonService.getDraftById(id);
             return addonMapper.toDto(addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
@@ -139,6 +141,27 @@ public class AddonRestController {
         }
     }
 
+    @GetMapping("/{userId}/pending-addons")
+    public List<AddonDtoOut> getUserPendingAddons(@PathVariable int userId) {
+        return addonService.getPendingAddonsByUser(userId).stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{userId}/approved-addons")
+    public List<AddonDtoOut> getUserApprovedAddons(@PathVariable int userId) {
+        return addonService.getApprovedAddonsByUser(userId).stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{userId}/draft-addons")
+    public List<AddonDtoOut> getUserDraftedAddons(@PathVariable int userId) {
+        return addonService.getDraftAddonsByUser(userId).stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
 
     @GetMapping("/featured")
     public List<AddonDtoOut> getFeaturedAddons() {
@@ -167,6 +190,17 @@ public class AddonRestController {
         return addonService.getAllPendingAddons().stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping("/pending/{id}")
+    public AddonDtoOut getPendingAddonById(@PathVariable int id) {
+        try {
+            Addon addon = addonService.getPendingAddonById(id);
+            return addonMapper.toDto(addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PostMapping

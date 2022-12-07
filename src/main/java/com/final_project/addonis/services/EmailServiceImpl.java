@@ -46,6 +46,22 @@ public class EmailServiceImpl implements EmailService {
         this.userRepository = userRepository;
     }
 
+    @Async
+    @Override
+    public void sendEmailForRejectedAddon(String toUser, String email) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            helper.setText(email, true);
+            helper.setTo(toUser);
+            helper.setSubject("Confirm your email for more features!");
+            helper.setFrom(SENDER_EMAIL);
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new IllegalStateException("Failed to send email.");
+        }
+    }
 
     @Async
     @Override
