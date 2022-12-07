@@ -1,14 +1,8 @@
 package com.final_project.addonis.controllers.mvc;
 
-import com.final_project.addonis.models.Addon;
-import com.final_project.addonis.models.Tag;
-import com.final_project.addonis.models.TargetIde;
-import com.final_project.addonis.models.User;
+import com.final_project.addonis.models.*;
 import com.final_project.addonis.models.dtos.CreateAddonDto;
-import com.final_project.addonis.services.contracts.AddonService;
-import com.final_project.addonis.services.contracts.TagService;
-import com.final_project.addonis.services.contracts.TargetIdeService;
-import com.final_project.addonis.services.contracts.UserService;
+import com.final_project.addonis.services.contracts.*;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.GithubApiException;
@@ -23,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -116,6 +109,7 @@ public class AddonMvcController {
             return "createAddon";
         }
         try {
+            //        TODO add User
 //            User user = userService.getByUsername(principal.getName());
             User user = userService.getById(74);
             Addon addonToCreate = addonMapper.fromDtoCreate(addon, user);
@@ -130,5 +124,19 @@ public class AddonMvcController {
                     "Please check your repository url for typos. If the issue persists, contact Addonis support.");
         }
         return "pending";
+    }
+
+    @GetMapping("/user/{userId}")
+    public String showUserAddons(@PathVariable int userId, Model model) {
+        User user = userService.getById(userId);
+        List<Addon> getUserDraftAddons = addonService.getDraftAddonsByUser(userId);
+        List<Addon> getUserPendingAddons = addonService.getPendingAddonsByUser(userId);
+        List<Addon> getUserApprovedAddons = addonService.getApprovedAddonsByUser(userId);
+        model.addAttribute("userDraftAddons", getUserDraftAddons);
+        model.addAttribute("userPendingAddons", getUserPendingAddons);
+        model.addAttribute("userApprovedAddons", getUserApprovedAddons);
+        model.addAttribute("user", user);
+
+        return "userAddons";
     }
 }

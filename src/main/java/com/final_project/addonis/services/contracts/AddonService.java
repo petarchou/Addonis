@@ -21,6 +21,8 @@ public interface AddonService {
 
     Addon getAddonById(int addonId);
 
+    Addon getPendingAddonById(int addonId);
+
     Addon create(Addon addon, MultipartFile file);
 
     Addon update(Addon addon, MultipartFile file, User user);
@@ -60,4 +62,12 @@ public interface AddonService {
     Addon getDraftById(int id);
 
     Addon createDraft(Addon addon, MultipartFile file, User user);
+
+    List<Addon> getPendingAddonsByUser(int userId);
+
+    List<Addon> getApprovedAddonsByUser(int userId);
+
+    List<Addon> getDraftAddonsByUser(int userId);
+
+    void notifyUser(User creator, Addon addon);
 }

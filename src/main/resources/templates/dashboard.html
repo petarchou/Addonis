@@ -27,28 +27,37 @@
                 </h4>
                 <div class="card-wrapper swiper-wrapper" style="margin-top: 20px">
                     <div id="featuredAddons" th:each="addon : ${featuredAddons}"
-                         class="card swiper-slide"
+                         class="swiper-slide"
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
-                        <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                             th:src="@{${'/assets/pictures/' + addon.data.name}}">
-                        <div class="card-content">
-                            <div class="d-flex justify-content-center align-items-center">
+                        <div class="product-card">
+                            <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
+                                 th:src="@{${'/assets/pictures/' + addon.data.name}}">
+                            <div class="addon-details">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
-                                    <h6 class="card-title mb-0" th:text="${addon.name}">Addon Name</h6></a>
+                                    <span class="addon_name" th:text="${addon.name}">Addon Name</span>
+                                </a>
                             </div>
-                            <div class="d-inline-new">
-                                <i data-feather="user" class="icon-sm mb-1"></i>
-                                <span class="mb-2"
-                                      th:text="${addon.creator.username}">Creator</span>
+                            <div class="new-stars">
+                                <span class="custom-stars" th:text="${addon.averageRating}"></span>
                             </div>
-                            <div class="d-inline-new">
-                                <p class="text-success">
-                                    <i data-feather="download" class="icon-sm mb-1"></i>
-                                    <span th:text="${addon.downloads}">Downloads</span>
-                                </p>
-                                <i class="star">&#9733;</i>
-                                <span th:text="${addon.averageRating}">Rating</span>
+                            <div class="user-downloads">
+                                <div class="user">
+                                    <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
+                                        <span class="username-creator"
+                                              th:text="${addon.creator.username}">Creator</span>
+                                    </a>
+                                </div>
+
+                                <div class="addon-downloads">
+                                    <p class="text-success">
+                                        <i data-feather="download" class="icon-sm mb-1"></i>
+                                        <span th:text="${addon.downloads}">Downloads</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="button">
+                                <div class="button-layer"></div>
                                 <a th:href="@{'/download?id=' + ${addon.id}}">
                                     <button type="button" class="btn btn-primary btn-xs">Download
                                     </button>
@@ -75,28 +84,36 @@
                 </h4>
                 <div class="card-wrapper swiper-wrapper" style="margin-top: 20px">
                     <div id="mostDownloadedAddons" th:each="addon : ${mostDownloadedAddons}"
-                         class="card swiper-slide"
+                         class="swiper-slide"
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
-                        <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                             th:src="@{${'/assets/pictures/' + addon.data.name}}">
-                        <div class="card-content">
-                            <div class="d-flex justify-content-center align-items-center">
+                        <div class="product-card">
+                            <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
+                                 th:src="@{${'/assets/pictures/' + addon.data.name}}">
+                            <div class="addon-details">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
-                                    <h6 class="card-title mb-0" th:text="${addon.name}">Addon Name</h6></a>
+                                    <span class="addon_name" th:text="${addon.name}">Addon Name</span>
+                                </a>
                             </div>
-                            <div class="d-inline-new">
-                                <i data-feather="user" class="icon-sm mb-1"></i>
-                                <span class="mb-2"
-                                      th:text="${addon.creator.username}">Creator</span>
+                            <div class="new-stars">
+                                <span class="custom-stars" th:text="${addon.averageRating}"></span>
                             </div>
-                            <div class="d-inline-new">
-                                <p class="text-success">
-                                    <i data-feather="download" class="icon-sm mb-1"></i>
-                                    <span th:text="${addon.downloads}">Downloads</span>
-                                </p>
-                                <i class="star">&#9733;</i>
-                                <span th:text="${addon.averageRating}">Rating</span>
+                            <div class="user-downloads">
+                                <div class="user">
+                                    <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
+                                        <span class="username-creator"
+                                              th:text="${addon.creator.username}">Creator</span>
+                                    </a>
+                                </div>
+                                <div class="addon-downloads">
+                                    <p class="text-success">
+                                        <i data-feather="download" class="icon-sm mb-1"></i>
+                                        <span th:text="${addon.downloads}">Downloads</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="button">
+                                <div class="button-layer"></div>
                                 <a th:href="@{'/download?id=' + ${addon.id}}">
                                     <button type="button" class="btn btn-primary btn-xs">Download
                                     </button>
@@ -123,30 +140,38 @@
                 </h4>
                 <div class="card-wrapper swiper-wrapper" style="margin-top: 20px">
                     <div id="newestAddons" th:each="addon : ${newestAddons}"
-                         class="card swiper-slide"
+                         class="swiper-slide"
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
-                        <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                             th:src="@{${'/assets/pictures/' + addon.data.name}}">
-                        <div class="card-content">
-                            <div class="d-flex justify-content-center align-items-center">
+                        <div class="product-card">
+                            <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
+                                 th:src="@{${'/assets/pictures/' + addon.data.name}}">
+                            <div class="addon-details">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
-                                    <h6 class="card-title mb-0" th:text="${addon.name}">Addon Name</h6></a>
+                                    <span class="addon_name" th:text="${addon.name}">Addon Name</span>
+                                </a>
                             </div>
-                            <div class="d-inline-new">
-                                <i data-feather="user" class="icon-sm mb-1"></i>
-                                <span class="mb-2"
-                                      th:text="${addon.creator.username}">Creator</span>
+                            <div class="new-stars">
+                                <span class="custom-stars" th:text="${addon.averageRating}"></span>
                             </div>
-                            <div class="d-inline-new">
-                                <p class="text-success">
-                                    <i data-feather="download" class="icon-sm mb-1"></i>
-                                    <span th:text="${addon.downloads}">Downloads</span>
-                                </p>
-                                <i class="star">&#9733;</i>
-                                <span th:text="${addon.averageRating}">Rating</span>
+                            <div class="user-downloads">
+                                <div class="user">
+                                    <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
+                                        <span class="username-creator"
+                                              th:text="${addon.creator.username}">Creator</span>
+                                    </a>
+                                </div>
+                                <div class="addon-downloads">
+                                    <p class="text-success">
+                                        <i data-feather="download" class="icon-sm mb-1"></i>
+                                        <span th:text="${addon.downloads}">Downloads</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="button">
+                                <div class="button-layer"></div>
                                 <a th:href="@{'/download?id=' + ${addon.id}}">
-                                    <button type="button" class="btn btn-primary btn-xs pull-right">Download
+                                    <button type="button" class="btn btn-primary btn-xs">Download
                                     </button>
                                 </a>
                             </div>

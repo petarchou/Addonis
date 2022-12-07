@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="/partials/resources::resources">
+    <meta charset="UTF-8">
+    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
+    <title>Add-ons Plugins for your IDE</title>
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:partials/_sidebar.html -->
+    <nav th:replace="/partials/_sidebar::_sidebar"></nav>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+        <section class="py-7">
+            <div class="container">
+                <button onclick="showDrafts()" class="btn btn-primary text-center me-x2">Show Draft Addons</button>
+                <button onclick="showPending()" class="btn btn-primary text-center me-x2">Show Pending Addons</button>
+                <button onclick="showApproved()" class="btn btn-primary text-center">Show Approved Addons</button>
+            </div>
+            <div id="userDrafts" class="card-body px-4 px-lg-5 mt-5">
+                <div class="d-flex justify-content-between align-items-baseline mb-2">
+                    <h6 class="card-title mb-0">Draft Addons</h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th class="pt-0">#</th>
+                            <th class="pt-0">Addon Name</th>
+                            <th class="pt-0">Uploaded Date</th>
+                            <th class="pt-0">Target IDE</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(userDraftAddons)}">
+                            <td colspan="7">No Records found.</td>
+                        </tr>
+                        <tr th:each="addon : ${userDraftAddons}">
+                            <td th:text="${userDraftAddons.indexOf(addon)} + 1"></td>
+                            <td>
+                                <a th:href="@{/addons/{id}(id=${addon.id})}">
+                                    <span th:text="${addon.name}">Addon Name</span>
+                                </a>
+                            </td>
+                            <td th:text="${addon.uploadedDate}"></td>
+                            <td th:text="${addon.targetIde.name}">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="userPending" class="card-body px-4 px-lg-5 mt-5">
+                <div class="d-flex justify-content-between align-items-baseline mb-2">
+                    <h6 class="card-title mb-0">Pending Addons</h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th class="pt-0">#</th>
+                            <th class="pt-0">Addon Name</th>
+                            <th class="pt-0">Uploaded Date</th>
+                            <th class="pt-0">Target IDE</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(userPendingAddons)}">
+                            <td colspan="7">No Records found.</td>
+                        </tr>
+                        <tr th:each="addon : ${userPendingAddons}">
+                            <td th:text="${userPendingAddons.indexOf(addon)} + 1"></td>
+                            <td>
+                                <a th:href="@{/addons/{id}(id=${addon.id})}">
+                                    <span th:text="${addon.name}">Addon Name</span>
+                                </a>
+                            </td>
+                            <td th:text="${addon.uploadedDate}"></td>
+                            <td th:text="${addon.targetIde.name}">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="userApproved" class="card-body px-4 px-lg-5 mt-5">
+                <div class="d-flex justify-content-between align-items-baseline mb-2">
+                    <h6 class="card-title mb-0">Approved Addons</h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th class="pt-0">#</th>
+                            <th class="pt-0">Addon Name</th>
+                            <th class="pt-0">Uploaded Date</th>
+                            <th class="pt-0">Target IDE</th>
+                            <th class="pt-0">Downloads</th>
+                            <th class="pt-0">Rating</th>
+                            <th class="pt-0">Featured</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(userApprovedAddons)}">
+                            <td colspan="7">No Records found.</td>
+                        </tr>
+                        <tr th:each="addon : ${userApprovedAddons}">
+                            <td th:text="${userApprovedAddons.indexOf(addon)} + 1"></td>
+                            <td>
+                                <a th:href="@{/addons/{id}(id=${addon.id})}">
+                                    <span th:text="${addon.name}">Addon Name</span>
+                                </a>
+                            </td>
+                            <td th:text="${addon.uploadedDate}"></td>
+                            <td th:text="${addon.targetIde.name}">
+                            </td>
+                            <td th:text="${addon.downloads}"></td>
+                            <td th:text="${addon.averageRating}"></td>
+                            <td th:if="${addon.isFeatured}"><span>YES</span></td>
+                            <td th:if="${!addon.isFeatured}"><span>NO</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <!-- partial:partials/_navbar.html -->
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
+    </div>
+</div>
+<footer th:replace="/partials/_footer::_footer"></footer>
+
+<script type="text/javascript">
+
+    function showDrafts() {
+        const drafts = document.querySelector('#userDrafts');
+        const pending = document.querySelector('#userPending');
+        const approved = document.querySelector('#userApproved');
+        drafts.classList.add('active');
+        pending.classList.remove('active');
+        approved.classList.remove('active');
+    }
+    function showPending() {
+        const drafts = document.querySelector('#userDrafts');
+        const pending = document.querySelector('#userPending');
+        const approved = document.querySelector('#userApproved');
+        drafts.classList.remove('active');
+        pending.classList.add('active');
+        approved.classList.remove('active');
+    }
+    function showApproved() {
+        const drafts = document.querySelector('#userDrafts');
+        const pending = document.querySelector('#userPending');
+        const approved = document.querySelector('#userApproved');
+        drafts.classList.remove('active');
+        pending.classList.remove('active');
+        approved.classList.add('active');
+    }
+
+</script>
+</body>
+</html>
