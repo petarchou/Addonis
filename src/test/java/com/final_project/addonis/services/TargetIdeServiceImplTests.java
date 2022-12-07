@@ -116,4 +116,29 @@ public class TargetIdeServiceImplTests {
         verify(targetIdeRepository, times(1)).delete(any());
 
     }
+
+    @Test
+    public void getByName_should_returnTargetIde_when_targetIdeExist(){
+        // Arrange
+        TargetIde targetIde = new TargetIde();
+        when(targetIdeRepository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(targetIde));
+
+        // Act
+        TargetIde serviceTargetIde = targetIdeServiceImp.getByName(anyString());
+
+        // Assert
+        assertEquals(targetIde,serviceTargetIde);
+    }
+
+    @Test
+    public void getByName_should_throwsException_when_targetIdeNotExist(){
+        // Arrange
+        when(targetIdeRepository.findByNameIgnoreCase(anyString())).thenReturn(Optional.empty());
+
+        // Act, Assert
+        assertThrows(EntityNotFoundException.class,
+                () -> targetIdeServiceImp.getByName(anyString()));
+
+
+    }
 }

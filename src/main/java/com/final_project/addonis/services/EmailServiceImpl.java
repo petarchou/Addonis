@@ -37,7 +37,10 @@ public class EmailServiceImpl implements EmailService {
     private final UserRepository userRepository;
 
     @Autowired
-    public EmailServiceImpl(JavaMailSender emailSender, InvitedUserRepository invitedUserRepository, UserRepository userRepository) {
+    public EmailServiceImpl(JavaMailSender emailSender,
+                            InvitedUserRepository invitedUserRepository,
+                            UserRepository userRepository) {
+
         this.mailSender = emailSender;
         this.invitedUserRepository = invitedUserRepository;
         this.userRepository = userRepository;

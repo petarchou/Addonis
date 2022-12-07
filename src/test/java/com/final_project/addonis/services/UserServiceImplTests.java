@@ -1,5 +1,6 @@
 package com.final_project.addonis.services;
 
+import com.final_project.addonis.models.InvitedUser;
 import com.final_project.addonis.models.Role;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.VerificationToken;
@@ -11,12 +12,15 @@ import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import net.bytebuddy.utility.RandomString;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +44,40 @@ public class UserServiceImplTests {
     private InvitedUserRepository mockInvitedUserRepository;
     @InjectMocks
     private UserServiceImpl userService;
+    private User mockUser = new User();
+    private final User mockUser2 = new User();
 
+    @BeforeEach
+    public void createMockUser() {
+        mockUser.setId(0);
+        mockUser.setUsername("testUsername");
+        mockUser.setEmail("test@mail.com");
+        mockUser.setPassword("testPassword");
+        mockUser.setPhoneNumber("0885216546");
+        mockUser.setPhotoUrl("testUrl");
+        mockUser.setRating(new HashMap<>());
+        mockUser.setRoles(new HashSet<>());
+        mockUser.setVerified(true);
+        mockUser.setBlocked(false);
+        mockUser.setDeleted(false);
+
+        mockUser.setId(1);
+        mockUser.setUsername("testUsername2");
+        mockUser.setEmail("test2@mail.com");
+        mockUser.setPassword("testPassword2");
+        mockUser.setPhoneNumber("0885216547");
+        mockUser.setPhotoUrl("testUrl2");
+        mockUser.setRating(new HashMap<>());
+        mockUser.setRoles(new HashSet<>());
+        mockUser.setVerified(true);
+        mockUser.setBlocked(false);
+        mockUser.setDeleted(false);
+    }
 
     @Test
     public void getAll_should_callFindAllUsersByFilteringAndSorting_when_parametersIsValid() {
         // Arrange
-        List<User> repoUserList = List.of(new User(),new User());
+        List<User> repoUserList = List.of(mockUser, mockUser2);
         when(mockUserRepository.findAllUsersByFilteringAndSorting(any(),
                 any(),
                 anyString(),
@@ -63,14 +95,15 @@ public class UserServiceImplTests {
                 Optional.empty());
 
         // Assert
-        assertSame(serviceUsersList,repoUserList);
+        assertSame(serviceUsersList, repoUserList);
     }
+
     @Test
     public void getAll_should_throwsException_when_fieldsForFilteringOrSortingIsInvalid() {
         // Arrange, Act, Assert
-        assertThrows(IllegalArgumentException.class,() -> // Act
+        assertThrows(IllegalArgumentException.class, () -> // Act
                 userService.getAll(Optional.empty(),
-                         Optional.of("testField"),
+                        Optional.of("testField"),
                         Optional.empty(),
                         Optional.empty(),
                         Optional.empty(),
@@ -106,10 +139,6 @@ public class UserServiceImplTests {
     @Test
     public void create_should_createUser_when_userInfoIsValid() {
         // Arrange
-        User mockUser = new User();
-        mockUser.setUsername("test");
-        mockUser.setEmail("test");
-        mockUser.setPhoneNumber("test");
         when(mockUserRepository.save(any())).thenReturn(mockUser);
         when(mockInvitedUserRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
@@ -124,27 +153,19 @@ public class UserServiceImplTests {
     @Test
     public void create_should_throwsException_when_userUsernameExist() {
         // Arrange
-        User mockUser1 = new User();
-        mockUser1.setUsername("test");
-        mockUser1.setId(1);
-        User mockUser2 = new User();
-        mockUser2.setUsername("test");
-        mockUser2.setId(2);
         when(mockUserRepository.findByUsername(any())).thenReturn(Optional.of(mockUser2));
         when(mockUserRepository.existsUserByUsername(any())).thenReturn(true);
 
         //Act,Assert
         assertThrows(DuplicateEntityException.class,
-                () -> userService.create(mockUser1, ""));
+                () -> userService.create(mockUser, ""));
     }
 
     @Test
     public void create_should_throwsException_when_userEmailExist() {
         // Arrange
-        User mockUser1 = new User();
-        mockUser1.setEmail("existingEmail");
-        mockUser1.setId(1);
-        User mockUser2 = new User();
+        mockUser.setEmail("existingEmail");
+        mockUser.setId(1);
         mockUser2.setEmail("existingEmail");
         mockUser2.setId(2);
         when(mockUserRepository.findByEmail(any())).thenReturn(Optional.of(mockUser2));
@@ -152,16 +173,14 @@ public class UserServiceImplTests {
 
         //Act,Assert
         assertThrows(DuplicateEntityException.class,
-                () -> userService.create(mockUser1, ""));
+                () -> userService.create(mockUser, ""));
     }
 
     @Test
     public void create_should_throwsException_when_userPhoneExist() {
         // Arrange
-        User mockUser1 = new User();
-        mockUser1.setPhoneNumber("0898888888");
-        mockUser1.setId(1);
-        User mockUser2 = new User();
+        mockUser.setPhoneNumber("0898888888");
+        mockUser.setId(1);
         mockUser2.setPhoneNumber("0898888888");
         mockUser2.setId(2);
         when(mockUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(mockUser2));
@@ -169,16 +188,12 @@ public class UserServiceImplTests {
 
         // Act,Assert
         assertThrows(DuplicateEntityException.class,
-                () -> userService.create(mockUser1, ""));
+                () -> userService.create(mockUser, ""));
     }
 
     @Test
     public void update_should_updateUser_when_userInfoIsValid() {
         // Arrange
-        User mockUser = new User();
-        mockUser.setUsername("test");
-        mockUser.setEmail("test");
-        mockUser.setPhoneNumber("test");
         when(mockUserRepository.saveAndFlush(any())).thenReturn(null);
 
         // Act
@@ -192,9 +207,9 @@ public class UserServiceImplTests {
     @Test
     public void delete_should_setIsDeletedToTrue() {
         // Arrange
-        User mockUser = new User();
         mockUser.setDeleted(false);
-        when(mockUserRepository.saveAndFlush(any())).thenReturn(null);
+        User clone = mockUser.toBuilder().isDeleted(true).build();
+        when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
 
         // Act
         mockUser = userService.delete(mockUser);
@@ -207,7 +222,6 @@ public class UserServiceImplTests {
     public void verifyUser_should_setIsVerifiedToTrue_when_tokenExist() {
         //Arrange
         VerificationToken mockToken = new VerificationToken();
-        User mockUser = new User();
         mockUser.setVerified(false);
         mockToken.setToken(RandomString.make(64));
         mockToken.setUser(mockUser);
@@ -240,7 +254,6 @@ public class UserServiceImplTests {
         //Arrange
         VerificationToken mockToken = new VerificationToken();
         mockToken.setToken(RandomString.make(64));
-        User mockUser = new User();
         mockUser.setVerified(true);
         mockToken.setUser(mockUser);
         when(mockVerificationTokenRepository.getByToken(any())).thenReturn(mockToken);
@@ -254,9 +267,10 @@ public class UserServiceImplTests {
     @Test
     public void changeBlockStatus_should_blockUser_when_userIsUnblocked() {
         // Arrange
-        User mockUser = new User();
         mockUser.setBlocked(false);
-        when(mockUserRepository.saveAndFlush(any())).thenReturn(mockUser);
+        User clone = mockUser.toBuilder().build();
+        clone.setBlocked(true);
+        when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
         when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
 
         // Act
@@ -269,7 +283,6 @@ public class UserServiceImplTests {
     @Test
     public void changeBlockStatus_should_throwsException_when_userIsBlockedAndActionIsBlock() {
         // Arrange
-        User mockUser = new User();
         mockUser.setBlocked(true);
         when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
 
@@ -281,9 +294,9 @@ public class UserServiceImplTests {
     @Test
     public void changeBlockStatus_should_unblockUser_when_userIsBlocked() {
         // Arrange
-        User mockUser = new User();
+        User clone = mockUser.toBuilder().build();
         mockUser.setBlocked(true);
-        when(mockUserRepository.saveAndFlush(any())).thenReturn(mockUser);
+        when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
         when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
 
         // Act
@@ -296,7 +309,6 @@ public class UserServiceImplTests {
     @Test
     public void changeBlockStatus_should_throwsException_when_userIsUnblockedAndActionIsUnblock() {
         // Arrange
-        User mockUser = new User();
         mockUser.setBlocked(false);
         when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
 
@@ -308,7 +320,6 @@ public class UserServiceImplTests {
     @Test
     public void changeBlockStatus_should_throwsException_when_actionIsInvalid() {
         // Arrange
-        User mockUser = new User();
         when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
 
         // Act, Assert
@@ -319,13 +330,13 @@ public class UserServiceImplTests {
     @Test
     public void changeUserRole_should_addRoleToSetOfRoles_when_userNotContainTheRole() {
         // Arrange
-        User mockUser = new User();
-        mockUser.setRoles(new HashSet<>());
         Role mockRole = new Role();
         mockRole.setName("testRole");
+        User clone = mockUser.toBuilder().roles(new HashSet<>(mockUser.getRoles())).build();
+        clone.addRole(mockRole);
         when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.of(mockRole));
-        when(mockUserRepository.saveAndFlush(any())).thenReturn(mockUser);
+        when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
 
         // Act
         mockUser = userService.changeUserRole(anyInt(), "testRole", "promote");
@@ -337,8 +348,6 @@ public class UserServiceImplTests {
     @Test
     public void changeUserRole_should_throwsException_when_userContainTheRoleAndTryPromote() {
         // Arrange
-        User mockUser = new User();
-        mockUser.setRoles(new HashSet<>());
         Role mockRole = new Role();
         mockRole.setName("testRole");
         mockUser.getRoles().add(mockRole);
@@ -353,14 +362,13 @@ public class UserServiceImplTests {
     @Test
     public void changeUserRole_should_removeRoleFromSetOfRoles_when_userContainTheRole() {
         // Arrange
-        User mockUser = new User();
-        mockUser.setRoles(new HashSet<>());
         Role mockRole = new Role();
         mockRole.setName("testRole");
+        User clone = mockUser.toBuilder().roles(new HashSet<>(mockUser.getRoles())).build();
         mockUser.getRoles().add(mockRole);
         when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.of(mockRole));
-        when(mockUserRepository.saveAndFlush(any())).thenReturn(mockUser);
+        when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
 
         // Act
         mockUser = userService.changeUserRole(anyInt(), "testRole", "demote");
@@ -372,8 +380,6 @@ public class UserServiceImplTests {
     @Test
     public void changeUserRole_should_throwsException_when_userNotContainTheRoleAndTryToDemote() {
         // Arrange
-        User mockUser = new User();
-        mockUser.setRoles(new HashSet<>());
         Role mockRole = new Role();
         mockRole.setName("testRole");
         when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
@@ -387,12 +393,11 @@ public class UserServiceImplTests {
     @Test
     public void changeUserRole_should_throwsException_when_roleIsInvalid() {
         // Arrange
-        User mockUser = new User();
         when(mockUserRepository.findById(anyInt())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.empty());
 
         // Act, Arrange
-        assertThrows(UnsupportedOperationException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> userService.changeUserRole(mockUser.getId(), "testRole", anyString()));
 
     }
@@ -400,7 +405,6 @@ public class UserServiceImplTests {
     @Test
     public void changeUserRole_should_throwsException_when_actionIsInvalid() {
         // Arrange
-        User mockUser = new User();
         Role mockRole = new Role();
         when(mockUserRepository.findById(anyInt())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.of(mockRole));
@@ -411,4 +415,23 @@ public class UserServiceImplTests {
 
     }
 
+    @Test
+    public void deleteExpiredInvitations_should_deleteInvitedUser_when_invitationIsExpired() {
+        //Arrange
+        InvitedUser mockUser1 = new InvitedUser();
+        mockUser1.setId(1);
+        mockUser1.setLastInviteDate(LocalDateTime.now().minusDays(5));
+        InvitedUser mockUser2 = new InvitedUser();
+        mockUser2.setId(2);
+        mockUser2.setLastInviteDate(LocalDateTime.now().minusDays(5));
+        List<InvitedUser> invitedUsers = List.of(mockUser1, mockUser2);
+        when(mockInvitedUserRepository.findAll()).thenReturn(invitedUsers);
+        doNothing().when(mockInvitedUserRepository).delete(any());
+
+        // Act
+        userService.deleteExpiredInvitations();
+        // Assert
+        verify(mockInvitedUserRepository, times(2)).delete(any());
+
+    }
 }

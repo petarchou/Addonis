@@ -51,10 +51,11 @@ public class AddonMvcController {
     public Page<Addon> populateAddons(Optional<String> keyword,
                                       Optional<String> targetIde,
                                       Optional<String> category,
+                                      Optional<String> sortBy,
                                       Optional<Boolean> ascending,
                                       Optional<Integer> page,
                                       Optional<Integer> size) {
-        return addonService.getAllApproved(keyword, targetIde, category, ascending, page, size);
+        return addonService.getAllApproved(keyword, targetIde, category, sortBy, ascending, page, size);
     }
 
     @ModelAttribute("allTags")
@@ -83,11 +84,12 @@ public class AddonMvcController {
                             Optional<String> keyword,
                             Optional<String> targetIde,
                             Optional<String> category,
+                            Optional<String> sortBy,
                             Optional<Boolean> ascending,
                             Optional<Integer> page,
                             Optional<Integer> size) {
         Page<Addon> addons = addonService.getAllApproved(keyword,
-                targetIde, category, ascending, page, size);
+                targetIde, category, sortBy, ascending, page, size);
         model.addAttribute("page", addons);
 
         int totalPages = addons.getTotalPages();

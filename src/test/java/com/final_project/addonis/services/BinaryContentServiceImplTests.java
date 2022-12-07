@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -36,6 +38,17 @@ public class BinaryContentServiceImplTests {
     public void store_should_throwsException_when_FileIsEmpty() {
         // Arrange
         MockMultipartFile mockFile = new MockMultipartFile("test", new byte[0]);
+
+        // Act, Assert
+        assertThrows(IllegalArgumentException.class,
+                () -> service.store(mockFile));
+    }
+    @Test
+    public void store_should_throwsException_when_FileGetBytesThrowsIOException() throws IOException {
+        // Arrange
+        MockMultipartFile mockFile = mock(MockMultipartFile.class);
+        doReturn("test").when(mockFile).getOriginalFilename();
+        when(mockFile.getBytes()).thenThrow(IOException.class);
 
         // Act, Assert
         assertThrows(IllegalArgumentException.class,
