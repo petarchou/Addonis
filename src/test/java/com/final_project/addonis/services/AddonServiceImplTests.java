@@ -580,6 +580,10 @@ public class AddonServiceImplTests {
         mockAddon.setRating(new HashMap<>());
         mockAddon.setCategories(new HashSet<>());
         mockAddon.setTags(new HashSet<>());
+        when(gitHubService.getRepoDetailsIfValid(any())).thenReturn(List.of("test","test"));
+        when(gitHubService.getLastCommit(anyString(),anyString())).thenReturn(new GithubCommit());
+        when(gitHubService.getPullRequests(anyString(),anyString())).thenReturn(3);
+        when(gitHubService.getIssuesCount(anyString(),anyString())).thenReturn(2);
         when(addonRepository.findAddonByIdAndStateNamePending(anyInt())).thenReturn(Optional.of(mockAddon));
 
 
