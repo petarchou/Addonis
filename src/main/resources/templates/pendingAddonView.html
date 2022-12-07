@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="/partials/resources::resources">
+    <meta charset="UTF-8">
+    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
+    <title>Add-ons Plugins for your IDE</title>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <!-- partial:partials/_sidebar.html -->
+    <nav th:replace="/partials/_sidebar::_sidebar"></nav>
+
+    <div class="page-wrapper">
+        <!-- partial:partials/_navbar.html -->
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
+        <!-- partial -->
+        <div class="main-content item-details-main-content">
+            <div class="item-details-control-root">
+                <div class="item-details" role="main">
+                    <div id="banner" class="section-banner">
+                        <div class="section-core gallery-centered-content">
+                            <table role="presentation">
+                                <tbody>
+                                <tr>
+                                    <td id="banner-img" class="banner-item-img">
+                                        <img class="card-image" alt="" src="/assets/others/logo-placeholder.png"
+                                             th:src="@{${'/assets/pictures/' + pendingAddon.data.name}}"
+                                             style="top:1px;visibility: visible">
+                                    </td>
+                                    <td class="item-header">
+                                        <div class="item-header-content light">
+                                            <h3>
+                                                    <span class="item-name"
+                                                          th:text="${pendingAddon.name}">Addon Name</span>
+                                                <span class="divider">|</span>
+                                                <span class="badge bg-info">Pending</span>
+                                            </h3>
+                                            <div class="item-second-row-wrapper">
+                                                <div class="user-publisher">
+                                                    <h4 role="presentation">
+                                                        <a class="user-publisher-link d-inline-new"
+                                                           th:href="@{/profile/{username}(username=${pendingAddon.creator.username})}">
+                                                            <i data-feather="user" class="icon-sm mb-1"></i>
+                                                            <h6 class="mb-2"
+                                                                th:text="${pendingAddon.creator.username}">
+                                                                Creator</h6>
+                                                        </a>
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="gallery-centered-content">
+                        <div class="section-details">
+                            <div class="section-details-tabs root-40">
+                                <div>
+                                    <div class="tab" role="presentation">
+                                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" id="home-tab"
+                                                   data-bs-toggle="tab" href="#overview" role="tab"
+                                                   aria-controls="home" aria-selected="true">Overview</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="tab-content border border-top-0 p-3" id="myTabContent">
+                                        <div class="tab-pane fade show active"
+                                             id="overview" role="tabpanel" aria-labelledby="home-tab">
+                                            <div>
+                                                <table class="section-details-table" role="presentation">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td class="item-details-left">
+                                                            <div class="itemDetails">
+                                                                <div class="markdown-css">
+                                                                    <h1 class="link-header"
+                                                                        th:text="${pendingAddon.name}">
+                                                                        Addon name</h1>
+                                                                    <p th:text="${pendingAddon.description}">
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="item-details-right" role="complementary">
+                                                            <div class="itemDetails-right">
+                                                                <div class="meta-data-async-div">
+                                                                    <div class="meta-data-list-container">
+                                                                        <div class="meta-data-list-container">
+                                                                            <div class="section-meta-data-list">
+                                                                                <h3 class="section-header right">
+                                                                                    Tags</h3>
+                                                                                <div class="meta-data-list"
+                                                                                     role="group">
+                                                                                    <a th:each="tag : ${pendingAddon.tags}"
+                                                                                       class="meta-data-list-link"
+                                                                                       th:text="${tag.name}">
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="section-capabilities">
+                                                                    <h3 class="section-header right">
+                                                                        Works with</h3>
+                                                                    <div class="capabilities-list-item"
+                                                                         th:text="${pendingAddon.targetIde.name}">
+                                                                        Target IDE
+                                                                    </div>
+                                                                </div>
+                                                                <div class="resources-async-div">
+                                                                    <div class="section-resources">
+                                                                        <h3 class="itemDetails-section-header right">
+                                                                            Resources
+                                                                        </h3>
+                                                                        <ul>
+                                                                            <li>
+                                                                                <a href="#"
+                                                                                   th:href="@{${pendingAddon.originUrl}}">
+                                                                                    Repository
+                                                                                </a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="section-capabilities">
+                                                                    <h3 class="section-header right">
+                                                                        Action</h3>
+                                                                    <div>
+                                                                        <form style="float: left; padding: 5px;"
+                                                                              method="post" action="#"
+                                                                              th:action="@{/admin-panel/approve/{id}(id=${pendingAddon.id})}">
+                                                                            <div class="form-group">
+                                                                                <label for="category">Select
+                                                                                    Category</label>
+                                                                                <select class="form-control"
+                                                                                        name="categoriesIn"
+                                                                                        id="category"
+                                                                                        multiple="multiple">
+                                                                                    <option th:each="category : ${allCategories}"
+                                                                                            th:text="${category.name}"
+                                                                                            th:value="${category.name}">
+                                                                                        Categories
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <button type="submit"
+                                                                                    class="btn btn-success"
+                                                                                    style="margin-right: 10px; margin-top: 20px;"
+                                                                                    value="Approve">Approve
+                                                                            </button>
+                                                                        </form>
+                                                                        <form style="float: left; padding: 5px;"
+                                                                              method="post"
+                                                                              th:action="@{/admin-panel/notify/{id}(id=${pendingAddon.id})}">
+                                                                            <button type="submit"
+                                                                                    class="btn btn-danger"
+                                                                                    style="margin-right: 10px; margin-top: 20px;"
+                                                                                    value="Reject">Reject
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="/partials/_footer::_footer"></footer>
+
+<!-- core:js -->
+<script src="/vendors/core/core.js"></script>
+<!-- endinject -->
+
+<!-- Plugin js for this page -->
+<script src="/vendors/flatpickr/flatpickr.min.js"></script>
+<script src="/vendors/apexcharts/apexcharts.min.js"></script>
+<!-- End plugin js for this page -->
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#category").select2({
+            tags: true
+        });
+    });
+</script>
+<!-- inject:js -->
+<script src="/vendors/feather-icons/feather.min.js"></script>
+<script src="/js/template.js"></script>
+<!-- endinject -->
+
+<!-- Custom js for this page -->
+<script src="/js/dashboard-light.js"></script>
+<!--            Swipper JS-->
+<script src="/vendors/swiper/swiper-bundle.min.js"></script>
+<!--            JacaScript-->
+<script src="/js/script.js"></script>
+<!-- End custom js for this page -->
+</body>
+</html>

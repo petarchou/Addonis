@@ -38,4 +38,13 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
     @Query("select a from Addon a where a.isFeatured = true")
     List<Addon> getAddonsByFeaturedTrue();
 
+    @Query("select a from Addon a where a.creator.id = :userId and a.state.name like 'pending'")
+    List<Addon> getPendingAddonsByUser(int userId);
+
+    @Query("select a from Addon a where a.creator.id = :userId and a.state.name like 'approved'")
+    List<Addon> getApprovedAddonsByUser(int userId);
+
+
+    @Query("select a from Addon a where a.creator.id = :userId and a.state.name like 'draft'")
+    List<Addon> getDraftedAddonsByUser(int userId);
 }

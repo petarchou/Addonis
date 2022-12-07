@@ -57,7 +57,9 @@ public class AddonMapper {
         addonDtoOut.setDownloads(addon.getDownloads());
         addonDtoOut.setAverageRating(addon.getAverageRating());
         addonDtoOut.setPullRequests(addon.getPullRequests());
-        addonDtoOut.setLastCommitDate(FORMATTER.format(addon.getLastCommitDate()));
+        if (addon.getLastCommitDate() != null) {
+            addonDtoOut.setLastCommitDate(FORMATTER.format(addon.getLastCommitDate()));
+        }
         addonDtoOut.setLastCommitMessage(addon.getLastCommitMessage());
         addonDtoOut.setIssuesCount(addon.getIssuesCount());
         addonDtoOut.setFeatured(addon.isFeatured());

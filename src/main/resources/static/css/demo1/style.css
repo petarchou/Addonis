@@ -23056,19 +23056,17 @@ div.tox .tox-dialog__body {
   margin: 0 0 0 0.7em;
 }
 
-/*TODO START REMOVE IMPORT FROM TOP OF THE CSS*/
-
-
+/*TODO START */
 
 .card-container {
   max-width: 2000px;
   width: 100%;
-  padding: 80px 0;
+  padding: 40px 0;
 }
 
 .product-card {
   position: relative;
-  max-width: 230px;
+  max-width: 350px;
   width: 100%;
   border-radius: 25px;
   padding: 10px 20px;
@@ -23224,6 +23222,29 @@ div.tox .tox-dialog__body {
   font-weight: 600;
   letter-spacing: 1px;
   color: #fff;
+}
+
+ .new-stars {
+   display: inline-block;
+ }
+
+.custom-stars {
+  color: #ffd700;
+}
+
+.custom-stars:before {
+  content: "\2605\2605\2605\2605\2605";
+  letter-spacing: 2px;
+}
+
+.custom-stars[style] {
+  position: relative;
+}
+
+.custom-stars[style]:before {
+  position: absolute;
+  left: 0;
+  color: #ccc;
 }
 /*TODO END*/
 
