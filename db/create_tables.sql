@@ -1,5 +1,7 @@
-create database if not exists `addonis`;
-use `addonis`;
+create
+database if not exists `addonis`;
+use
+`addonis`;
 
 create table binary_contents
 (
@@ -27,7 +29,7 @@ create table invited_users
     id              int auto_increment
         primary key,
     email           varchar(70)                          not null,
-    invitation_date datetime default current_timestamp() not null on update current_timestamp(),
+    invitation_date datetime default current_timestamp() not null on update current_timestamp (),
     constraint invited_users_email_uk
         unique (email)
 );
@@ -67,15 +69,15 @@ create table tags
         unique (tag_id)
 );
 
-create table target_ides
+create table addonis.target_ides
 (
-    target_ide_id int         not null
+    target_ide_id int not null
         primary key,
     name          varchar(50) null,
+    ide_logo      varchar(100) null,
     constraint target_ide_name_uk
         unique (name)
 );
-
 create table users
 (
     user_id      int auto_increment
@@ -85,9 +87,9 @@ create table users
     email        varchar(80)                                            not null,
     phone_number varchar(25)                                            not null,
     photo_url    varchar(255) default '/assets/avatars/default/OIP.png' not null,
-    is_blocked   tinyint(1)   default 0                                 not null,
-    is_verified  tinyint(1)   default 0                                 not null,
-    is_deleted   tinyint(1)   default 0                                 not null,
+    is_blocked   tinyint(1) default 0 not null,
+    is_verified  tinyint(1) default 0 not null,
+    is_deleted   tinyint(1) default 0 not null,
     constraint users_email_uk
         unique (email),
     constraint users_phone_number_uk
@@ -100,20 +102,20 @@ create table addons
 (
     addon_id            int auto_increment
         primary key,
-    name                varchar(50)                             null,
-    target_ide_id       int                                     null,
-    creator_id          int                                     not null,
-    description         text                                    null,
-    binary_content_id   int                                     null,
-    origin_url          varchar(255)                            null,
-    upload_date         timestamp default current_timestamp()   not null on update current_timestamp(),
+    name                varchar(50) null,
+    target_ide_id       int null,
+    creator_id          int                                   not null,
+    description         text null,
+    binary_content_id   int null,
+    origin_url          varchar(255) null,
+    upload_date         timestamp default current_timestamp() not null on update current_timestamp (),
     last_commit_date    datetime  default '2022-11-13 22:03:38' null,
-    last_commit_message text                                    null,
-    downloads           int       default 0                     not null,
-    state_id            int                                     not null,
-    open_issues_count   int                                     null,
-    pull_requests_count int                                     null,
-    is_featured         tinyint(1)                              not null,
+    last_commit_message text null,
+    downloads           int       default 0                   not null,
+    state_id            int                                   not null,
+    open_issues_count   int null,
+    pull_requests_count int null,
+    is_featured         tinyint(1) not null,
     constraint addons_binary_contents_null_fk
         foreign key (binary_content_id) references binary_contents (binary_content_id),
     constraint addons_states_state_id_fk
@@ -158,7 +160,7 @@ create table addons_tags
         foreign key (tag_id) references tags (tag_id)
 );
 
-create table pasword_reset_tokens
+create table password_reset_tokens
 (
     id              int auto_increment
         primary key,
