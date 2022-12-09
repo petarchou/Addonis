@@ -117,7 +117,7 @@ public class GitHubServiceImpl implements GitHubService {
     private JSONObject getBaseRepositoryInfo(String owner, String repo) {
         try {
             String url = format(MASTER_URL, owner, repo);
-            ResponseEntity<String> raw = template.exchange(url, HttpMethod.GET, githubGetEntity, String.class);
+            ResponseEntity<String> raw = template.exchange(url, HttpMethod.GET, githubGetEntity,String.class);
             return new JSONObject(raw.getBody());
         } catch (JSONException | RestClientException e) {
             throw new GithubApiException(format(GITHUB_API_ERROR, "commits"));

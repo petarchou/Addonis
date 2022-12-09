@@ -10,21 +10,24 @@ import javax.validation.constraints.*;
 public class CreateUserDto {
 
     @NotNull
-    @Size(min = 2, max = 20)
+    @Size(min = 2, max = 20, message = "Username must be between 2 and 20 characters long.")
     private String username;
 
     @NotNull
-    @Size(min = 8)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-])[A-Za-z\\d!@#$%^&*()_+=-]{8,}$")
+    @Size(min = 8,
+    message = "Password must be at least 8 characters long.")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-])[A-Za-z\\d!@#$%^&*()_+=-]{8,}$",
+    message = "Password must contain a small letter, a capital letter, a number and a symbol.")
     private String password;
+
     private String confirmPassword;
 
-    @Email(message = "Email is not valid", regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:" +
+    @Email(message = "Invalid email format", regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:" +
             "[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}")
     private String email;
 
-    @Size(min = 10, max = 10)
-    @Pattern(regexp = "^\\d{10}")
+    @Pattern(regexp = "^\\d{10}$",
+    message = "Phone must consist of exactly 10 digits.")
     private String phoneNumber;
 
 }

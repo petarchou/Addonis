@@ -1,17 +1,10 @@
 package com.final_project.addonis.services;
 
-import com.final_project.addonis.models.InvitedUser;
-import com.final_project.addonis.models.Role;
-import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.VerificationToken;
-import com.final_project.addonis.repositories.contracts.InvitedUserRepository;
-import com.final_project.addonis.repositories.contracts.RoleRepository;
-import com.final_project.addonis.repositories.contracts.UserRepository;
-import com.final_project.addonis.repositories.contracts.VerificationTokenRepository;
+import com.final_project.addonis.models.*;
+import com.final_project.addonis.repositories.contracts.*;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
-import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
-import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
+import com.final_project.addonis.utils.exceptions.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -35,16 +28,20 @@ public class UserServiceImpl implements UserService {
 
     private final InvitedUserRepository invitedUserRepository;
 
+    private final PasswordResetTokenRepository passwordTokenRepository;
+
 
     public UserServiceImpl(UserRepository repository,
                            EmailService emailService,
                            RoleRepository roleRepository, VerificationTokenRepository verificationTokenRepository,
-                           InvitedUserRepository invitedUserRepository) {
+                           InvitedUserRepository invitedUserRepository,
+                           PasswordResetTokenRepository passwordTokenRepository) {
         this.repository = repository;
         this.emailService = emailService;
         this.roleRepository = roleRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.invitedUserRepository = invitedUserRepository;
+        this.passwordTokenRepository = passwordTokenRepository;
     }
 
     @Override
@@ -108,11 +105,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void sendResetPasswordRequest(User user, String siteUrl) {
+        Optional<PasswordResetToken> existingToken = passwordTokenRepository.findByUser(user);
+        existingToken.ifPresent(passwordTokenRepository::delete);
+        PasswordResetToken token = createPasswordResetToken(user);
+        emailService.sendPasswordResetEmail(user, siteUrl, token);
+    }
+
+    @Override
     public void verifyUser(String tokenStr) {
         VerificationToken token = verificationTokenRepository.getByToken(tokenStr);
 
         if (token == null || token.getUser().isEnabled()) {
-            throw new IllegalArgumentException("Verification failed - wrong token, expired token or user is verified");
+            throw new IllegalArgumentException("Verification failed - wrong token or user is verified");
         } else {
             User user = token.getUser();
             user.setVerified(true);
@@ -236,7 +241,7 @@ public class UserServiceImpl implements UserService {
         if (repository.existsUserByUsername(user.getUsername())) {
             User existingUser = getByUsername(user.getUsername());
             if (!user.equals(existingUser)) {
-                throw new DuplicateEntityException("User", "username", user.getUsername());
+                throw new DuplicateUsernameException("User", "username", user.getUsername());
             }
         }
     }
@@ -245,7 +250,7 @@ public class UserServiceImpl implements UserService {
         if (repository.existsUserByEmail(user.getEmail())) {
             User existingUser = getByEmail(user.getEmail());
             if (!user.equals(existingUser)) {
-                throw new DuplicateEntityException("User", "username", user.getUsername());
+                throw new DuplicateEmailException("User", "email", user.getEmail());
             }
         }
     }
@@ -254,7 +259,7 @@ public class UserServiceImpl implements UserService {
         if (repository.existsUserByPhoneNumber(user.getPhoneNumber())) {
             User existingUser = getByPhone(user.getPhoneNumber());
             if (!user.equals(existingUser)) {
-                throw new DuplicateEntityException("User", "username", user.getUsername());
+                throw new DuplicatePhoneException("User", "phone", user.getPhoneNumber());
             }
         }
     }
@@ -264,6 +269,14 @@ public class UserServiceImpl implements UserService {
         token.setToken(UUID.randomUUID().toString());
         token.setUser(user);
         return verificationTokenRepository.saveAndFlush(token);
+    }
+
+    private PasswordResetToken createPasswordResetToken(User user) {
+        PasswordResetToken token = new PasswordResetToken();
+        token.setToken(UUID.randomUUID().toString());
+        token.setUser(user);
+        token.setExpirationDate(LocalDateTime.now().plusMinutes(15));
+        return passwordTokenRepository.saveAndFlush(token);
     }
 
     private void validateFields(Optional<String> fields) {

@@ -52,7 +52,7 @@ public class AdminPanelMvcController {
     }
 
     // TODO restrict only for admins and creators
-    @GetMapping("/pending/{id}")
+    @GetMapping("/pending-addons/{id}")
     public String getPendingAddon(@PathVariable int id, Model model) {
         try {
             Addon addon = addonService.getPendingAddonById(id);
@@ -62,7 +62,7 @@ public class AdminPanelMvcController {
         } catch (UnauthorizedOperationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
-        return "pendingAddonView";
+        return "pending_addon";
     }
 
     // TODO restrict only for admins

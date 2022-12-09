@@ -46,14 +46,6 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    @ManyToMany
-    @JoinTable(name = "addons_ratings",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "rating_id"))
-    @MapKeyJoinColumn(name = "addon_id")
-    private Map<Addon, Rating> rating;
-
-
     @Column(name = "is_blocked")
     private boolean isBlocked;
 

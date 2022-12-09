@@ -2,10 +2,8 @@ package com.final_project.addonis.controllers.rest;
 
 import com.final_project.addonis.models.InvitedUser;
 import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.dtos.CreateUserDto;
-import com.final_project.addonis.models.dtos.PasswordDto;
-import com.final_project.addonis.models.dtos.UpdateUserDto;
-import com.final_project.addonis.models.dtos.UserDto;
+import com.final_project.addonis.models.dtos.*;
+import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
@@ -13,6 +11,7 @@ import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.PasswordNotMatchException;
 import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
+import com.final_project.addonis.utils.mappers.AddonMapper;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
 import com.final_project.addonis.utils.mappers.UserMapper;
 import org.springframework.http.HttpStatus;
@@ -35,14 +34,20 @@ public class UserRestController {
     private final InvitedUserMapper invitedUserMapper;
     private final EmailService emailService;
 
+    private final AddonService addonService;
+
+    private final AddonMapper addonMapper;
+
     public UserRestController(UserService service,
                               UserMapper mapper,
                               InvitedUserMapper invitedUserMapper,
-                              EmailService emailService) {
+                              EmailService emailService, AddonService addonService, AddonMapper addonMapper) {
         this.service = service;
         this.mapper = mapper;
         this.invitedUserMapper = invitedUserMapper;
         this.emailService = emailService;
+        this.addonService = addonService;
+        this.addonMapper = addonMapper;
     }
 
     @Secured("ROLE_ADMIN")
@@ -223,6 +228,29 @@ public class UserRestController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
+    }
+
+    @IsHimselfOrAdmin
+    @GetMapping("/{userId}/pending-addons")
+    public List<AddonDtoOut> getUserPendingAddons(@PathVariable int userId) {
+        return addonService.getPendingAddonsByUser(userId).stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{userId}/approved-addons")
+    public List<AddonDtoOut> getUserApprovedAddons(@PathVariable int userId) {
+        return addonService.getApprovedAddonsByUser(userId).stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @IsHimselfOrAdmin
+    @GetMapping("/{userId}/draft-addons")
+    public List<AddonDtoOut> getUserDraftedAddons(@PathVariable int userId) {
+        return addonService.getDraftAddonsByUser(userId).stream()
+                .map(addonMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     private String getSiteUrl(HttpServletRequest request) {

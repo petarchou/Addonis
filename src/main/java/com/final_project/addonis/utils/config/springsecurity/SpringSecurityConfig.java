@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
+
+import java.util.Optional;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -32,19 +35,35 @@ public class SpringSecurityConfig {
                 .antMatchers(HttpMethod.POST,"/api/users")
                 .permitAll()
                 .anyRequest()
-                //make this authenticated when we start the front-end
+                //TODO make this authenticated when we finish the front-end
                 .permitAll()
                 .and()
                 .httpBasic()
                 .and()
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/process_login")
+
+                .defaultSuccessUrl("/")
+                //how do i handle errors?
+                .failureUrl("/login?error=true")
+                .and()
                 .logout()
+                .logoutSuccessUrl("/")
                 .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true);
+                .invalidateHttpSession(true)
+                .and()
+                .rememberMe();
+
         //make only  single  session possible
 
         return http.build();
     }
 
+    @Bean
+    public SecurityContextHolderAwareRequestFilter securityContextHolderAwareRequestFilter() {
+        return new SecurityContextHolderAwareRequestFilter();
+    }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {

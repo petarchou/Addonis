@@ -35,7 +35,7 @@ public class Addon {
     @Column(name = "description")
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "binary_content_id")
     private BinaryContent data;
 

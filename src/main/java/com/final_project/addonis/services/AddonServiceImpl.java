@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class AddonServiceImpl implements AddonService {
-    private static final String NOT_AUTHORIZED_ERROR = "You are not authorized to modify this post.";
+    private static final String NOT_AUTHORIZED_ERROR = "You are not authorized to modify this addon.";
     private final AddonRepository addonRepository;
     private final BinaryContentService binaryContentService;
     private final RatingRepository ratingRepository;
@@ -212,6 +212,10 @@ public class AddonServiceImpl implements AddonService {
         checkIfUserIsBlocked(addon);
         checkModifyPermissions(addon, user);
         verifyIsUniqueName(addon);
+        if (addon.getState().getName().equalsIgnoreCase("draft") &&
+                !user.equals(addon.getCreator())) {
+            throw new UnauthorizedOperationException(NOT_AUTHORIZED_ERROR);
+        }
         Addon clone = updateFileIfExists(addon, file);
         return addonRepository.saveAndFlush(clone);
     }

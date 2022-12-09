@@ -176,14 +176,6 @@
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
 
-<!-- core:js -->
-<script src="/vendors/core/core.js"></script>
-<!-- endinject -->
-
-<!-- Plugin js for this page -->
-<script src="/vendors/flatpickr/flatpickr.min.js"></script>
-<script src="/vendors/apexcharts/apexcharts.min.js"></script>
-<!-- End plugin js for this page -->
 
 <script type="text/javascript">
     $(document).ready(function () {
@@ -192,17 +184,8 @@
         });
     });
 </script>
-<!-- inject:js -->
-<script src="/vendors/feather-icons/feather.min.js"></script>
-<script src="/js/template.js"></script>
-<!-- endinject -->
 
-<!-- Custom js for this page -->
-<script src="/js/dashboard-light.js"></script>
-<!--            Swipper JS-->
-<script src="/vendors/swiper/swiper-bundle.min.js"></script>
-<!--            JacaScript-->
-<script src="/js/script.js"></script>
-<!-- End custom js for this page -->
+<!--This should always be the last script insert -->
+<div th:replace="/partials/resources :: js-scripts"></div>
 </body>
 </html>

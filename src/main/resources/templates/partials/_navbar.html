@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Navbar</title>
 </head>
-<nav th:fragment="_navbar" class="navbar">
+<nav th:fragment="_navbar" class="navbar top-navbar">
     <a href="#" class="sidebar-toggler">
         <i data-feather="menu"></i>
     </a>
@@ -71,30 +71,31 @@
                     </div>
                 </div>
             </li>
-            <li class="nav-item dropdown">
+            <li th:if="${isAuth}" class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img class="wd-30 ht-30 rounded-circle" src="https://via.placeholder.com/30x30"
+                    <img class="wd-30 ht-30 rounded-circle" th:src="${loggedUser.getPhotoUrl()}" src="https://via.placeholder.com/30x30"
                          alt="profile">
                 </a>
                 <div class="dropdown-menu p-0" aria-labelledby="profileDropdown">
                     <div class="d-flex flex-column align-items-center border-bottom px-5 py-3">
                         <div class="mb-3">
-                            <img class="wd-80 ht-80 rounded-circle" src="https://via.placeholder.com/80x80"
+                            <img class="wd-80 ht-80 rounded-circle" th:src="${loggedUser.getPhotoUrl()}" src="https://via.placeholder.com/80x80"
                                  alt="">
                         </div>
                         <div class="text-center">
-                            <p class="tx-16 fw-bolder">Amiah Burton</p>
-                            <p class="tx-12 text-muted">amiahburton@gmail.com</p>
+                            <p class="tx-16 fw-bolder" th:text="${loggedUser.getUsername()}">Amiah Burton</p>
+                            <p class="tx-12 text-muted" th:text="${loggedUser.getEmail()}">amiahburton@gmail.com</p>
                         </div>
                     </div>
                     <ul class="list-unstyled p-1">
+                        <a th:href="@{/users/{id}(id=${loggedUser.getId()})}" href="../pages/general/profile.html" class="text-body ms-0">
                         <li class="dropdown-item py-2">
-                            <a href="../pages/general/profile.html" class="text-body ms-0">
+
                                 <i class="me-2 icon-md" data-feather="user"></i>
                                 <span>Profile</span>
-                            </a>
                         </li>
+                        </a>
                         <li class="dropdown-item py-2">
                             <a href="javascript:" class="text-body ms-0">
                                 <i class="me-2 icon-md" data-feather="edit"></i>
@@ -102,19 +103,19 @@
                             </a>
                         </li>
                         <li class="dropdown-item py-2">
-                            <a href="javascript:" class="text-body ms-0">
-                                <i class="me-2 icon-md" data-feather="repeat"></i>
-                                <span>Switch User</span>
-                            </a>
-                        </li>
-                        <li class="dropdown-item py-2">
-                            <a href="javascript:" class="text-body ms-0">
+                            <a  th:href="@{/logout}" href="javascript:" class="text-body ms-0">
                                 <i class="me-2 icon-md" data-feather="log-out"></i>
                                 <span>Log Out</span>
                             </a>
                         </li>
                     </ul>
                 </div>
+            </li>
+            <li class="nav-item" th:unless="${isAuth}" >
+                <a class="btn btn-primary" th:href="@{/login}">Login</a>
+            </li>
+            <li class="nav-item" th:unless="${isAuth}" >
+                <a class="btn btn-outline-primary" th:href="@{/register}">Register</a>
             </li>
         </ul>
     </div>

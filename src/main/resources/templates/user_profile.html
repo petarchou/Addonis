@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="partials/resources :: resources">
+
+  <title>User Profile</title>
+</head>
+<body>
+<div class="main-wrapper">
+
+  <!-- partial:partials/_sidebar.html -->
+  <nav th:replace="/partials/_sidebar::_sidebar"></nav>
+  <!-- partial -->
+
+  <div class="page-wrapper">
+
+    <!-- partial:partials/_navbar.html -->
+    <nav th:replace="/partials/_navbar::_navbar"></nav>
+    <!-- partial -->
+
+    <div class="page-content">
+      <section style="background-color: #eee;">
+        <div class="container py-5">
+          <div class="row">
+
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4">
+              <div class="card mb-4">
+                <div class="card-body text-center">
+                  <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                       th:src="${profile.getPhotoUrl()}" alt="avatar"
+                       class="rounded-circle img-fluid" style="width: 150px;">
+                  <h5 class="mt-3 mb-2" th:text="${profile.getUsername()}">John Smith</h5>
+                  <div class="mb-4">
+                  <p th:if="${profile.isAdmin()}" class="text-muted" th:text="Administrator">Admin</p>
+                  <p th:unless="${profile.isAdmin()}" class="text-muted" th:text="User"></p>
+                  </div>
+                  <div class="d-flex justify-content-center mb-2">
+                    <button type="button" class="btn btn-primary">Edit Profile</button>
+<!--                    th:if="${profile.equals(loggedUser) || (isAuth && loggedUser.isAdmin() && !profile.isAdmin())}"-->
+                    <button  type="button" class="btn btn-outline-danger ms-1" id="delete">Delete Account</button>
+                    <div class="ms-2 me-2"th:if="${!profile.isAdmin()}">
+                    <button th:if="${isAuth && loggedUser.isAdmin() && !profile.isBlocked()}" class="btn btn-warning-secondary">Block</button>
+                    <button class="btn btn-warning">Unblock</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="col-lg-8">
+              <div class="card mb-4">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <p class="mb-0">Username</p>
+                    </div>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0" th:text="${profile.getUsername()}">unnamed</p>
+                    </div>
+                  </div>
+                  <hr th:if="${profile.equals(loggedUser)}">
+                  <div th:if="${profile.equals(loggedUser)}" class="row">
+                    <div class="col-sm-3">
+                      <p class="mb-0">Email</p>
+                    </div>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0" th:text="${profile.getEmail()}">example@example.com</p>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <p class="mb-0">Phone</p>
+                    </div>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0" th:text="${profile.getPhoneNumber()}">(097) 234-5678</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+<!--              !!!!!!!-->
+<!--              Add all addons of a user here in 1 card-->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="card mb-4 mb-md-0">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-baseline mb-2">
+                        <h6 class="card-title mb-0">Addons</h6>
+                      </div>
+                      <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                          <thead>
+                          <tr>
+                            <th class="pt-0">#</th>
+                            <th class="pt-0">Addon Name</th>
+                            <th class="pt-0">Creator</th>
+                            <th class="pt-0">Uploaded Date</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <tr th:if="${#lists.isEmpty(approvedAddons)}">
+                            <td colspan="7">No Records found.</td>
+                          </tr>
+                          <tr th:each="addon : ${approvedAddons}">
+                            <td th:text="${approvedAddons.indexOf(addon)} + 1"></td>
+                            <td>
+                              <a th:href="@{/admin-panel/pending/{id}(id=${addon.id})}">
+                                <span th:text="${addon.name}">Addon Name</span>
+                              </a>
+                            </td>
+                            <td>
+                              <a href="#" th:href="@{/users/{id}(id=${addon.creator.id})}">
+                                <span th:text="${addon.creator.username}">Creator</span>
+                              </a>
+                            </td>
+                            <td th:text="${addon.uploadedDate}"></td>
+                          </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer th:replace="/partials/_footer::_footer"></footer>
+
+  </div>
+</div>
+
+<script>
+  $('#delete').on('click',function() {
+    Swal.fire({
+      title: 'Do you want to DELETE your account?',
+      text: "This is a permanent action.",
+      icon: 'warning',
+      iconColor: '#d33',
+      showCancelButton: true,
+      confirmButtonColor: '#6571ff',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+                'Deleted!',
+                'Your file has been deleted.',
+                'success'
+        )
+      }
+    })
+  })
+</script>
+
+<!--This should always be the last script insert -->
+<div th:replace="/partials/resources :: js-scripts"></div>
+</body>
+</html>

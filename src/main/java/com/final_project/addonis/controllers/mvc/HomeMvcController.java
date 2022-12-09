@@ -2,10 +2,18 @@ package com.final_project.addonis.controllers.mvc;
 
 import com.final_project.addonis.models.Addon;
 import com.final_project.addonis.models.BinaryContent;
+import com.final_project.addonis.models.User;
+import com.final_project.addonis.models.dtos.AddonDtoOut;
 import com.final_project.addonis.services.contracts.AddonService;
+import com.final_project.addonis.services.contracts.UserService;
+import com.final_project.addonis.utils.mappers.AddonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +25,10 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Controller
@@ -27,9 +37,12 @@ public class HomeMvcController {
 
     private final AddonService addonService;
 
+    private final UserService userService;
+
     @Autowired
-    public HomeMvcController(AddonService addonService) {
+    public HomeMvcController(AddonService addonService, UserService userService) {
         this.addonService = addonService;
+        this.userService = userService;
     }
 
 
@@ -45,7 +58,7 @@ public class HomeMvcController {
         model.addAttribute("featuredAddons", featuredAddons);
         model.addAttribute("mostDownloadedAddons", mostDownloadedAddons);
         model.addAttribute("newestAddons", newestAddons);
-        return "dashboard";
+        return "home";
     }
 
     @GetMapping("/download")
@@ -69,5 +82,18 @@ public class HomeMvcController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @ModelAttribute("isAuth")
+    private boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
+        Authentication authentication = context.getAuthentication();
+        boolean au = authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+        return au;
+    }
+
+    @ModelAttribute("loggedUser")
+    private User getLoggedUser(Principal principal) {
+
+        return principal == null ? null : userService.getByUsername(principal.getName());
     }
 }

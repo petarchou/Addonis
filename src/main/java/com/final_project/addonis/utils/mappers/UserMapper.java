@@ -1,10 +1,7 @@
 package com.final_project.addonis.utils.mappers;
 
 import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.dtos.CreateUserDto;
-import com.final_project.addonis.models.dtos.PasswordDto;
-import com.final_project.addonis.models.dtos.UpdateUserDto;
-import com.final_project.addonis.models.dtos.UserDto;
+import com.final_project.addonis.models.dtos.*;
 import com.final_project.addonis.utils.config.springsecurity.PasswordEncoder;
 import com.final_project.addonis.utils.exceptions.PasswordNotMatchException;
 import com.final_project.addonis.utils.helpers.SaveFileHelper;
@@ -71,6 +68,10 @@ public class UserMapper {
             throw new PasswordNotMatchException(INVALID_VERIFICATION_PASSWORD);
         }
 
+        return setNewPassword(user, passwordDto);
+    }
+
+    public User setNewPassword(User user, BasePasswordDto passwordDto) {
         if (!passwordDto.getNewPassword()
                 .equals(passwordDto.getConfirmNewPassword())) {
             throw new PasswordNotMatchException(INVALID_CONFIRMATION);

@@ -79,7 +79,7 @@ public class AddonMapper {
         return addon;
     }
 
-
+    //TODO Why is logged user not being used? - check
     public Addon updateDraft(CreateAddonDto addonDto, User loggedUser, Addon draft) {
 
         updateBaseDtoIn(addonDto,draft);
@@ -124,7 +124,7 @@ public class AddonMapper {
             addonDtoOut.setTargetIde(addon.getTargetIde().getName());
         addonDtoOut.setCreator(userMapper.toDto(addon.getCreator()));
         addonDtoOut.setDescription(addon.getDescription());
-        addonDtoOut.setBinaryContent(addon.getData());
+//        addonDtoOut.setBinaryContent(addon.getData());
         addonDtoOut.setOriginUrl(addon.getOriginUrl());
         addonDtoOut.setUploadedDate(FORMATTER.format(addon.getUploadedDate()));
         addonDtoOut.setState(addon.getState().getName());
