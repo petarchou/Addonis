@@ -1,17 +1,23 @@
 package com.final_project.addonis.repositories;
 
+import com.final_project.addonis.models.Addon;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.repositories.contracts.UserRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -24,7 +30,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     }
 
     @Override
-    public List<User> findAllUsersByFilteringAndSorting(Optional<String> keyword,
+    public Page<User> findAllUsersByFilteringAndSorting(Optional<String> keyword,
                                                         Optional<String> filterBy,
                                                         String sort,
                                                         boolean ascending,
@@ -58,10 +64,16 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
             criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]))
                     .orderBy(criteriaBuilder.desc(root.get(sort))).distinct(true);
         }
+        TypedQuery<User> query = entityManager.createQuery(criteriaQuery)
+                .setFirstResult((page-1) * size)
+                .setMaxResults(size);
 
-        return entityManager.createQuery(criteriaQuery)
-                .setFirstResult(page * size)
-                .setMaxResults(size)
-                .getResultList();
+        long totalCount = 0;
+        List<User> resultList = entityManager.createQuery(criteriaQuery).getResultList();
+        if(resultList != null) {
+            totalCount = resultList.size();
+        }
+
+        return new PageImpl<>(query.getResultList(), PageRequest.of(page-1, size), totalCount);
     }
 }

@@ -18,6 +18,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -55,7 +58,6 @@ public class UserServiceImplTests {
         mockUser.setPassword("testPassword");
         mockUser.setPhoneNumber("0885216546");
         mockUser.setPhotoUrl("testUrl");
-        mockUser.setRating(new HashMap<>());
         mockUser.setRoles(new HashSet<>());
         mockUser.setVerified(true);
         mockUser.setBlocked(false);
@@ -67,7 +69,6 @@ public class UserServiceImplTests {
         mockUser.setPassword("testPassword2");
         mockUser.setPhoneNumber("0885216547");
         mockUser.setPhotoUrl("testUrl2");
-        mockUser.setRating(new HashMap<>());
         mockUser.setRoles(new HashSet<>());
         mockUser.setVerified(true);
         mockUser.setBlocked(false);
@@ -77,7 +78,7 @@ public class UserServiceImplTests {
     @Test
     public void getAll_should_callFindAllUsersByFilteringAndSorting_when_parametersIsValid() {
         // Arrange
-        List<User> repoUserList = List.of(mockUser, mockUser2);
+        Page<User> repoUserList = new PageImpl<>(List.of(mockUser,mockUser2));
         when(mockUserRepository.findAllUsersByFilteringAndSorting(any(),
                 any(),
                 anyString(),
@@ -87,7 +88,7 @@ public class UserServiceImplTests {
                 .thenReturn(repoUserList);
 
         // Act
-        List<User> serviceUsersList = userService.getAll(Optional.empty(),
+        Page<User> serviceUsersList = userService.getAll(Optional.empty(),
                 Optional.of("username"),
                 Optional.empty(),
                 Optional.empty(),

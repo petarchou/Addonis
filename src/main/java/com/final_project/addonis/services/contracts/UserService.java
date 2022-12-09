@@ -1,13 +1,14 @@
 package com.final_project.addonis.services.contracts;
 
 import com.final_project.addonis.models.User;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
 
-    List<User> getAll(Optional<String> keyword,
+    Page<User> getAll(Optional<String> keyword,
                       Optional<String> filterByField,
                       Optional<String> sortByField,
                       Optional<Boolean> order,

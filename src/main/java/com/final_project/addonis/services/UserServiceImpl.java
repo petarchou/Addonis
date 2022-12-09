@@ -5,12 +5,12 @@ import com.final_project.addonis.repositories.contracts.*;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.exceptions.*;
+import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -45,21 +45,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll(Optional<String> keyword,
+    public Page<User> getAll(Optional<String> keyword,
                              Optional<String> filterByField,
                              Optional<String> sortByField,
                              Optional<Boolean> order,
                              Optional<Integer> page,
                              Optional<Integer> size) {
 
-        validateFields(filterByField);
-        validateFields(sortByField);
-        int pageOrDefault = page.orElse(0);
+        filterByField = validateFields(filterByField);
+        sortByField = validateFields(sortByField);
+        int pageOrDefault = page.orElse(1);
         int sizeOrDefault = size.orElse(10);
-        String sortOrDefault = sortByField.orElse("id");
+        String sortOrDefault = sortByField.orElse("username");
         boolean descOrder = order.orElse(true);
 
-        return repository.findAllUsersByFilteringAndSorting(keyword,
+        return repository.findAllUsersByFilteringAndSorting(
+                keyword,
                 filterByField,
                 sortOrDefault,
                 descOrder,
@@ -279,16 +280,20 @@ public class UserServiceImpl implements UserService {
         return passwordTokenRepository.saveAndFlush(token);
     }
 
-    private void validateFields(Optional<String> fields) {
+    private Optional<String> validateFields(Optional<String> fields) {
+
         if (fields.isPresent()) {
             switch (fields.get()) {
                 case "username":
                 case "email":
                 case "phoneNumber":
                     break;
+                case "":
+                    return Optional.empty();
                 default:
                     throw new IllegalArgumentException(INVALID_FIELDS);
             }
         }
+        return fields;
     }
 }

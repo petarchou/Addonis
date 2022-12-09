@@ -67,7 +67,7 @@ public class AddonServiceImpl implements AddonService {
 
         targetIde = validateIde(targetIde);
         category = validateCategory(category);
-        validateSortBy(sortBy);
+        sortBy = validateSortBy(sortBy);
 
         int pageOrDefault = page.orElse(1);
         int sizeOrDefault = size.orElse(8);
@@ -368,7 +368,7 @@ public class AddonServiceImpl implements AddonService {
         return targetIde;
     }
 
-    private void validateSortBy(Optional<String> sortBy) {
+    private Optional<String> validateSortBy(Optional<String> sortBy) {
         if (sortBy.isPresent()) {
             switch (sortBy.get()) {
                 case "name":
@@ -376,10 +376,13 @@ public class AddonServiceImpl implements AddonService {
                 case "uploadedDate":
                 case "lastCommitDate":
                     break;
+                case "":
+                    return Optional.empty();
                 default:
                     throw new IllegalArgumentException("You can sort only by name, downloads, " +
                             "uploadedDate and lastCommitDate ");
             }
         }
+        return sortBy;
     }
 }
