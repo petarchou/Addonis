@@ -72,106 +72,96 @@
                                     <div class="tab-content border border-top-0 p-3" id="myTabContent">
                                         <div class="tab-pane fade show active"
                                              id="overview" role="tabpanel" aria-labelledby="home-tab">
-                                            <div>
-                                                <table class="section-details-table" role="presentation">
-                                                    <tbody>
-                                                    <tr>
-                                                        <td class="item-details-left">
-                                                            <div class="itemDetails">
-                                                                <div class="markdown-css">
-                                                                    <h1 class="link-header"
-                                                                        th:text="${pendingAddon.name}">
-                                                                        Addon name</h1>
-                                                                    <p th:text="${pendingAddon.description}">
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="item-details-right" role="complementary">
-                                                            <div class="itemDetails-right">
-                                                                <div class="meta-data-async-div">
-                                                                    <div class="meta-data-list-container">
-                                                                        <div class="meta-data-list-container">
-                                                                            <div class="section-meta-data-list">
-                                                                                <h3 class="section-header right">
-                                                                                    Tags</h3>
-                                                                                <div class="meta-data-list"
-                                                                                     role="group">
-                                                                                    <a th:each="tag : ${pendingAddon.tags}"
-                                                                                       class="meta-data-list-link"
-                                                                                       th:text="${tag.name}">
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="section-capabilities">
+                                            <div class="float-container">
+                                                <div class="item-details-left">
+                                                    <div class="markdown-css">
+                                                        <h1 class="link-header"
+                                                            th:text="${pendingAddon.name}">
+                                                            Addon name</h1>
+                                                        <p th:text="${pendingAddon.description}">
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="itemDetails-right">
+                                                    <div class="meta-data-async-div">
+                                                        <div class="meta-data-list-container">
+                                                            <div class="meta-data-list-container">
+                                                                <div class="section-meta-data-list">
                                                                     <h3 class="section-header right">
-                                                                        Works with</h3>
-                                                                    <div class="capabilities-list-item"
-                                                                         th:text="${pendingAddon.targetIde.name}">
-                                                                        Target IDE
-                                                                    </div>
-                                                                </div>
-                                                                <div class="resources-async-div">
-                                                                    <div class="section-resources">
-                                                                        <h3 class="itemDetails-section-header right">
-                                                                            Resources
-                                                                        </h3>
-                                                                        <ul>
-                                                                            <li>
-                                                                                <a href="#"
-                                                                                   th:href="@{${pendingAddon.originUrl}}">
-                                                                                    Repository
-                                                                                </a>
-                                                                            </li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="section-capabilities">
-                                                                    <h3 class="section-header right">
-                                                                        Action</h3>
-                                                                    <div>
-                                                                        <form style="float: left; padding: 5px;"
-                                                                              method="post" action="#"
-                                                                              th:action="@{/admin-panel/approve/{id}(id=${pendingAddon.id})}">
-                                                                            <div class="form-group">
-                                                                                <label for="category">Select
-                                                                                    Category</label>
-                                                                                <select class="form-control"
-                                                                                        name="categoriesIn"
-                                                                                        id="category"
-                                                                                        multiple="multiple">
-                                                                                    <option th:each="category : ${allCategories}"
-                                                                                            th:text="${category.name}"
-                                                                                            th:value="${category.name}">
-                                                                                        Categories
-                                                                                    </option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <button type="submit"
-                                                                                    class="btn btn-success"
-                                                                                    style="margin-right: 10px; margin-top: 20px;"
-                                                                                    value="Approve">Approve
-                                                                            </button>
-                                                                        </form>
-                                                                        <form style="float: left; padding: 5px;"
-                                                                              method="post"
-                                                                              th:action="@{/admin-panel/notify/{id}(id=${pendingAddon.id})}">
-                                                                            <button type="submit"
-                                                                                    class="btn btn-danger"
-                                                                                    style="margin-right: 10px; margin-top: 20px;"
-                                                                                    value="Reject">Reject
-                                                                            </button>
-                                                                        </form>
+                                                                        Tags</h3>
+                                                                    <div class="meta-data-list"
+                                                                         role="group">
+                                                                        <a th:each="tag : ${pendingAddon.tags}"
+                                                                           class="meta-data-list-link"
+                                                                           th:text="${tag.name}">
+                                                                        </a>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="section-capabilities">
+                                                        <h3 class="section-header right">
+                                                            Works with</h3>
+                                                        <div class="capabilities-list-item"
+                                                             th:text="${pendingAddon.targetIde.name}">
+                                                            Target IDE
+                                                        </div>
+                                                    </div>
+                                                    <div class="resources-async-div">
+                                                        <div class="section-resources">
+                                                            <h3 class="itemDetails-section-header right">
+                                                                Resources
+                                                            </h3>
+                                                            <ul>
+                                                                <li>
+                                                                    <a href="#"
+                                                                       th:href="@{${pendingAddon.originUrl}}">
+                                                                        Repository
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="section-capabilities">
+                                                        <h3 class="section-header right">
+                                                            Action</h3>
+                                                        <div>
+                                                            <form style="float: left; padding: 5px;"
+                                                                  method="post" action="#"
+                                                                  th:action="@{/admin-panel/approve/{id}(id=${pendingAddon.id})}">
+                                                                <div class="form-group">
+                                                                    <label for="category">Select
+                                                                        Category</label>
+                                                                    <select class="form-control"
+                                                                            name="categoriesIn"
+                                                                            id="category"
+                                                                            multiple="multiple">
+                                                                        <option th:each="category : ${allCategories}"
+                                                                                th:text="${category.name}"
+                                                                                th:value="${category.name}">
+                                                                            Categories
+                                                                        </option>
+                                                                    </select>
+                                                                </div>
+                                                                <button type="submit"
+                                                                        class="btn btn-success"
+                                                                        style="margin-right: 10px; margin-top: 20px;"
+                                                                        value="Approve">Approve
+                                                                </button>
+                                                            </form>
+                                                            <form style="float: left; padding: 5px;"
+                                                                  method="post"
+                                                                  th:action="@{/admin-panel/notify/{id}(id=${pendingAddon.id})}">
+                                                                <button type="submit"
+                                                                        class="btn btn-danger"
+                                                                        style="margin-right: 10px; margin-top: 20px;"
+                                                                        value="Reject">Reject
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

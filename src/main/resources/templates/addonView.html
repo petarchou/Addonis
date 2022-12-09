@@ -90,133 +90,123 @@
                                     <div class="tab-content border border-top-0 p-3" id="myTabContent">
                                         <div class="tab-pane fade show active"
                                              id="overview" role="tabpanel" aria-labelledby="home-tab">
-                                            <div>
-                                                <table class="section-details-table" role="presentation">
-                                                    <tbody>
-                                                    <tr>
-                                                        <td class="item-details-left">
-                                                            <div class="itemDetails">
-                                                                <div class="markdown-css">
-                                                                    <h1 class="link-header" th:text="${addon.name}">
-                                                                        Addon name</h1>
-                                                                    <p th:text="${addon.description}">
-                                                                    </p>
+                                            <div class="float-container">
+                                                <div class="item-details-left">
+                                                    <div class="markdown-css">
+                                                        <h1 class="link-header" th:text="${addon.name}">
+                                                            Addon name</h1>
+                                                        <p th:text="${addon.description}">
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                 <div class="itemDetails-right">
+                                                    <div class="meta-data-async-div">
+                                                        <div class="meta-data-list-container">
+                                                            <div class="section-meta-data-list">
+                                                                <h3 class="section-header right">
+                                                                    Categories</h3>
+                                                                <div class="meta-data-list" role="group">
+                                                                    <a th:each="category : ${addon.categories}"
+                                                                       class="meta-data-list-link"
+                                                                       th:text="${category.name}">
+                                                                    </a>
                                                                 </div>
                                                             </div>
-                                                        </td>
-                                                        <td class="item-details-right" role="complementary">
-                                                            <div class="itemDetails-right">
-                                                                <div class="meta-data-async-div">
-                                                                    <div class="meta-data-list-container">
-                                                                        <div class="section-meta-data-list">
-                                                                            <h3 class="section-header right">
-                                                                                Categories</h3>
-                                                                            <div class="meta-data-list" role="group">
-                                                                                <a th:each="category : ${addon.categories}"
-                                                                                   class="meta-data-list-link"
-                                                                                   th:text="${category.name}">
-                                                                                </a>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="meta-data-list-container">
-                                                                            <div class="section-meta-data-list">
-                                                                                <h3 class="section-header right">
-                                                                                    Tags</h3>
-                                                                                <div class="meta-data-list"
-                                                                                     role="group">
-                                                                                    <a th:each="tag : ${addon.tags}"
-                                                                                       class="meta-data-list-link"
-                                                                                       th:text="${tag.name}">
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="section-capabilities">
+                                                            <div class="meta-data-list-container">
+                                                                <div class="section-meta-data-list">
                                                                     <h3 class="section-header right">
-                                                                        Works with</h3>
-                                                                    <div class="capabilities-list-item"
-                                                                         th:text="${addon.targetIde.name}">
-                                                                        Target IDE
-                                                                    </div>
-                                                                </div>
-                                                                <div class="resources-async-div">
-                                                                    <div class="section-resources">
-                                                                        <h3 class="itemDetails-section-header right">
-                                                                            Resources
-                                                                        </h3>
-                                                                        <ul>
-                                                                            <li>
-                                                                                <a href="#"
-                                                                                   th:href="@{${addon.originUrl}}">
-                                                                                    Repository
-                                                                                </a>
-                                                                            </li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="section-other">
-                                                                    <h3 class="itemDetails-section-header right">
-                                                                        More Info
-                                                                    </h3>
-                                                                    <div>
-                                                                        <table class="table-metadata"
-                                                                               role="presentation">
-                                                                            <tbody>
-                                                                            <tr>
-                                                                                <td id="Released-on">Released on</td>
-                                                                                <td role="definition"
-                                                                                    aria-labelledby="Released-on"
-                                                                                    th:text="${addon.uploadedDate}">
-                                                                                    Uploaded date
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td id="Last-update-date">Last updated
-                                                                                </td>
-                                                                                <td role="definition"
-                                                                                    aria-labelledby="Last-update-date"
-                                                                                    th:text="${addon.lastCommitDate}">
-                                                                                    Last updated
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td id="Last-update-message">Last update
-                                                                                    message
-                                                                                </td>
-                                                                                <td role="definition"
-                                                                                    aria-labelledby="Last-update-message"
-                                                                                    th:text="${addon.lastCommitMessage}">
-                                                                                    Last update message
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td id="Open-issues">Open issues</td>
-                                                                                <td role="definition"
-                                                                                    aria-labelledby="Open-issues"
-                                                                                    th:text="${addon.issuesCount}">Open
-                                                                                    issues
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td id="Pull-requests">Pull requests
-                                                                                </td>
-                                                                                <td role="definition"
-                                                                                    aria-labelledby="Pull-requests"
-                                                                                    th:text="${addon.pullRequests}">Pull
-                                                                                    requests
-                                                                                </td>
-                                                                            </tr>
-                                                                            </tbody>
-                                                                        </table>
+                                                                        Tags</h3>
+                                                                    <div class="meta-data-list"
+                                                                         role="group">
+                                                                        <a th:each="tag : ${addon.tags}"
+                                                                           class="meta-data-list-link"
+                                                                           th:text="${tag.name}">
+                                                                        </a>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="section-capabilities">
+                                                        <h3 class="section-header right">
+                                                            Works with</h3>
+                                                        <div class="capabilities-list-item"
+                                                             th:text="${addon.targetIde.name}">
+                                                            Target IDE
+                                                        </div>
+                                                    </div>
+                                                    <div class="resources-async-div">
+                                                        <div class="section-resources">
+                                                            <h3 class="itemDetails-section-header right">
+                                                                Resources
+                                                            </h3>
+                                                            <ul>
+                                                                <li>
+                                                                    <a href="#"
+                                                                       th:href="@{${addon.originUrl}}">
+                                                                        Repository
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="section-other">
+                                                        <h3 class="itemDetails-section-header right">
+                                                            More Info
+                                                        </h3>
+                                                        <div>
+                                                            <table class="table-metadata"
+                                                                   role="presentation">
+                                                                <tbody>
+                                                                <tr>
+                                                                    <td id="Released-on">Released on</td>
+                                                                    <td role="definition"
+                                                                        aria-labelledby="Released-on"
+                                                                        th:text="${addon.uploadedDate}">
+                                                                        Uploaded date
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td id="Last-update-date">Last updated
+                                                                    </td>
+                                                                    <td role="definition"
+                                                                        aria-labelledby="Last-update-date"
+                                                                        th:text="${addon.lastCommitDate}">
+                                                                        Last updated
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td id="Last-update-message">Last update
+                                                                        message
+                                                                    </td>
+                                                                    <td role="definition"
+                                                                        aria-labelledby="Last-update-message"
+                                                                        th:text="${addon.lastCommitMessage}">
+                                                                        Last update message
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td id="Open-issues">Open issues</td>
+                                                                    <td role="definition"
+                                                                        aria-labelledby="Open-issues"
+                                                                        th:text="${addon.issuesCount}">Open
+                                                                        issues
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td id="Pull-requests">Pull requests
+                                                                    </td>
+                                                                    <td role="definition"
+                                                                        aria-labelledby="Pull-requests"
+                                                                        th:text="${addon.pullRequests}">Pull
+                                                                        requests
+                                                                    </td>
+                                                                </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade"
@@ -226,22 +216,26 @@
                                                     <div>
                                                         <div class="rating-top-container">
                                                             <div class="col-md-12 grid-margin">
-                                                                <br/><h3>Users ratings</h3><br/>
+                                                                <br/>
+                                                                <h3>Users ratings</h3><br/>
                                                                 <div class="d-flex justify-content-between mb-2 pb-2 border-bottom"
                                                                      th:each="rating : ${addon.rating}">
                                                                     <div class="d-flex align-items-center hover-pointer">
                                                                         <img class="img-xs rounded-circle"
-                                                                             alt="user image" src="/assets/others/logo-placeholder.png"
+                                                                             alt="user image"
+                                                                             src="/assets/others/logo-placeholder.png"
                                                                              th:src="${rating.key.photoUrl}">
                                                                         <div class="ms-2">
                                                                             <p th:text="${rating.key.username}"></p>
-                                                                            <p class="tx-11 text-muted" th:text="${rating.key.email}"></p>
+                                                                            <p class="tx-11 text-muted"
+                                                                               th:text="${rating.key.email}"></p>
                                                                         </div>
                                                                     </div>
-                                                                    <button class="btn btn-icon border-0">
-                                                                        <i data-feather="star"></i>
-                                                                        <div th:title="${'Rating ' + rating.value + ' from 5'}" th:text="${rating.value + ''}">
-                                                                        </div></button>
+                                                                    <button class="btn btn-icon border-0"><i
+                                                                            data-feather="star"></i>
+                                                                        <div th:title="${'Rating ' + rating.value + ' from 5'}"
+                                                                             th:text="${rating.value + ''}"></div>
+                                                                    </button>
                                                                 </div>
 
                                                             </div>

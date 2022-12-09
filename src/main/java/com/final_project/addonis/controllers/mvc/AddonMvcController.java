@@ -1,6 +1,8 @@
 package com.final_project.addonis.controllers.mvc;
 
 import com.final_project.addonis.models.*;
+import com.final_project.addonis.models.dtos.AddonFilter;
+import com.final_project.addonis.models.dtos.AddonFilterDto;
 import com.final_project.addonis.models.dtos.CreateAddonDto;
 import com.final_project.addonis.services.contracts.*;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
@@ -18,37 +20,31 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/addons")
 public class AddonMvcController {
-
     private final AddonService addonService;
     private final UserService userService;
     private final AddonMapper addonMapper;
     private final TagService tagService;
     private final TargetIdeService targetIdeService;
+    private final CategoryService categoryService;
 
-    public AddonMvcController(AddonService addonService, UserService userService, AddonMapper addonMapper, TagService tagService, TargetIdeService targetIdeService) {
+    public AddonMvcController(AddonService addonService,
+                              UserService userService,
+                              AddonMapper addonMapper,
+                              TagService tagService,
+                              TargetIdeService targetIdeService,
+                              CategoryService categoryService) {
         this.addonService = addonService;
         this.userService = userService;
         this.addonMapper = addonMapper;
         this.tagService = tagService;
         this.targetIdeService = targetIdeService;
-    }
-
-    @ModelAttribute("allAddons")
-    public Page<Addon> populateAddons(Optional<String> keyword,
-                                      Optional<String> targetIde,
-                                      Optional<String> category,
-                                      Optional<String> sortBy,
-                                      Optional<Boolean> ascending,
-                                      Optional<Integer> page,
-                                      Optional<Integer> size) {
-        return addonService.getAllApproved(keyword, targetIde, category, sortBy, ascending, page, size);
+        this.categoryService = categoryService;
     }
 
     @ModelAttribute("allTags")
@@ -59,6 +55,11 @@ public class AddonMvcController {
     @ModelAttribute("allIdes")
     public List<TargetIde> populateIdes() {
         return targetIdeService.getAll();
+    }
+
+    @ModelAttribute("allCategories")
+    public List<Category> populateCategories(){
+        return categoryService.getAll();
     }
 
     @GetMapping("/{id}")
@@ -74,16 +75,16 @@ public class AddonMvcController {
 
     @GetMapping
     public String getAddons(Model model,
-                            Optional<String> keyword,
-                            Optional<String> targetIde,
-                            Optional<String> category,
-                            Optional<String> sortBy,
-                            Optional<Boolean> ascending,
-                            Optional<Integer> page,
-                            Optional<Integer> size) {
-        Page<Addon> addons = addonService.getAllApproved(keyword,
-                targetIde, category, sortBy, ascending, page, size);
+                            @ModelAttribute AddonFilter addonFilter) {
+        Page<Addon> addons = addonService.getAllApproved(addonFilter.getSearch(),
+                addonFilter.getTargetIde(),
+                addonFilter.getCategory(),
+                addonFilter.getSortBy(),
+                addonFilter.getOrderBy(),
+                addonFilter.getPage(),
+                addonFilter.getSize());
         model.addAttribute("page", addons);
+        model.addAttribute("addonFilterDto", new AddonFilterDto());
 
         int totalPages = addons.getTotalPages();
         if (totalPages > 0) {
@@ -103,7 +104,7 @@ public class AddonMvcController {
         return "createAddon";
     }
 
-    @PostMapping("/create")
+    @RequestMapping(value = "/create", method = RequestMethod.POST, params = "action=publish")
     public String createAddon(@Valid @ModelAttribute("addon") CreateAddonDto addon,
                               @RequestParam("binaryContent") MultipartFile binaryContent,
                               BindingResult bindingResult) {
@@ -113,10 +114,11 @@ public class AddonMvcController {
         try {
             //        TODO add User
 //            User user = userService.getByUsername(principal.getName());
-            User user = userService.getById(74);
+            User user = userService.getById(77);
             Addon addonToCreate = addonMapper.fromDtoCreate(addon, user);
 
             addonService.create(addonToCreate, binaryContent);
+            return "pending";
         } catch (DuplicateEntityException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -125,8 +127,33 @@ public class AddonMvcController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage() +
                     "Please check your repository url for typos. If the issue persists, contact Addonis support.");
         }
-        return "pending";
+
     }
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST, params = "action=save")
+    public String createAddonDraft(@ModelAttribute("addon") CreateAddonDto createAddonDraftDto,
+                                   @RequestParam("binaryContent") MultipartFile binaryContent,
+                                   BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "createAddon";
+        }
+        try {
+            //        TODO add User
+            //            User user = userService.getByUsername(principal.getName());
+            User user = userService.getById(77);
+            Addon addonDraftToCreate = addonMapper.fromDtoCreate(createAddonDraftDto, user);
+            addonService.createDraft(addonDraftToCreate, binaryContent, user);
+            return "redirect:/addons/user/" + user.getId();
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (GithubApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage() +
+                    "Please check your repository url for typos. If the issue persists, contact Addonis support.");
+        }
+    }
+
 
     @GetMapping("/user/{userId}")
     public String showUserAddons(@PathVariable int userId, Model model) {

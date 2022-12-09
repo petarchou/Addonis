@@ -19647,6 +19647,7 @@ body {
 }
 
 .item-details-control-root .item-details-left {
+  flex: 1;
   vertical-align: top;
   font-size: 14px;
   padding-right: 20px;
@@ -19853,6 +19854,7 @@ body {
 }
 
 .item-details-control-root .itemDetails-right {
+  width: 300px;
   display: table-cell;
 }
 
@@ -23245,6 +23247,10 @@ div.tox .tox-dialog__body {
   position: absolute;
   left: 0;
   color: #ccc;
+}
+
+.float-container {
+  display: flex;
 }
 /*TODO END*/
 

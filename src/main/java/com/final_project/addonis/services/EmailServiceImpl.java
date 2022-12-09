@@ -1,9 +1,6 @@
 package com.final_project.addonis.services;
 
-import com.final_project.addonis.models.InvitedUser;
-import com.final_project.addonis.models.PasswordResetToken;
-import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.VerificationToken;
+import com.final_project.addonis.models.*;
 import com.final_project.addonis.repositories.contracts.InvitedUserRepository;
 import com.final_project.addonis.repositories.contracts.UserRepository;
 import com.final_project.addonis.services.contracts.EmailService;
@@ -48,18 +45,33 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendEmailForRejectedAddon(String toUser, String email) {
+    public void sendEmailForRejectedAddon(User toUser, Addon addon) {
         try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            String toEmail = toUser.getEmail();
+            String subject = "Addon state changed to Draft";
+            String content = "Hello [[name]], <br>" +
+                    "It seems that your recently uploaded addon:<br>" +
+                    "<h3>[[addonName]]</h3>" +
+                    "It was put in your list of Drafts by our admins." +
+                    "Check it again for typos or inappropriate wording and content." +
+                    "Best regards,<br>" +
+                    "The Addonis Team";
 
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-            helper.setText(email, true);
-            helper.setTo(toUser);
-            helper.setSubject("Confirm your email for more features!");
-            helper.setFrom(SENDER_EMAIL);
-            mailSender.send(mimeMessage);
+            MimeMessage message = mailSender.createMimeMessage();
+
+            MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+            helper.setFrom(SENDER_EMAIL, SENDER_NAME);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+
+            content = content.replace("[[name]]", toUser.getUsername()).replace("[[addonName]]", addon.getName());
+            helper.setText(content, true);
+            mailSender.send(message);
+
         } catch (MessagingException e) {
-            throw new IllegalStateException("Failed to send email.");
+            throw new IllegalStateException(EMAIL_SEND_FAIL);
+        } catch(UnsupportedEncodingException e) {
+            logger.error("Invalid encoding for email sender name");
         }
     }
 
