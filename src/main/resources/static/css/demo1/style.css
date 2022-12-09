@@ -19647,6 +19647,7 @@ body {
 }
 
 .item-details-control-root .item-details-left {
+//TODO This was edit by us
   flex: 1;
   vertical-align: top;
   font-size: 14px;
@@ -19854,7 +19855,6 @@ body {
 }
 
 .item-details-control-root .itemDetails-right {
-  width: 300px;
   display: table-cell;
 }
 
@@ -23249,9 +23249,17 @@ div.tox .tox-dialog__body {
   color: #ccc;
 }
 
+/*TODO END*/
+/*CUSTOM CSS*/
+
+
 .float-container {
   display: flex;
 }
-/*TODO END*/
 
-/*# sourceMappingURL=../maps/demo1/style.css.map */
+.img-error-page {
+  min-width:250px;
+  width: 50vw;
+  max-width:800px;
+  height: auto;
+}

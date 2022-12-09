@@ -10,46 +10,44 @@
     <div class="page-wrapper full-page">
         <div class="page-content d-flex align-items-center justify-content-center">
             <div class="row w-100 mx-0 auth-page">
-                <div class="col-md-8 col-xl-6 mx-auto">
+                <div class="col-md-6 col-xl-4 mx-auto">
                     <div class="card">
                         <div class="row">
                             <div class="col-md-4 pe-md-0">
-                                <div class="auth-side-wrapper">
-                                </div>
+                                Here image
                             </div>
                             <div class="col-md-8 ps-md-0">
                                 <div class="auth-form-wrapper px-4 py-5">
-                                    <a href="#" class="noble-ui-logo d-block mb-2">Addon<span>IN</span></a>
+                                    <a href="#" th:href="@{/}" class="noble-ui-logo d-block mb-2">Addonis</a>
                                     <h5 class="text-muted fw-normal mb-4">Welcome back! Log in to your account.</h5>
-<!--                                    TODO LoginDto -->
-                                    <form class="forms-sample" action="#" th:action="@{/login}" th:object="${login}" method="post">
+                                    <form name="logform" class="forms-sample" action="/process_login" th:action="@{/process_login}" method="post">
                                         <div class="mb-3">
-<!--                                            TODO User label in properties -->
-                                            <label for="userEmail" class="form-label" th:text="#{user.label.username}">Email address</label>
-                                            <label><input type="email" class="form-control" id="userEmail" placeholder="Email" th:field="*{username}"/></label>
+                                            <label for="username" class="form-label d-block" th:text="#{user.label.username}">Email address</label>
+                                            <label><input type="text" class="form-control" id="username" th:name="username" required="required"/></label>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="userPassword" class="form-label" th:text="#{user.label.password}">Password</label>
-                                            <label><input type="password" class="form-control" id="userPassword"
-                                                   autocomplete="current-password" placeholder="Password" th:field="*{password}"/></label>
+                                            <label for="userPassword" class="form-label d-block" th:text="#{user.label.password}">Password</label>
+                                            <label><input type="password" class="form-control" name="password" id="userPassword" th:name="password" required="required"/></label>
+                                            <div><a th:href="@{/forgotten_password}">Forgot your password?</a></div>
                                         </div>
+                                        <div th:if="${param.error}" class="error pb-2" style="color:red">
+                                            Invalid username or password.
+                                        </div>
+
                                         <div class="form-check mb-3">
-                                            <input type="checkbox" class="form-check-input" id="authCheck">
+                                            <input type="checkbox" class="form-check-input" id="authCheck" name="remember-me">
                                             <label class="form-check-label" for="authCheck">
                                                 Remember me
                                             </label>
                                         </div>
                                         <div>
-                                            <a href="/dashboard"
-                                               class="btn btn-primary me-2 mb-2 mb-md-0 text-white">Login</a>
-                                            <button type="button"
-                                                    class="btn btn-outline-primary btn-icon-text mb-2 mb-md-0">
-                                                <i class="btn-icon-prepend" data-feather="twitter"></i>
-                                                Login with twitter
-                                            </button>
+                                            <input type="submit" name="submit" value="Login"
+                                               class="btn btn-primary me-2 mb-2 mb-md-0 text-white">
                                         </div>
                                         <a href="/register" class="d-block mt-3 text-muted">Not a user? Sign up</a>
                                     </form>
+                                    <p data-bs-toggle="modal" data-bs-target="#passwordModal"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -60,20 +58,7 @@
     </div>
 </div>
 
-<!-- core:js -->
-<script src="/vendors/core/core.js"></script>
-<!-- endinject -->
-
-<!-- Plugin js for this page -->
-<!-- End plugin js for this page -->
-
-<!-- inject:js -->
-<script src="/vendors/feather-icons/feather.min.js"></script>
-<script src="/js/template.js"></script>
-<!-- endinject -->
-
-<!-- Custom js for this page -->
-<!-- End custom js for this page -->
-
+<!--This should always be the last script insert -->
+<div th:replace="/partials/resources :: js-scripts"></div>
 </body>
 </html>

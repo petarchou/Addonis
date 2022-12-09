@@ -6,9 +6,10 @@
 </head>
 <nav th:fragment="_sidebar" class="sidebar">
     <div class="sidebar-header">
-        <a href="#" class="sidebar-brand">
-            Addons<span>IN</span>
+        <a th:href="@{/}" href="#" class="sidebar-brand">
+            Addonis
         </a>
+        <!-- //TODO swap sidebar icons -->
         <div class="sidebar-toggler not-active">
             <span></span>
             <span></span>
@@ -318,7 +319,7 @@
 </nav>
 <nav class="settings-sidebar">
     <div class="sidebar-body">
-        <a href="#" class="settings-sidebar-toggler">
+        <a href="#" class="settings-sidebar-toggler ">
             <i data-feather="settings"></i>
         </a>
         <h6 class="text-muted mb-2">Sidebar:</h6>

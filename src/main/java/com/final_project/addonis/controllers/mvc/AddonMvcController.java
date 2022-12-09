@@ -101,7 +101,7 @@ public class AddonMvcController {
     public String createAddon(Model model) {
 //        TODO add User
         model.addAttribute("addon", new CreateAddonDto());
-        return "createAddon";
+        return "create_addon";
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, params = "action=publish")
@@ -109,7 +109,7 @@ public class AddonMvcController {
                               @RequestParam("binaryContent") MultipartFile binaryContent,
                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "createAddon";
+            return "create_addon";
         }
         try {
             //        TODO add User
@@ -135,7 +135,7 @@ public class AddonMvcController {
                                    @RequestParam("binaryContent") MultipartFile binaryContent,
                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "createAddon";
+            return "create_addon";
         }
         try {
             //        TODO add User
@@ -166,6 +166,6 @@ public class AddonMvcController {
         model.addAttribute("userApprovedAddons", getUserApprovedAddons);
         model.addAttribute("user", user);
 
-        return "userAddons";
+        return "user_addons";
     }
 }

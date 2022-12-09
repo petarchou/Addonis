@@ -20,6 +20,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         this.binaryContentRepository = binaryContentRepository;
     }
 
+    //TODO Remove unique-ness of content in db and have it create a new file every time.
     @Override
     public BinaryContent store(MultipartFile file) {
         if (file == null || file.isEmpty()) {

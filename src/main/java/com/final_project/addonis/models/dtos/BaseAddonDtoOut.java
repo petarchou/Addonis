@@ -19,7 +19,7 @@ public abstract class BaseAddonDtoOut {
 
     private String description;
 
-    private BinaryContent binaryContent;
+//    private BinaryContent binaryContent;
 
     private String originUrl;
 

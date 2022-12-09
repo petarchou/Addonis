@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-
-@Table(name = "password_reset_tokens")
+@Entity
+@Table(name="password_reset_tokens")
 @Data
 @Builder(toBuilder = true)
 @AllArgsConstructor

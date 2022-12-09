@@ -44,6 +44,7 @@ public class AddonRepositoryImpl implements CustomAddonRepository {
         Join<Addon, Category> categoryJoin = addon.join("categories", JoinType.LEFT);
         List<Predicate> predicates = new ArrayList<>();
 
+
         keyword.ifPresent(value -> predicates.add(criteriaBuilder
                 .like(addon.get("name"), "%" + value + "%")));
         targetIde.ifPresent(value -> predicates.add(criteriaBuilder

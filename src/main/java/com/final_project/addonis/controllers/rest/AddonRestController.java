@@ -76,13 +76,11 @@ public class AddonRestController {
         }
     }
 
-
-
     @GetMapping("/drafts/{id}")
-    public AddonDtoOut getDraft(@PathVariable int id) {
+    public DraftDtoOut getDraft(@PathVariable int id) {
         try {
             Addon addon = addonService.getDraftById(id);
-            return addonMapper.toDto(addon);
+            return addonMapper.toDraftDto(addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
@@ -115,6 +113,8 @@ public class AddonRestController {
             addon = addonMapper.updateDraft(addonDto, user, addon);
             addon = addonService.update(addon, file, addon.getCreator());
             return addonMapper.toDraftDto(addon);
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DuplicateEntityException e) {
@@ -139,27 +139,6 @@ public class AddonRestController {
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-    }
-
-    @GetMapping("/{userId}/pending-addons")
-    public List<AddonDtoOut> getUserPendingAddons(@PathVariable int userId) {
-        return addonService.getPendingAddonsByUser(userId).stream()
-                .map(addonMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("/{userId}/approved-addons")
-    public List<AddonDtoOut> getUserApprovedAddons(@PathVariable int userId) {
-        return addonService.getApprovedAddonsByUser(userId).stream()
-                .map(addonMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("/{userId}/draft-addons")
-    public List<AddonDtoOut> getUserDraftedAddons(@PathVariable int userId) {
-        return addonService.getDraftAddonsByUser(userId).stream()
-                .map(addonMapper::toDto)
-                .collect(Collectors.toList());
     }
 
 
@@ -232,6 +211,8 @@ public class AddonRestController {
             addon = addonMapper.fromDtoUpdate(addonDto, addon);
             addon = addonService.update(addon, file, user);
             return addonMapper.toDto(addon);
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DuplicateEntityException e) {

@@ -110,6 +110,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendPasswordResetEmail(User user, String siteUrl, PasswordResetToken token) {
         try {
             String toEmail = user.getEmail();
@@ -117,8 +118,9 @@ public class EmailServiceImpl implements EmailService {
             String content = "Hello [[name]], <br>" +
                     "Please click the link below and choose a new password for your account:<br>" +
                     "<h3><a href=\"[[URL]]\" target=\"_blank\">Reset Password</a></h3>" +
+                    "The link is valid for 15 minutes.<br>" +
                     "If this wasn't you, be careful as somebody might be trying to steal your credential details.<br>"+
-                    "Best regards,<br>" +
+                    "Best regards,<br><br>" +
                     "The Addonis Team";
 
             MimeMessage message = mailSender.createMimeMessage();
@@ -128,7 +130,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
 
             content = content.replace("[[name]]", user.getUsername());
-            String verifyUrl = siteUrl + "/users/reset-password?code=" + token.getToken();
+            String verifyUrl = siteUrl + "/reset_password?token=" + token.getToken();
 
             content = content.replace("[[URL]]", verifyUrl);
 

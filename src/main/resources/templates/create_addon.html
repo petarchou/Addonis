@@ -3,6 +3,8 @@
 <head th:insert="/partials/resources::resources">
     <meta charset="UTF-8">
     <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <link rel="stylesheet" href="/vendors/jquery-tags-input/jquery.tagsinput.min.css">
     <title>Add-ons Plugins for your IDE</title>
 </head>
 <body>
@@ -34,7 +36,7 @@
                                 <div class="mb-3">
                                     <label for="addonName" class="form-label">Addon Name</label>
                                     <input type="text"
-                                           class="${#fields.hasErrors('addonName')} ? 'form-control is-invalid' : form-control"
+                                           th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
                                            id="addonName" value="" th:field="*{name}"
                                            placeholder="Write the name of your Addon here">
                                     <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
@@ -131,25 +133,14 @@
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
 
-<!-- core:js -->
-<script src="/vendors/core/core.js"></script>
-<!-- endinject -->
-
-<!-- Plugin js for this page -->
-<script src="/vendors/flatpickr/flatpickr.min.js"></script>
-<script src="/vendors/apexcharts/apexcharts.min.js"></script>
-<!-- End plugin js for this page -->
-
-<!-- inject:js -->
-<script src="/vendors/feather-icons/feather.min.js"></script>
-<script src="/js/template.js"></script>
-<!-- endinject -->
+<!-- Custom js for this page -->
+<script src="/js/dashboard-light.js"></script>
 
 
 <script src="/vendors/jquery-tags-input/jquery.tagsinput.min.js"></script>
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-<link rel="stylesheet" href="/vendors/jquery-tags-input/jquery.tagsinput.min.css">
 <script src="/js/tags-input.js"></script>
+
+
 <script type="text/javascript">
     $('#tags').tagsInput({
         'height': '50px',
@@ -162,13 +153,10 @@
         });
     });
 </script>
-
-<!-- Custom js for this page -->
-<script src="/js/dashboard-light.js"></script>
-<!--            Swipper JS-->
-<script src="/vendors/swiper/swiper-bundle.min.js"></script>
-<!--            JacaScript-->
-<script src="/js/script.js"></script>
 <!-- End custom js for this page -->
+
+
+<!--This should always be the last script insert -->
+<div th:replace="/partials/resources :: js-scripts"></div>
 </body>
 </html>
