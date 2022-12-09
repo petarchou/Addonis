@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Controller
@@ -53,8 +52,8 @@ public class HomeMvcController {
     public void downloadAddon(@Param("id") int id, HttpServletResponse response) {
         try {
             BinaryContent binaryContent = addonService.downloadContent(id);
-            Optional<BinaryContent> result = Optional.ofNullable(binaryContent);
-            binaryContent = result.get();
+//            Optional<BinaryContent> result = Optional.ofNullable(binaryContent);
+//            binaryContent = result.get();
 
             response.setContentType("application/octet-stream");
             String headerKey = "Content-Disposition";

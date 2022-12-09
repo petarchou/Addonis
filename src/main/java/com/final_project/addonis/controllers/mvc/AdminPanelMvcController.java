@@ -3,7 +3,6 @@ package com.final_project.addonis.controllers.mvc;
 import com.final_project.addonis.models.Addon;
 import com.final_project.addonis.models.Category;
 import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.dtos.CategoryDto;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.CategoryService;
 import com.final_project.addonis.services.contracts.UserService;
@@ -60,6 +59,8 @@ public class AdminPanelMvcController {
             model.addAttribute("pendingAddon", addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
         return "pendingAddonView";
     }
@@ -92,6 +93,8 @@ public class AdminPanelMvcController {
             return "redirect:/admin-panel/pending-addons";
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 }

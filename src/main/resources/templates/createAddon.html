@@ -37,30 +37,23 @@
                                            class="${#fields.hasErrors('addonName')} ? 'form-control is-invalid' : form-control"
                                            id="addonName" value="" th:field="*{name}"
                                            placeholder="Write the name of your Addon here">
-
                                     <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
                                          th:errors="*{name}">Name Error
                                     </div>
                                 </div>
-                                <!--                                    new-->
                                 <div class="mb-3">
                                     <div class="form-group col-md">
                                         <label>Description</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                             </div>
-                                            <input class="form-control"
-                                                   maxlength="5000"
-                                                   minlength="3"
-                                                   placeholder="Description"
-                                                   required th:field="*{description}" type="text">
+                                            <textarea class="form-control"
+                                                      th:field="*{description}" type="text"></textarea>
                                             <label class="error error-color" th:errors="*{description}">
                                                 Username name error placeholder</label>
                                         </div>
                                     </div>
                                 </div>
-                                <!--                                                                    new end-->
-
                                 <div class="mb-3">
                                     <label class="form-label" th:text="#{addon.label.tags}">Tags</label>
                                     <select class="form-select" id="category" multiple="multiple"
@@ -68,7 +61,8 @@
                                         <option disabled selected value="">Select Tags</option>
                                         <option th:each="tag : ${allTags}"
                                                 th:text="${tag.name}"
-                                                th:value="${tag.name}">Tags</option>
+                                                th:value="${tag.name}">Tags
+                                        </option>
 
                                     </select>
 <!--                                    <label for="tags" class="form-label">Tags</label>-->
@@ -99,7 +93,6 @@
                                         </select>
                                     </div>
                                 </div>
-
                                 <div class="mb-3">
                                     <div class="form-group col-md">
                                         <label>Origin URL</label>
@@ -108,7 +101,6 @@
                                             </div>
                                             <input class="form-control"
                                                    placeholder="Origin URL"
-                                                   required
                                                    th:field="*{originUrl}"
                                                    type="text">
                                         </div>
@@ -122,13 +114,13 @@
                                             later</label>
                                     </div>
                                 </div>
-
                                 <div class="mb-3">
                                     <label class="form-label" for="formFile">Addon content</label>
                                     <input class="form-control" type="file" name="binaryContent" id="formFile">
 <!--                                    <label class="error" th:errors="*{data}">Username name error placeholder</label>-->
                                 </div>
-                                <button class="btn btn-primary" type="submit">Create Addon</button>
+                                <button class="btn btn-primary" type="submit" name="action" value="publish">Create Addon</button>
+                                <button class="btn btn-primary" type="submit" name="action" value="save">Upload as Draft</button>
                             </form>
                         </div>
                     </div>
@@ -155,13 +147,14 @@
 
 
 <script src="/vendors/jquery-tags-input/jquery.tagsinput.min.js"></script>
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <link rel="stylesheet" href="/vendors/jquery-tags-input/jquery.tagsinput.min.css">
 <script src="/js/tags-input.js"></script>
 <script type="text/javascript">
     $('#tags').tagsInput({
-            'height': '50px',
-            'width': '100%',
-            'placeholderColor': '#666666'
+        'height': '50px',
+        'width': '100%',
+        'placeholderColor': '#666666'
     });
     $(document).ready(function () {
         $("#category").select2({

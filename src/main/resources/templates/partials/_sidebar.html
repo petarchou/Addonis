@@ -24,38 +24,26 @@
                     <span class="link-title">Home</span>
                 </a>
             </li>
-            <li class="nav-item nav-category">web apps</li>
+            <li class="nav-item nav-category">admin panel</li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#emails" role="button" aria-expanded="false"
-                   aria-controls="emails">
-                    <i class="link-icon" data-feather="activity"></i>
-                    <span class="link-title">Addons</span>
-                    <i class="link-arrow" data-feather="chevron-down"></i>
+                <a th:href="@{/admin-panel/pending-addons}" class="nav-link">
+                    <i class="link-icon" data-feather="upload"></i>
+                    <span class="link-title">See pending Addons</span>
                 </a>
-                <div class="collapse" id="emails">
-                    <ul class="nav sub-menu">
-                        <li class="nav-item">
-                            <!--                                TODO replace it with another functionality-->
-                            <a href="../pages/email/inbox.html" class="nav-link">Featured</a>
-                        </li>
-                        <li class="nav-item">
-                            <!--                               TODO replace it with another functionalit-->
-                            <a href="../pages/email/read.html" class="nav-link">Popular</a>
-                        </li>
-                        <li class="nav-item">
-                            <!--                               TODO replace it with another functionalit-->
-                            <a href="../pages/email/compose.html" class="nav-link">Newest addons</a>
-                        </li>
-                    </ul>
-                </div>
             </li>
             <li class="nav-item">
+                <a th:href="@{/admin-panel/users}" class="nav-link">
+                    <i class="link-icon" data-feather="user-check"></i>
+                    <span class="link-title">See all Users</span>
+                </a>
+            </li>
+            <li class="nav-item nav-category">User panel</li>
+            <li class="nav-item">
                 <a th:href="@{/addons/create}" class="nav-link">
-                    <i class="link-icon" data-feather="upload"></i>
+                    <i class="link-icon" data-feather="upload-cloud"></i>
                     <span class="link-title">Create Addon</span>
                 </a>
             </li>
-            <li class="nav-item nav-category">Components</li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#uiComponents" role="button"
                    aria-expanded="false" aria-controls="uiComponents">
