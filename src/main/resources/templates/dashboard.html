@@ -32,7 +32,7 @@
                          th:attr="data-target='addonModal' + ${addon.id}">
                         <div class="product-card">
                             <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                                 th:src="@{${'/assets/pictures/' + addon.data.name}}">
+                                 th:src="@{${'/assets/ide-logos/' + addon.targetIde.logo}}">
                             <div class="addon-details">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
                                     <span class="addon_name" th:text="${addon.name}">Addon Name</span>
@@ -89,7 +89,7 @@
                          th:attr="data-target='addonModal' + ${addon.id}">
                         <div class="product-card">
                             <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                                 th:src="@{${'/assets/pictures/' + addon.data.name}}">
+                                 th:src="@{${'/assets/ide-logos/' + addon.targetIde.logo}}">
                             <div class="addon-details">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
                                     <span class="addon_name" th:text="${addon.name}">Addon Name</span>
@@ -145,7 +145,7 @@
                          th:attr="data-target='addonModal' + ${addon.id}">
                         <div class="product-card">
                             <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                                 th:src="@{${'/assets/pictures/' + addon.data.name}}">
+                                 th:src="@{${'/assets/ide-logos/' + addon.targetIde.logo}}">
                             <div class="addon-details">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
                                     <span class="addon_name" th:text="${addon.name}">Addon Name</span>

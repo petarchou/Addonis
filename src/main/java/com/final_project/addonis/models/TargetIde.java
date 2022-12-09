@@ -1,7 +1,10 @@
 package com.final_project.addonis.models;
 
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -21,6 +24,9 @@ public class TargetIde {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "ide_logo")
+    private String logo;
 
 
     @Override
