@@ -7,13 +7,11 @@
 </head>
 <body>
 <div class="main-wrapper">
-
     <!-- partial:partials/_sidebar.html -->
     <nav th:replace="/partials/_sidebar::_sidebar"></nav>
     <!-- partial -->
     <!-- partial:partials/_navbar.html -->
     <nav th:replace="/partials/_navbar::_navbar"></nav>
-
     <div class="page-wrapper">
         <section class="py-4">
             <div class="card-container px-4 px-lg-5 mt-5">
@@ -21,117 +19,112 @@
                       method="get">
                     <div style="margin-bottom: 30px;">
                         <div class="row" style="padding-bottom: 50px">
-                            <table class="table table-borderless">
-                                <thead>
-                                <tr style="color: white">
-                                    <th class="text-center"><label></label></th>
-                                    <th class="text-center"><label></label></th>
-                                    <th class="text-center"><label></label></th>
-                                    <th class="text-center"><label></label></th>
-                                    <th class="text-center"><label></label></th>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="col-lg-10">
-                                            <div class="input-group mb-2">
-                                                <input th:field="${addonFilterDto.search}" type="text"
-                                                       class="form-control"
-                                                       placeholder="Search..."
-                                                       aria-label="Search"
-                                                       aria-describedby="button-addon2">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group col-md">
-                                                <select class="btn btn-primary dropdown-toggle text-center"
-                                                        aria-label="Default select example"
-                                                        th:field="${addonFilterDto.targetIde}"
-                                                        style="width: 150px; height: 38px;
-                                                        font-size: smaller">
-                                                    <option selected th:value="null" value="null">Select IDE</option>
-                                                    <option th:each="ide : ${allIdes}"
-                                                            th:value="${ide.name}"
-                                                            th:text="${ide.name}"
-                                                            class="dropdown-item">IDE name
-                                                    </option>
-                                                </select>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group col-md">
-                                                <select class="btn btn-primary dropdown-toggle text-center"
-                                                        th:field="${addonFilterDto.category}"
-                                                        aria-label="Default select example"
-                                                        style="width: 150px; height: 38px;
-                                                        font-size: smaller">
-                                                    <option selected th:value="null" value="null">Select Category</option>
-                                                    <option th:each="category : ${allCategories}"
-                                                            th:value="${category.name}"
-                                                            th:text="${category.name}"
-                                                            class="dropdown-item">Category name
-                                                    </option>
-                                                </select>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <label>Sort by:
-                                            <select class="btn btn-primary dropdown-toggle text-center"
-                                                    th:field="${addonFilterDto.sortBy}"
-                                                    style="width: 150px; height: 38px;
-                                                    font-size: smaller">
-                                                <option th:value="name"
-                                                        class="dropdown-item">Name</option>
-                                                <option th:value="downloads"
-                                                        class="dropdown-item">Downloads</option>
-                                                <option th:value="uploadedDate"
-                                                        class="dropdown-item">Upload Date</option>
-                                                <option th:value="lastCommitDate"
-                                                        class="dropdown-item">Last Commit Date</option>
-                                            </select>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label>Order by:
-                                            <select class="btn btn-primary dropdown-toggle text-center"
-                                                    th:field="${addonFilterDto.orderBy}"
-                                                    style="width: 150px; height: 38px;
-                                                    font-size: smaller">
-                                                <option th:value="true"
-                                                        class="dropdown-item">Ascending</option>
-                                                <option th:value="false"
-                                                        class="dropdown-item">Descending</option>
-                                            </select>
-                                        </label>
-                                    </td>
+                            <table class="table table-borderless text-center">
+                                <div class="input-group mb-1">
+                                    <input th:field="${addonFilterDto.search}" type="text"
+                                           class="form-control"
+                                           placeholder="Search..."
+                                           aria-label="Search"
+                                           aria-describedby="button-addon2">
                                     <button class="btn btn-outline-secondary" type="submit"
                                             id="button-addon2">Search
                                     </button>
-                                </tr>
-                                </thead>
+                                </div>
+                                <td>
+                                    <div class="form-group col-md">
+                                        <select class="btn btn-primary dropdown-toggle text-center"
+                                                aria-label="Default select example"
+                                                th:field="${addonFilterDto.targetIde}"
+                                                style="width: 150px; height: 38px;
+                                                        font-size: smaller">
+                                            <option selected th:value="null" value="null">Select IDE
+                                            </option>
+                                            <option th:each="ide : ${allIdes}"
+                                                    th:value="${ide.name}"
+                                                    th:text="${ide.name}"
+                                                    class="dropdown-item">IDE name
+                                            </option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group col-md">
+                                        <select class="btn btn-primary dropdown-toggle text-center"
+                                                th:field="${addonFilterDto.category}"
+                                                aria-label="Default select example"
+                                                style="width: 150px; height: 38px;
+                                                        font-size: smaller">
+                                            <option selected th:value="null">Select Category</option>
+                                            <option th:each="category : ${allCategories}"
+                                                    th:value="${category.name}"
+                                                    th:text="${category.name}"
+                                                    class="dropdown-item">Category name
+                                            </option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <label>
+                                        <select class="btn btn-primary dropdown-toggle text-center"
+                                                th:field="${addonFilterDto.sortBy}"
+                                                style="width: 150px; height: 38px;
+                                                    font-size: smaller">
+                                            <option th:value="null"
+                                                    class="dropdown-item">Sort
+                                            </option>
+                                            <option th:value="name"
+                                                    class="dropdown-item">Name
+                                            </option>
+                                            <option th:value="downloads"
+                                                    class="dropdown-item">Downloads
+                                            </option>
+                                            <option th:value="uploadedDate"
+                                                    class="dropdown-item">Upload Date
+                                            </option>
+                                            <option th:value="lastCommitDate"
+                                                    class="dropdown-item">Last Commit Date
+                                            </option>
+                                        </select>
+                                    </label>
+                                </td>
+                                <td>
+                                    <label>
+                                        <select class="btn btn-primary dropdown-toggle text-center"
+                                                th:field="${addonFilterDto.orderBy}"
+                                                style="width: 150px; height: 38px;
+                                                    font-size: smaller">
+                                            <option th:value="false"
+                                                    class="dropdown-item">Order
+                                            </option>
+                                            <option th:value="true"
+                                                    class="dropdown-item">Ascending
+                                            </option>
+                                            <option th:value="false"
+                                                    class="dropdown-item">Descending
+                                            </option>
+                                        </select>
+                                    </label>
+                                </td>
                             </table>
                         </div>
                     </div>
                 </form>
-                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content">
                     <div th:each="addon : ${page.content}" class="col mb-5"
                          data-toggle="modal"
                          th:attr="data-target='#addonModal' + ${addon.id}">
-                        <div class="product-card">
+                        <div class="product-card text-center">
                             <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
                                  th:src="@{${'/assets/ide-logos/' + addon.targetIde.logo}}">
                             <div class="addon-details">
                                 <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
                                     <span class="addon_name" th:text="${addon.name}">Addon Name</span>
                                 </a>
-                                <div class="stars">
-                                    <i class="star">&#9734;</i>
-                                    <i class="star">&#9734;</i>
-                                    <i class="star">&#9734;</i>
-                                    <i class="star">&#9733;</i>
-                                    <i class="star">&#9733;</i>
-                                </div>
                             </div>
+                            <div class="new-stars">
+                                <span class="custom-stars" th:text="${addon.averageRating}"></span>
+                            </div>
+                            <hr>
                             <div class="user-downloads">
                                 <div class="user">
                                     <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
@@ -139,15 +132,13 @@
                                               th:text="${addon.creator.username}">Creator</span>
                                     </a>
                                 </div>
-                                <div class="addon-downloads">
-                                    <p class="text-success">
-                                        <i data-feather="download" class="icon-sm mb-1"></i>
-                                        <span th:text="${addon.downloads}">Downloads</span>
-                                    </p>
-                                </div>
+                                <p class="text-success">
+                                    <i data-feather="download" class="icon-sm mb-1"></i>
+                                    <span th:text="${addon.downloads}">Downloads</span>
+                                </p>
                             </div>
-                            <div class="button">
-                                <div class="button-layer"></div>
+                            <hr>
+                            <div class="button-layer text-center">
                                 <a th:href="@{'/download?id=' + ${addon.id}}">
                                     <button type="button" class="btn btn-primary btn-xs">Download
                                     </button>
@@ -156,45 +147,46 @@
                         </div>
                     </div>
                 </div>
-
+            </div>
+            <div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item"
+                            th:each="pageNumber : ${pageNumbers}"
+                            th:class="${pageNumber==page.number + 1} ? active"
+                            th:if="${page.totalPages > 1}">
+                            <a class="page-link"
+                               th:href="@{/addons(size=${page.size}, page=${pageNumber})}"
+                               th:text="${pageNumber}">
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </section>
     </div>
 </div>
-<div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item"
-                th:each="pageNumber : ${pageNumbers}"
-                th:class="${pageNumber==page.number + 1} ? active"
-                th:if="${page.totalPages > 0}"><a class="page-link"
-                                                  th:href="@{/addons(size=${page.size}, page=${pageNumber})}"
-                                                  th:text="${pageNumber}"></a></li>
-        </ul>
-    </nav>
-    <!-- core:js -->
-    <script src="/vendors/core/core.js"></script>
-    <!-- endinject -->
-
-    <!-- Plugin js for this page -->
-    <script src="/vendors/flatpickr/flatpickr.min.js"></script>
-    <script src="/vendors/apexcharts/apexcharts.min.js"></script>
-    <!-- End plugin js for this page -->
-
-    <!-- inject:js -->
-    <script src="/vendors/feather-icons/feather.min.js"></script>
-    <script src="/js/template.js"></script>
-    <!-- endinject -->
-
-    <!-- Custom js for this page -->
-    <script src="/js/dashboard-light.js"></script>
-    <!--            Swipper JS-->
-    <script src="/vendors/swiper/swiper-bundle.min.js"></script>
-    <!--            JacaScript-->
-    <script src="/js/script.js"></script>
-    <!-- End custom js for this page -->
-
-</div>
 <footer th:replace="/partials/_footer::_footer"></footer>
+<!-- core:js -->
+<script src="/vendors/core/core.js"></script>
+<!-- endinject -->
+
+<!-- Plugin js for this page -->
+<script src="/vendors/flatpickr/flatpickr.min.js"></script>
+<script src="/vendors/apexcharts/apexcharts.min.js"></script>
+<!-- End plugin js for this page -->
+
+<!-- inject:js -->
+<script src="/vendors/feather-icons/feather.min.js"></script>
+<script src="/js/template.js"></script>
+<!-- endinject -->
+
+<!-- Custom js for this page -->
+<script src="/js/dashboard-light.js"></script>
+<!--            Swipper JS-->
+<script src="/vendors/swiper/swiper-bundle.min.js"></script>
+<!--            JacaScript-->
+<script src="/js/script.js"></script>
+<!-- End custom js for this page -->
 </body>
 </html>

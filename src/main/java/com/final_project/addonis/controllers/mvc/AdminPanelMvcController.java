@@ -3,12 +3,15 @@ package com.final_project.addonis.controllers.mvc;
 import com.final_project.addonis.models.Addon;
 import com.final_project.addonis.models.Category;
 import com.final_project.addonis.models.User;
+import com.final_project.addonis.models.dtos.UsersFilter;
+import com.final_project.addonis.models.dtos.UsersFilterDto;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.CategoryService;
 import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import com.final_project.addonis.utils.helpers.CategoryHelper;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/admin-panel")
@@ -51,8 +55,31 @@ public class AdminPanelMvcController {
         return "adminPanel";
     }
 
+    @GetMapping("/users")
+    public String getUsers(Model model,
+                           @ModelAttribute UsersFilter usersFilter) {
+
+        Page<User> users = userService.getAll(usersFilter.getSearch(),
+                usersFilter.getFilterByField(),
+                usersFilter.getSortByField(),
+                usersFilter.getOrder(),
+                usersFilter.getPage(),
+                usersFilter.getSize());
+        model.addAttribute("usersPage", users);
+        model.addAttribute("userFilter",new UsersFilterDto());
+
+        int totalPages = users.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            model.addAttribute("userPages", pageNumbers);
+        }
+        return "all_users";
+    }
+
     // TODO restrict only for admins and creators
-    @GetMapping("/pending-addons/{id}")
+    @GetMapping("/pending/{id}")
     public String getPendingAddon(@PathVariable int id, Model model) {
         try {
             Addon addon = addonService.getPendingAddonById(id);

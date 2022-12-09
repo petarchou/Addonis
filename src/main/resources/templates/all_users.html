@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="/partials/resources::resources">
+    <meta charset="UTF-8">
+    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
+    <title>Add-ons Plugins for your IDE</title>
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:partials/_sidebar.html -->
+    <nav th:replace="/partials/_sidebar::_sidebar"></nav>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+        <section class="py-7">
+            <form th:action="@{/admin-panel/users}" th:object="${userFilter}"
+                  method="get">
+                <div style="margin-bottom: 30px;">
+                    <div class="row">
+                        <table class="table table-borderless text-center">
+                            <div class="input-group mb-2">
+                                <input th:field="${userFilter.search}" type="text"
+                                       class="form-control"
+                                       placeholder="Search..."
+                                       aria-label="Search"
+                                       aria-describedby="button-addon2">
+                                <button class="btn btn-outline-secondary" type="submit"
+                                        id="button-addon2">Search
+                                </button>
+                            </div>
+                            <td>
+                                <label>
+                                    <select class="btn btn-primary dropdown-toggle text-center"
+                                            th:field="${userFilter.filterByField}"
+                                            style="width: 150px; height: 38px;
+                                                    font-size: smaller">
+                                        <option th:value="null"
+                                                class="dropdown-item">Filter
+                                        </option>
+                                        <option th:value="username"
+                                                class="dropdown-item">Username
+                                        </option>
+                                        <option th:value="email"
+                                                class="dropdown-item">Email
+                                        </option>
+                                        <option th:value="phoneNumber"
+                                                class="dropdown-item">Phone
+                                        </option>
+                                    </select>
+                                </label>
+                            </td>
+                            <td>
+                                <label>
+                                    <select class="btn btn-primary dropdown-toggle text-center"
+                                            th:field="${userFilter.sortByField}"
+                                            style="width: 150px; height: 38px;
+                                                    font-size: smaller">
+                                        <option th:value="null"
+                                                class="dropdown-item">Sort
+                                        </option>
+                                        <option th:value="username"
+                                                class="dropdown-item">Username
+                                        </option>
+                                        <option th:value="email"
+                                                class="dropdown-item">Email
+                                        </option>
+                                        <option th:value="phoneNumber"
+                                                class="dropdown-item">Phone
+                                        </option>
+                                    </select>
+                                </label>
+                            </td>
+                            <td>
+                                <label>
+                                    <select class="btn btn-primary dropdown-toggle text-center"
+                                            th:field="${userFilter.order}"
+                                            style="width: 150px; height: 38px;
+                                                    font-size: smaller">
+                                        <option th:value="false"
+                                                class="dropdown-item">Order
+                                        </option>
+                                        <option th:value="true"
+                                                class="dropdown-item">Ascending
+                                        </option>
+                                        <option th:value="false"
+                                                class="dropdown-item">Descending
+                                        </option>
+                                    </select>
+                                </label>
+                            </td>
+                        </table>
+                    </div>
+                </div>
+            </form>
+            <div class="card-body px-4 px-lg-5 mt-5">
+                <div class="d-flex justify-content-center align-items-baseline mb-7">
+                    <h2 class="card-title mb-0 text-dark">Active Users</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th class="pt-0">#</th>
+                            <th class="pt-0">Username</th>
+                            <th class="pt-0">Email</th>
+                            <th class="pt-0">Phone</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${usersPage.isEmpty()}">
+                            <td colspan="7">No Records found.</td>
+                        </tr>
+                        <tr th:each="user : ${usersPage.content}">
+                            <td th:text="${usersPage.getContent().indexOf(user)+1}"></td>
+                            <td>
+                                <a th:href="@{/users/{id}(id=${user.id})}">
+                                    <span th:text="${user.username}">Username</span>
+                                </a>
+                            </td>
+                            <td>
+                                <span th:text="${user.email}">Email</span>
+                            </td>
+                            <td>
+                                <span th:text="${user.phoneNumber}">Email</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item"
+                            th:each="pageNumber : ${userPages}"
+                            th:class="${pageNumber==usersPage.number + 1} ? active"
+                            th:if="${usersPage.totalPages > 1}">
+                            <a class="page-link"
+                               th:href="@{/admin-panel/users(size=${usersPage.size}, page=${pageNumber})}"
+                               th:text="${pageNumber}">
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+        <!-- partial:partials/_navbar.html -->
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
+    </div>
+</div>
+<footer th:replace="/partials/_footer::_footer"></footer>
+</body>
+</html>

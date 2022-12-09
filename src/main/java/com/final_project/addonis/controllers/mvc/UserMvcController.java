@@ -37,8 +37,7 @@ public class UserMvcController {
         try {
             userService.verifyUser(tokenStr);
             return "verify_success";
-        }
-        catch(IllegalArgumentException e) {
+        } catch(IllegalArgumentException e) {
             return "verify_fail";
         }
     }

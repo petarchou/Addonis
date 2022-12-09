@@ -464,6 +464,10 @@ public class AddonServiceImplTests {
         User mockCreator = mock(User.class);
         mockCreator.setBlocked(false);
         mockAddon.setCreator(mockCreator);
+        State mockState = new State();
+        mockState.setName("pending");
+        mockState.setId(2);
+        when(stateRepository.findByName(anyString())).thenReturn(mockState);
         when(binaryContentService.store(any())).thenReturn(new BinaryContent());
         when(gitHubService.getRepoDetailsIfValid(any())).thenReturn(List.of("test", "test"));
         when(gitHubService.getIssuesCount(anyString(), anyString())).thenReturn(1);

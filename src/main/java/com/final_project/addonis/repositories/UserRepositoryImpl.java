@@ -3,6 +3,9 @@ package com.final_project.addonis.repositories;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.repositories.contracts.UserRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -12,6 +15,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -24,7 +28,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     }
 
     @Override
-    public List<User> findAllUsersByFilteringAndSorting(Optional<String> keyword,
+    public Page<User> findAllUsersByFilteringAndSorting(Optional<String> keyword,
                                                         Optional<String> filterBy,
                                                         String sort,
                                                         boolean ascending,
@@ -59,9 +63,16 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                     .orderBy(criteriaBuilder.desc(root.get(sort))).distinct(true);
         }
 
-        return entityManager.createQuery(criteriaQuery)
-                .setFirstResult(page * size)
+        long totalCount = 0;
+        List<User> query = entityManager.createQuery(criteriaQuery)
+                .setFirstResult((page - 1) * size)
                 .setMaxResults(size)
                 .getResultList();
+
+        if (query != null) {
+            totalCount = query.size();
+        }
+
+        return new PageImpl<>(Objects.requireNonNull(query), PageRequest.of(page - 1, size), totalCount);
     }
 }
