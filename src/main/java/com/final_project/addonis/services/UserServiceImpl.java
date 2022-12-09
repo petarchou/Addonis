@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         filterByField = validateFields(filterByField);
         sortByField = validateFields(sortByField);
         int pageOrDefault = page.orElse(1);
-        int sizeOrDefault = size.orElse(11);
+        int sizeOrDefault = size.orElse(10);
         String sortOrDefault = sortByField.orElse("username");
         boolean descOrder = order.orElse(true);
 

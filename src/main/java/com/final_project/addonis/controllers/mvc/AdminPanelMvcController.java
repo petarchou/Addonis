@@ -13,11 +13,16 @@ import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException
 import com.final_project.addonis.utils.helpers.CategoryHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -37,6 +42,18 @@ public class AdminPanelMvcController {
         this.addonService = addonService;
         this.categoryHelper = categoryHelper;
         this.categoryService = categoryService;
+    }
+    @ModelAttribute("isAuth")
+    private boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
+        Authentication authentication = context.getAuthentication();
+        boolean au = authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+        return au;
+    }
+
+    @ModelAttribute("loggedUser")
+    private User getLoggedUser(Principal principal) {
+
+        return principal == null ? null : userService.getByUsername(principal.getName());
     }
 
     @ModelAttribute("allCategories")

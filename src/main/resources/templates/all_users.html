@@ -3,7 +3,7 @@
 <head th:insert="/partials/resources::resources">
     <meta charset="UTF-8">
     <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
-    <title>Add-ons Plugins for your IDE</title>
+    <title>Active Users</title>
 </head>
 <body>
 <div class="main-wrapper">
@@ -13,6 +13,7 @@
     <!-- partial -->
 
     <div class="page-wrapper">
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
         <section class="py-7">
             <form th:action="@{/admin-panel/users}" th:object="${userFilter}"
                   method="get">
@@ -112,7 +113,7 @@
                             <td colspan="7">No Records found.</td>
                         </tr>
                         <tr th:each="user : ${usersPage.content}">
-                            <td th:text="${usersPage.getContent().indexOf(user)+1}"></td>
+                            <td th:text="${usersPage.getContent().indexOf(user)+1 + usersPage.getNumber()*10}"></td>
                             <td>
                                 <a th:href="@{/users/{id}(id=${user.id})}">
                                     <span th:text="${user.username}">Username</span>
@@ -146,9 +147,10 @@
             </div>
         </section>
         <!-- partial:partials/_navbar.html -->
-        <nav th:replace="/partials/_navbar::_navbar"></nav>
     </div>
 </div>
+<!--This should always be the last script insert -->
 <footer th:replace="/partials/_footer::_footer"></footer>
+<div th:replace="/partials/resources :: js-scripts"></div>
 </body>
 </html>
