@@ -17,7 +17,10 @@ public interface AddonService {
                                Optional<Integer> size);
 
 
+    Addon getApprovedOrPendingAddonById(int id);
     List<Addon> getAllPendingAddons();
+
+    List<Addon> getAllDraftAddons();
 
     Addon getAddonById(int addonId);
 

@@ -53,7 +53,7 @@ public class EmailServiceImpl implements EmailService {
                     "It seems that your recently uploaded addon:<br>" +
                     "<h3>[[addonName]]</h3>" +
                     "It was put in your list of Drafts by our admins." +
-                    "Check it again for typos or inappropriate wording and content." +
+                    "Check it again for typos or inappropriate wording and content.<br>" +
                     "Best regards,<br>" +
                     "The Addonis Team";
 

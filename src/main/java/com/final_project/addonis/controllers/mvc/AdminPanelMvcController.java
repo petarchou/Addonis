@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
-@RequestMapping("/admin-panel")
+@RequestMapping
 public class AdminPanelMvcController {
 
     private final UserService userService;
@@ -67,9 +67,9 @@ public class AdminPanelMvcController {
     }
 
     // TODO restrict only for admins
-    @GetMapping("/pending-addons")
+    @GetMapping("/addons/pending-addons")
     public String getPendingAddons() {
-        return "adminPanel";
+        return "admin_pending_addons";
     }
 
     @GetMapping("/users")
@@ -92,11 +92,11 @@ public class AdminPanelMvcController {
                     .collect(Collectors.toList());
             model.addAttribute("userPages", pageNumbers);
         }
-        return "all_users";
+        return "admin_all_users";
     }
 
     // TODO restrict only for admins and creators
-    @GetMapping("/pending/{id}")
+    @GetMapping("/addons/pending/{id}")
     public String getPendingAddon(@PathVariable int id, Model model) {
         try {
             Addon addon = addonService.getPendingAddonById(id);
@@ -109,7 +109,6 @@ public class AdminPanelMvcController {
         return "pending_addon";
     }
 
-    // TODO restrict only for admins
     @PostMapping("/approve/{id}")
     public String approveAddon(@PathVariable int id,
                                @RequestParam("categoriesIn") List<String> categoriesIn) {
@@ -119,7 +118,7 @@ public class AdminPanelMvcController {
                     .map(categoryHelper::fromCategoryName)
                     .collect(Collectors.toList());
             addonService.approveAddon(addon.getId(), categories);
-            return "redirect:/admin-panel/pending-addons";
+            return "redirect:/addons/pending-addons";
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (UnauthorizedOperationException e) {
@@ -127,14 +126,13 @@ public class AdminPanelMvcController {
         }
     }
 
-    // TODO restrict only for admins
     @PostMapping("/notify/{id}")
     public String notifyUser(@PathVariable int id) {
         try {
             Addon currentAddon = addonService.getPendingAddonById(id);
             User creator = currentAddon.getCreator();
             addonService.notifyUser(creator, currentAddon);
-            return "redirect:/admin-panel/pending-addons";
+            return "redirect:/addons/pending-addons";
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (UnauthorizedOperationException e) {

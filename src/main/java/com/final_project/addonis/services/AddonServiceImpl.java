@@ -104,6 +104,11 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
+    public List<Addon> getAllDraftAddons() {
+        return addonRepository.getAllByStateNameDraft();
+    }
+
+    @Override
     public List<Addon> getAddonsFeaturedByAdmin() {
         return addonRepository.getAddonsByFeaturedTrue();
     }
@@ -116,6 +121,12 @@ public class AddonServiceImpl implements AddonService {
     @Override
     public List<Addon> getNewestAddons() {
         return addonRepository.getAllByStateNameApprovedOrderByUploadedDate();
+    }
+
+    @Override
+    public Addon getApprovedOrPendingAddonById(int addonId) {
+        return addonRepository.findApprovedOrPendingAddonById(addonId)
+                .orElseThrow(() -> new EntityNotFoundException("Addon", addonId));
     }
 
     @Override
@@ -316,10 +327,13 @@ public class AddonServiceImpl implements AddonService {
         if (file != null && !file.isEmpty()) {
             BinaryContent newFile = binaryContentService.store(file);
             BinaryContent oldFile = addon.getData();
-            if (oldFile != null && !oldFile.equals(newFile)) {
-                binaryContentService.delete(addon.getData());
+            if (oldFile == null || !oldFile.equals(newFile)) {
+                addon.setData(newFile);
             }
-            return addon.toBuilder().data(newFile).build();
+            if (oldFile != null && !oldFile.equals(newFile)) {
+                addon.setData(newFile);
+                binaryContentService.delete(oldFile);
+            }
         }
         return addon;
     }

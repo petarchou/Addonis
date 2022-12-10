@@ -25,24 +25,36 @@
                     <span class="link-title">Home</span>
                 </a>
             </li>
-            <li class="nav-item nav-category">admin panel</li>
-            <li class="nav-item">
-                <a th:href="@{/admin-panel/pending-addons}" class="nav-link">
+            <li class="nav-item nav-category" th:if="${isAuth && loggedUser.isAdmin()}">admin panel</li>
+            <li class="nav-item" th:if="${isAuth && loggedUser.isAdmin()}">
+                <a th:href="@{/addons/pending-addons}" class="nav-link">
                     <i class="link-icon" data-feather="upload"></i>
                     <span class="link-title">See pending Addons</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a th:href="@{/admin-panel/users}" class="nav-link">
+            <li class="nav-item" th:if="${isAuth && loggedUser.isAdmin()}">
+                <a th:href="@{/users}" class="nav-link">
                     <i class="link-icon" data-feather="user-check"></i>
                     <span class="link-title">See all Users</span>
                 </a>
             </li>
             <li class="nav-item nav-category">User panel</li>
-            <li class="nav-item">
+            <li th:if="${isAuth}" class="nav-item">
                 <a th:href="@{/addons/create}" class="nav-link">
                     <i class="link-icon" data-feather="upload-cloud"></i>
                     <span class="link-title">Create Addon</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/addons}" class="nav-link">
+                    <i class="link-icon" data-feather="upload-cloud"></i>
+                    <span class="link-title">See All Addon</span>
+                </a>
+            </li>
+            <li th:if="${isAuth}" class="nav-item">
+                <a th:href="@{/addons/user/{id}(id=${loggedUser.getId()})}" class="nav-link">
+                    <i class="link-icon" data-feather="upload-cloud"></i>
+                    <span class="link-title">My Addons</span>
                 </a>
             </li>
             <li class="nav-item">
