@@ -25,25 +25,25 @@
                                 <tr>
                                     <td id="banner-img" class="banner-item-img">
                                         <img class="card-image" alt="" src="/assets/others/logo-placeholder.png"
-                                             th:src="@{${'/assets/ide-logos/' + pendingAddon.targetIde.logo}}"
+                                             th:src="@{${'/assets/ide-logos/' + draftAddon.targetIde.logo}}"
                                              style="top:1px;visibility: visible">
                                     </td>
                                     <td class="item-header">
                                         <div class="item-header-content light">
                                             <h3>
                                                     <span class="item-name"
-                                                          th:text="${pendingAddon.name}">Addon Name</span>
+                                                          th:text="${draftAddon.name}">Addon Name</span>
                                                 <span class="divider">|</span>
-                                                <span class="badge bg-info">Pending</span>
+                                                <span class="badge bg-secondary">Draft</span>
                                             </h3>
                                             <div class="item-second-row-wrapper">
                                                 <div class="user-publisher">
                                                     <h4 role="presentation">
                                                         <a class="user-publisher-link d-inline-new"
-                                                           th:href="@{/profile/{username}(username=${pendingAddon.creator.username})}">
+                                                           th:href="@{/profile/{username}(username=${draftAddon.creator.username})}">
                                                             <i data-feather="user" class="icon-sm mb-1"></i>
                                                             <h6 class="mb-2"
-                                                                th:text="${pendingAddon.creator.username}">
+                                                                th:text="${draftAddon.creator.username}">
                                                                 Creator</h6>
                                                         </a>
                                                     </h4>
@@ -76,9 +76,9 @@
                                                 <div class="item-details-left">
                                                     <div class="markdown-css">
                                                         <h1 class="link-header"
-                                                            th:text="${pendingAddon.name}">
+                                                            th:text="${draftAddon.name}">
                                                             Addon name</h1>
-                                                        <p th:text="${pendingAddon.description}">
+                                                        <p th:text="${draftAddon.description}">
                                                         </p>
                                                     </div>
                                                 </div>
@@ -91,7 +91,7 @@
                                                                         Tags</h3>
                                                                     <div class="meta-data-list"
                                                                          role="group">
-                                                                        <a th:each="tag : ${pendingAddon.tags}"
+                                                                        <a th:each="tag : ${draftAddon.tags}"
                                                                            class="meta-data-list-link"
                                                                            th:text="${tag.name}">
                                                                         </a>
@@ -104,7 +104,7 @@
                                                         <h3 class="section-header right">
                                                             Works with</h3>
                                                         <div class="capabilities-list-item"
-                                                             th:text="${pendingAddon.targetIde.name}">
+                                                             th:text="${draftAddon.targetIde.name}">
                                                             Target IDE
                                                         </div>
                                                     </div>
@@ -116,7 +116,7 @@
                                                             <ul>
                                                                 <li>
                                                                     <a href="#"
-                                                                       th:href="@{${pendingAddon.originUrl}}">
+                                                                       th:href="@{${draftAddon.originUrl}}">
                                                                         Repository
                                                                     </a>
                                                                 </li>
@@ -126,46 +126,11 @@
                                                     <div class="section-capabilities">
                                                         <h3 class="section-header right">
                                                             Action</h3>
-                                                        <div th:if="${loggedUser.isAdmin()}">
-                                                            <form style="float: left; padding: 5px;"
-                                                                  method="post" action="#"
-                                                                  th:action="@{/approve/{id}(id=${pendingAddon.id})}">
-                                                                <div class="form-group">
-                                                                    <label for="category">Select
-                                                                        Category</label>
-                                                                    <select class="form-control"
-                                                                            name="categoriesIn"
-                                                                            id="category"
-                                                                            multiple="multiple">
-                                                                        <option th:each="category : ${allCategories}"
-                                                                                th:text="${category.name}"
-                                                                                th:value="${category.name}">
-                                                                            Categories
-                                                                        </option>
-                                                                    </select>
-                                                                </div>
-                                                                <button type="submit"
-                                                                        class="btn btn-success"
-                                                                        style="margin-right: 10px; margin-top: 20px;"
-                                                                        value="Approve">Approve
-                                                                </button>
-                                                            </form>
-                                                            <form style="float: left; padding: 5px;"
-                                                                  method="post"
-                                                                  th:action="@{/notify/{id}(id=${pendingAddon.id})}">
-                                                                <button type="submit"
-                                                                        class="btn btn-danger"
-                                                                        style="margin-right: 10px; margin-top: 20px;"
-                                                                        value="Reject">Reject
-                                                                </button>
-                                                            </form>
+                                                        <div>
                                                             <div>
                                                                 <a class="btn btn-primary" style="margin-right: 10px; margin-top: 20px;"
-                                                                   th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit Addon</a>
+                                                                   th:href="@{/addons/{id}/edit-draft(id=${draftAddon.id})}">Edit Draft</a>
                                                             </div>
-                                                        </div>
-                                                        <div th:if="${pendingAddon.creator.id == loggedUser.id}">
-                                                            <a class="btn btn-primary" th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit Addon</a>
                                                         </div>
                                                     </div>
                                                 </div>

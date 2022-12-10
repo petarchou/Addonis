@@ -1,13 +1,12 @@
 package com.final_project.addonis.controllers.mvc;
 
 import com.final_project.addonis.models.*;
-import com.final_project.addonis.models.dtos.AddonFilter;
-import com.final_project.addonis.models.dtos.AddonFilterDto;
-import com.final_project.addonis.models.dtos.CreateAddonDto;
+import com.final_project.addonis.models.dtos.*;
 import com.final_project.addonis.services.contracts.*;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.GithubApiException;
+import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
 import com.final_project.addonis.utils.mappers.AddonMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -79,6 +78,11 @@ public class AddonMvcController {
         return categoryService.getAll();
     }
 
+    @ModelAttribute("draftAddons")
+    public List<Addon> populateDraftAddons() {
+        return addonService.getAllDraftAddons();
+    }
+
     @GetMapping("/{id}")
     public String getAddon(@PathVariable int id, Model model) {
         try {
@@ -87,7 +91,18 @@ public class AddonMvcController {
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-        return "addonView";
+        return "approved_addon_view";
+    }
+
+    @GetMapping("/draft/{id}")
+    public String getDraftAddon(@PathVariable int id, Model model) {
+        try {
+            Addon addon = addonService.getDraftById(id);
+            model.addAttribute("draftAddon", addon);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+        return "draft_addon";
     }
 
     @GetMapping
@@ -111,7 +126,7 @@ public class AddonMvcController {
             model.addAttribute("pageNumbers", pageNumbers);
         }
 
-        return "allAddons";
+        return "all_addons";
     }
 
     @GetMapping("/create")
@@ -124,14 +139,13 @@ public class AddonMvcController {
     @RequestMapping(value = "/create", method = RequestMethod.POST, params = "action=publish")
     public String createAddon(@Valid @ModelAttribute("addon") CreateAddonDto addon,
                               @RequestParam("binaryContent") MultipartFile binaryContent,
-                              BindingResult bindingResult) {
+                              BindingResult bindingResult,
+                              Principal principal) {
         if (bindingResult.hasErrors()) {
             return "create_addon";
         }
         try {
-            //        TODO add User
-//            User user = userService.getByUsername(principal.getName());
-            User user = userService.getById(77);
+            User user = getLoggedUser(principal);
             Addon addonToCreate = addonMapper.fromDtoCreate(addon, user);
 
             addonService.create(addonToCreate, binaryContent);
@@ -150,14 +164,13 @@ public class AddonMvcController {
     @RequestMapping(value = "/create", method = RequestMethod.POST, params = "action=save")
     public String createAddonDraft(@ModelAttribute("addon") CreateAddonDto createAddonDraftDto,
                                    @RequestParam("binaryContent") MultipartFile binaryContent,
-                                   BindingResult bindingResult) {
+                                   BindingResult bindingResult,
+                                   Principal principal) {
         if (bindingResult.hasErrors()) {
             return "create_addon";
         }
         try {
-            //        TODO add User
-            //            User user = userService.getByUsername(principal.getName());
-            User user = userService.getById(77);
+            User user = getLoggedUser(principal);
             Addon addonDraftToCreate = addonMapper.fromDtoCreate(createAddonDraftDto, user);
             addonService.createDraft(addonDraftToCreate, binaryContent, user);
             return "redirect:/addons/user/" + user.getId();
@@ -171,6 +184,126 @@ public class AddonMvcController {
         }
     }
 
+    @GetMapping("/{id}/edit")
+    public String showEditApprovedOrPendingAddonView(@PathVariable int id,
+                                                     Model model) {
+        try {
+            Addon addon = addonService.getApprovedOrPendingAddonById(id);
+            UpdateAddonDto addonToUpdate = new UpdateAddonDto();
+            addonMapper.transferData(addon, addonToUpdate);
+            model.addAttribute("addon", addonToUpdate);
+            model.addAttribute("existingAddon", addon);
+            return "edit_addon";
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/edit")
+    public String editApprovedOrPendingAddon(@PathVariable int id,
+                            @Valid @ModelAttribute("newInput") UpdateAddonDto addonToUpdate,
+                            @RequestParam("binaryContent") MultipartFile binaryContent,
+                            BindingResult bindingResult,
+                                             Principal principal) {
+        if (bindingResult.hasErrors()) {
+            return "edit_addon";
+        }
+        try {
+            User user = getLoggedUser(principal);
+            Addon addon = addonService.getApprovedOrPendingAddonById(id);
+            addon = addonMapper.fromDtoUpdate(addonToUpdate, addon);
+
+            addonService.update(addon, binaryContent, user);
+
+            if (addon.getState().getName().equals("pending")) {
+                return "redirect:/addons/pending/" + addon.getId();
+            } else {
+                return "redirect:/addons/" + addon.getId();
+            }
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/edit-draft")
+    public String showEditDraftAddonView(@PathVariable int id,
+                                                     Model model) {
+        try {
+            Addon addon = addonService.getDraftById(id);
+            CreateAddonDto draftAddonToUpdate = new CreateAddonDto();
+            addonMapper.transferData(addon, draftAddonToUpdate);
+            model.addAttribute("draftAddon", draftAddonToUpdate);
+            model.addAttribute("existingDraftAddon", addon);
+            return "edit_draft_addon";
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/{id}/edit-draft", method = RequestMethod.POST, params = "action=save")
+    public String editDraftAddon(@PathVariable int id,
+                                 @ModelAttribute("newInput") CreateAddonDto addonToUpdate,
+                                 @RequestParam("binaryContent") MultipartFile binaryContent,
+                                 BindingResult bindingResult,
+                                 Principal principal) {
+        if(bindingResult.hasErrors()) {
+            return "edit_draft_addon";
+        }
+        try {
+            User user = getLoggedUser(principal);
+            Addon addon = addonService.getDraftById(id);
+            addon = addonMapper.updateDraft(addonToUpdate, user, addon);
+
+            addon = addonService.update(addon, binaryContent, user);
+
+            return "redirect:/addons/draft/" + addon.getId();
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (UnauthorizedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/{id}/edit-draft", method = RequestMethod.POST, params = "action=publish")
+    public String createAddonFromDraft(@PathVariable int id,
+                                       @Valid @ModelAttribute CreateAddonDto createAddonFromDraft,
+                                       @RequestParam("binaryContent") MultipartFile binaryContent,
+                                       BindingResult bindingResult,
+                                       Principal principal) {
+        if(bindingResult.hasErrors()) {
+            return "edit_draft_addon";
+        }
+        try {
+            User user = getLoggedUser(principal);
+            Addon addon = addonService.getDraftById(id);
+            addon = addonMapper.updateDraft(createAddonFromDraft, user, addon);
+            addonService.createFromDraft(addon, binaryContent, user);
+
+            return "redirect:/addons/user/" + user.getId();
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
 
     @GetMapping("/user/{userId}")
     public String showUserAddons(@PathVariable int userId, Model model) {

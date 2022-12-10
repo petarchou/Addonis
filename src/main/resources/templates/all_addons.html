@@ -11,8 +11,8 @@
     <nav th:replace="/partials/_sidebar::_sidebar"></nav>
     <!-- partial -->
     <!-- partial:partials/_navbar.html -->
-    <nav th:replace="/partials/_navbar::_navbar"></nav>
     <div class="page-wrapper">
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
         <section class="py-4">
             <div class="card-container px-4 px-lg-5 mt-5">
                 <form th:action="@{/addons}" th:object="${addonFilterDto}"
@@ -167,26 +167,6 @@
     </div>
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
-<!-- core:js -->
-<script src="/vendors/core/core.js"></script>
-<!-- endinject -->
-
-<!-- Plugin js for this page -->
-<script src="/vendors/flatpickr/flatpickr.min.js"></script>
-<script src="/vendors/apexcharts/apexcharts.min.js"></script>
-<!-- End plugin js for this page -->
-
-<!-- inject:js -->
-<script src="/vendors/feather-icons/feather.min.js"></script>
-<script src="/js/template.js"></script>
-<!-- endinject -->
-
-<!-- Custom js for this page -->
-<script src="/js/dashboard-light.js"></script>
-<!--            Swipper JS-->
-<script src="/vendors/swiper/swiper-bundle.min.js"></script>
-<!--            JacaScript-->
-<script src="/js/script.js"></script>
-<!-- End custom js for this page -->
+<div th:replace="/partials/resources :: js-scripts"></div>
 </body>
 </html>

@@ -15,7 +15,7 @@
     <div class="page-wrapper">
         <nav th:replace="/partials/_navbar::_navbar"></nav>
         <section class="py-7">
-            <form th:action="@{/admin-panel/users}" th:object="${userFilter}"
+            <form th:action="@{/users}" th:object="${userFilter}"
                   method="get">
                 <div style="margin-bottom: 30px;">
                     <div class="row">
@@ -138,7 +138,7 @@
                             th:class="${pageNumber==usersPage.number + 1} ? active"
                             th:if="${usersPage.totalPages > 1}">
                             <a class="page-link"
-                               th:href="@{/admin-panel/users(size=${usersPage.size}, page=${pageNumber})}"
+                               th:href="@{/users(size=${usersPage.size}, page=${pageNumber})}"
                                th:text="${pageNumber}">
                             </a>
                         </li>

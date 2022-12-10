@@ -11,6 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAddonRepository {
+
+    @Query("select a from Addon a where a.id = :id and (a.state.name like 'approved' or a.state.name like 'pending')")
+    Optional<Addon> findApprovedOrPendingAddonById(int id);
     @Query("select a from Addon a where a.id = :id and a.state.name like 'approved'")
     Optional<Addon> findAddonByIdAndStateNameApproved(int id);
 
@@ -26,6 +29,9 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
 
     @Query("select a from Addon a where a.state.name like 'pending'")
     List<Addon> getAllByStateNamePending();
+
+    @Query("select a from Addon a where a.state.name like 'draft'")
+    List<Addon> getAllByStateNameDraft();
 
     List<Addon> getAllByStateNameEqualsIgnoreCase(String name);
 

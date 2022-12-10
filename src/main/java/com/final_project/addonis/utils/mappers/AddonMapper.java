@@ -83,16 +83,32 @@ public class AddonMapper {
     public Addon updateDraft(CreateAddonDto addonDto, User loggedUser, Addon draft) {
 
         updateBaseDtoIn(addonDto,draft);
-        draft.setTags(addonDto.getTags().stream()
+        draft.getTags().addAll(addonDto.getTags().stream()
                 .map(tagHelper::fromTagName)
                 .collect(Collectors.toSet()));
-
         return draft;
     }
 
     public Addon fromDtoUpdate(UpdateAddonDto addonDto, Addon existingAddon) {
         updateBaseDtoIn(addonDto, existingAddon);
         return existingAddon;
+    }
+
+    public void transferData(Addon addon, UpdateAddonDto addonToUpdate) {
+        addonToUpdate.setName(addon.getName());
+        addonToUpdate.setDescription(addon.getDescription());
+        addonToUpdate.setTargetIde(addon.getTargetIde().getName());
+        addonToUpdate.setOriginUrl(addon.getOriginUrl());
+    }
+
+    public void transferData(Addon addon, CreateAddonDto addonToUpdate) {
+        addonToUpdate.setName(addon.getName());
+        addonToUpdate.setDescription(addon.getDescription());
+        addonToUpdate.setTags(addon.getTags().stream()
+                .map(Tag::getName)
+                .collect(Collectors.toList()));
+        addonToUpdate.setTargetIde(addon.getTargetIde().getName());
+        addonToUpdate.setOriginUrl(addon.getOriginUrl());
     }
 
     private void updateBaseDtoIn(BaseAddonDtoIn addonDto, Addon existingAddon) {

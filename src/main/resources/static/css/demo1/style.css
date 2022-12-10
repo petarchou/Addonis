@@ -19647,7 +19647,7 @@ body {
 }
 
 .item-details-control-root .item-details-left {
-//TODO This was edit by us
+/*//TODO This was edit by us*/
   flex: 1;
   vertical-align: top;
   font-size: 14px;
@@ -19855,6 +19855,7 @@ body {
 }
 
 .item-details-control-root .itemDetails-right {
+  width: 50%;
   display: table-cell;
 }
 
