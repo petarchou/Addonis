@@ -30,40 +30,7 @@
                          class="swiper-slide"
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
-                        <div class="product-card text-center">
-                            <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                                 th:src="@{${'/assets/ide-logos/' + addon.targetIde.logo}}">
-                            <div class="addon-details">
-                                <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
-                                    <span class="addon_name" th:text="${addon.name}">Addon Name</span>
-                                </a>
-                            </div>
-                            <div class="new-stars">
-                                <span class="custom-stars" th:text="${addon.averageRating}"></span>
-                            </div>
-                            <hr>
-                            <div class="user-downloads">
-                                <div class="user">
-                                    <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
-                                        <span class="username-creator"
-                                              th:text="${addon.creator.username}">Creator</span>
-                                    </a>
-                                </div>
-                                <div class="addon-downloads">
-                                    <p class="text-success">
-                                        <i data-feather="download" class="icon-sm mb-1"></i>
-                                        <span th:text="${addon.downloads}">Downloads</span>
-                                    </p>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="button-layer text-center">
-                                <a th:href="@{'/download?id=' + ${addon.id}}">
-                                    <button type="button" class="btn btn-primary btn-xs">Download
-                                    </button>
-                                </a>
-                            </div>
-                        </div>
+                        <div th:replace="/partials/addon_card::addon_card"></div>
                     </div>
                 </div>
                 <div class="swiper-button-next swiper-navBtn"></div>
@@ -87,40 +54,7 @@
                          class="swiper-slide"
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
-                        <div class="product-card text-center">
-                            <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                                 th:src="@{${'/assets/ide-logos/' + addon.targetIde.logo}}">
-                            <div class="addon-details">
-                                <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
-                                    <span class="addon_name" th:text="${addon.name}">Addon Name</span>
-                                </a>
-                            </div>
-                            <div class="new-stars">
-                                <span class="custom-stars" th:text="${addon.averageRating}"></span>
-                            </div>
-                            <hr>
-                            <div class="user-downloads">
-                                <div class="user">
-                                    <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
-                                        <span class="username-creator"
-                                              th:text="${addon.creator.username}">Creator</span>
-                                    </a>
-                                </div>
-                                <div class="addon-downloads">
-                                    <p class="text-success">
-                                        <i data-feather="download" class="icon-sm mb-1"></i>
-                                        <span th:text="${addon.downloads}">Downloads</span>
-                                    </p>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="button-layer text-center">
-                                <a th:href="@{'/download?id=' + ${addon.id}}">
-                                    <button type="button" class="btn btn-primary btn-xs">Download
-                                    </button>
-                                </a>
-                            </div>
-                        </div>
+                        <div th:replace="/partials/addon_card::addon_card"></div>
                     </div>
                 </div>
                 <div class="swiper-button-next swiper-navBtn"></div>
@@ -144,40 +78,7 @@
                          class="swiper-slide"
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
-                        <div class="product-card text-center">
-                            <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
-                                 th:src="@{${'/assets/ide-logos/' + addon.targetIde.logo}}">
-                            <div class="addon-details">
-                                <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
-                                    <span class="addon_name" th:text="${addon.name}">Addon Name</span>
-                                </a>
-                            </div>
-                            <div class="new-stars">
-                                <span class="custom-stars" th:text="${addon.averageRating}"></span>
-                            </div>
-                            <hr>
-                            <div class="user-downloads">
-                                <div class="user">
-                                    <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
-                                        <span class="username-creator"
-                                              th:text="${addon.creator.username}">Creator</span>
-                                    </a>
-                                </div>
-                                <div class="addon-downloads">
-                                    <p class="text-success">
-                                        <i data-feather="download" class="icon-sm mb-1"></i>
-                                        <span th:text="${addon.downloads}">Downloads</span>
-                                    </p>
-                                </div>
-                            </div>
-                            <hr>
-                                <div class="button-layer text-center">
-                                <a th:href="@{'/download?id=' + ${addon.id}}">
-                                    <button type="button" class="btn btn-primary btn-xs">Download
-                                    </button>
-                                </a>
-                            </div>
-                        </div>
+                        <div th:replace="/partials/addon_card::addon_card"></div>
                     </div>
                 </div>
                 <div class="swiper-button-next swiper-navBtn"></div>
@@ -432,11 +333,13 @@
 
     </div>
 </div>
-<!-- Custom js for this page -->
-<script src="/js/dashboard-light.js"></script>
-<script src="/vendors/swiper/swiper-bundle.min.js"></script>
-<!--This should always be the last script insert -->
 <footer th:replace="/partials/_footer::_footer"></footer>
+
+<!-- JS for this page only -->
+<script src="/js/card_ratings.js"></script>
+<!-- End of page JS-->
+
+<!--This should always be the last script insert -->
 <div th:replace="/partials/resources :: js-scripts"></div>
 </body>
 </html>    

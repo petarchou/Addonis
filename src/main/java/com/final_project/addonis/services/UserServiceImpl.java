@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(int id) {
-        return repository.findById(id)
+        return repository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("User", id));
     }
 
@@ -179,19 +179,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getByUsername(String username) {
-        return repository.findByUsername(username)
+        return repository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new EntityNotFoundException("User", "username", username));
     }
 
     @Override
     public User getByEmail(String email) {
-        return repository.findByEmail(email)
+        return repository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new EntityNotFoundException("User", "email", email));
     }
 
     @Override
     public User getByPhone(String phone) {
-        return repository.findByPhoneNumber(phone)
+        return repository.findByPhoneNumberAndIsDeletedFalse(phone)
                 .orElseThrow(() -> new EntityNotFoundException("User", "phone", phone));
     }
 
@@ -239,7 +239,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void verifyIsUniqueUsername(User user) {
-        if (repository.existsUserByUsername(user.getUsername())) {
+        if (repository.existsUserByUsernameAndIsDeletedFalse(user.getUsername())) {
             User existingUser = getByUsername(user.getUsername());
             if (!user.equals(existingUser)) {
                 throw new DuplicateUsernameException("User", "username", user.getUsername());
@@ -248,7 +248,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void verifyIsUniqueEmail(User user) {
-        if (repository.existsUserByEmail(user.getEmail())) {
+        if (repository.existsUserByEmailAndIsDeletedFalse(user.getEmail())) {
             User existingUser = getByEmail(user.getEmail());
             if (!user.equals(existingUser)) {
                 throw new DuplicateEmailException("User", "email", user.getEmail());
@@ -257,7 +257,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void verifyIsUniquePhone(User user) {
-        if (repository.existsUserByPhoneNumber(user.getPhoneNumber())) {
+        if (repository.existsUserByPhoneNumberAndIsDeletedFalse(user.getPhoneNumber())) {
             User existingUser = getByPhone(user.getPhoneNumber());
             if (!user.equals(existingUser)) {
                 throw new DuplicatePhoneException("User", "phone", user.getPhoneNumber());

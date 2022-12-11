@@ -349,4 +349,14 @@ public class AddonRestController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
+
+    @GetMapping("/{addonId}/downloads")
+    public int getAddonDownloads(@PathVariable int addonId) {
+        try {
+            Addon addon = addonService.getAddonById(addonId);
+            return addon.getDownloads();
+        }catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,e.getMessage());
+        }
+    }
 }

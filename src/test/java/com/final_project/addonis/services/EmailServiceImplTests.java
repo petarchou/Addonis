@@ -97,7 +97,7 @@ public class EmailServiceImplTests {
         mockInvitedUser.setLastInviteDate(LocalDateTime.now().minusDays(6));
         when(mailSender.createMimeMessage()).thenReturn(message);
         when(invitedUserRepository.findByEmail(anyString())).thenReturn(Optional.of(mockInvitedUser));
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailAndIsDeletedFalse(anyString())).thenReturn(Optional.empty());
 
         // Act
         emailService.sendInvitationEmail(user, "url", mockInvitedUser);
@@ -123,7 +123,7 @@ public class EmailServiceImplTests {
         InvitedUser mockInvitedUser = new InvitedUser();
         mockInvitedUser.setEmail("testEmail");
         mockInvitedUser.setLastInviteDate(LocalDateTime.now().minusDays(3));
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(new User()));
+        when(userRepository.findByEmailAndIsDeletedFalse(anyString())).thenReturn(Optional.of(new User()));
 
 
         // Act

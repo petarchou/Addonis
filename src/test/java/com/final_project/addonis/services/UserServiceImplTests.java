@@ -20,10 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -154,8 +152,8 @@ public class UserServiceImplTests {
     @Test
     public void create_should_throwsException_when_userUsernameExist() {
         // Arrange
-        when(mockUserRepository.findByUsername(any())).thenReturn(Optional.of(mockUser2));
-        when(mockUserRepository.existsUserByUsername(any())).thenReturn(true);
+        when(mockUserRepository.findByUsernameAndIsDeletedFalse(any())).thenReturn(Optional.of(mockUser2));
+        when(mockUserRepository.existsUserByUsernameAndIsDeletedFalse(any())).thenReturn(true);
 
         //Act,Assert
         assertThrows(DuplicateEntityException.class,
@@ -169,8 +167,8 @@ public class UserServiceImplTests {
         mockUser.setId(1);
         mockUser2.setEmail("existingEmail");
         mockUser2.setId(2);
-        when(mockUserRepository.findByEmail(any())).thenReturn(Optional.of(mockUser2));
-        when(mockUserRepository.existsUserByEmail(any())).thenReturn(true);
+        when(mockUserRepository.findByEmailAndIsDeletedFalse(any())).thenReturn(Optional.of(mockUser2));
+        when(mockUserRepository.existsUserByEmailAndIsDeletedFalse(any())).thenReturn(true);
 
         //Act,Assert
         assertThrows(DuplicateEntityException.class,
@@ -184,8 +182,8 @@ public class UserServiceImplTests {
         mockUser.setId(1);
         mockUser2.setPhoneNumber("0898888888");
         mockUser2.setId(2);
-        when(mockUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(mockUser2));
-        when(mockUserRepository.existsUserByPhoneNumber(any())).thenReturn(true);
+        when(mockUserRepository.findByPhoneNumberAndIsDeletedFalse(any())).thenReturn(Optional.of(mockUser2));
+        when(mockUserRepository.existsUserByPhoneNumberAndIsDeletedFalse(any())).thenReturn(true);
 
         // Act,Assert
         assertThrows(DuplicateEntityException.class,

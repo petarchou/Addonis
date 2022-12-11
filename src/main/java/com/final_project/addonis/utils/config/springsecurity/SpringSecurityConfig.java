@@ -34,18 +34,42 @@ public class SpringSecurityConfig {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST,"/api/users")
                 .permitAll()
-                .anyRequest()
-                //TODO make this authenticated when we finish the front-end
+                .antMatchers("/",
+                        "/login",
+                        "/error",
+                        "/reset-password",
+                        "/forgotten-password",
+                        "/swagger-ui/",
+                        "/about-us",
+                        "/download/**",
+                        "/addons/**",
+                        "/**/*.css",
+                        "/**/*.csv",
+                        "/**/*.js",
+                        "/**/*.json",
+                        "/**/*.html",
+                        "/**/*.eot",
+                        "/**/*.svg",
+                        "/**/*.ttf",
+                        "/**/*.woff",
+                        "/**/*.woff2",
+                        "/**/*.less",
+                        "/**/*.jpg",
+                        "/**/*.jpeg",
+                        "/**/*.png",
+                        "/**/*.gif",
+                        "/**/*.map"
+                )
                 .permitAll()
-                .and()
-                .httpBasic()
+                .anyRequest()
+                //TODO specify which endpoints are authenticated
+                .permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/process_login")
 
-                .defaultSuccessUrl("/")
-                //how do i handle errors?
+                .defaultSuccessUrl("/", true)
                 .failureUrl("/login?error=true")
                 .and()
                 .logout()
@@ -53,7 +77,10 @@ public class SpringSecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true)
                 .and()
-                .rememberMe();
+                .rememberMe()
+                .and()
+                .sessionManagement()
+                .maximumSessions(1);
 
         //make only  single  session possible
 

@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Service
-public class GitHubServiceImpl implements GitHubService {
+public class    GitHubServiceImpl implements GitHubService {
     private static final String GITHUB_PREFIX = "https://github.com/";
     public static final String INVALID_REPOSITORY = "Invalid repository url";
     public static final String GITHUB_API_ERROR = "Error retrieving %s from git hub";
@@ -105,7 +105,9 @@ public class GitHubServiceImpl implements GitHubService {
         GithubCommit commit = new GithubCommit();
         String date = dateInfo.get("date").toString();
         String message = commitInfo.get("message").toString().strip();
-        //set max message length?
+        if(message.length()>512){
+            message = message.substring(0,513)+"...";
+        }
         commit.setMessage(message);
         date = date.substring(0, date.length() - 1);
         commit.setDate(LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME));

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <div th:fragment="addon_card" class="product-card text-center">
+    <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
+    <img class="card-image-center" alt="" src="/assets/others/logo-placeholder.png"
+         th:src="@{${'/assets/ide-logos/' + addon.targetIde.logo}}">
+    </a>
+    <div class="addon-details">
+      <a href="#" th:href="@{/addons/{id}(id=${addon.id})}">
+        <span class="addon_name" th:text="${addon.name}">Addon Name</span>
+      </a>
+    </div>
+    <div class="star-widget" th:data-rating="${addon.averageRating}">
+      <i class="fa-solid fa-star star-rating"></i>
+      <i class="fa-solid fa-star star-rating"></i>
+      <i class="fa-solid fa-star star-rating"></i>
+      <i class="fa-solid fa-star star-rating"></i>
+      <i class="fa-solid fa-star star-rating"></i>
+      <span  th:text="${addon.averageRating}"></span>
+    </div>
+    <hr>
+    <div class="user-downloads">
+      <div class="user">
+        <a href="#" th:href="@{/profile/{username}(username=${addon.creator.username})}">
+                                        <span class="username-creator"
+                                              th:text="${addon.creator.username}">Creator</span>
+        </a>
+      </div>
+      <p class="text-success">
+        <i data-feather="download" class="icon-sm mb-1"></i>
+        <span th:text="${addon.downloads}">Downloads</span>
+      </p>
+    </div>
+    <hr>
+    <div class="button-layer text-center">
+      <a th:href="@{'/download?id=' + ${addon.id}}">
+        <button type="button" class="btn btn-primary btn-xs">Download
+        </button>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

@@ -195,7 +195,7 @@ public class EmailServiceImpl implements EmailService {
 
 
     private boolean isAUser(InvitedUser invitedUser) {
-        return userRepository.findByEmail(invitedUser.getEmail()).isPresent();
+        return userRepository.findByEmailAndIsDeletedFalse(invitedUser.getEmail()).isPresent();
     }
 
     private boolean wasInvitedMinFiveDaysAgo(Optional<InvitedUser> existing) {

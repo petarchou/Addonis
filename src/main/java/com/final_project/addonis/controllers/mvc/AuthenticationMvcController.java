@@ -97,7 +97,7 @@ public class AuthenticationMvcController {
         return "verify_success";
     }
 
-    @GetMapping("/verify_fail")
+    @GetMapping("/verify-fail")
     public String showVerifyFailedPage() {
         return "verify_fail";
     }
@@ -123,7 +123,7 @@ public class AuthenticationMvcController {
         }
     }
 
-    @GetMapping("/reset_password")
+    @GetMapping("/reset-password")
     public String resetPasswordView(@RequestParam(name = "token") String tokenStr, Model model) {
         try {
             passwordResetTokenService.validateToken(tokenStr);
@@ -136,7 +136,7 @@ public class AuthenticationMvcController {
         }
     }
 
-    @PostMapping("/reset_password")
+    @PostMapping("/reset-password")
     public String resetPassword(@RequestParam(name = "token") String tokenStr,
                                 @Valid @ModelAttribute(name = "passwordDto") ForgottenPasswordDto passwordDto,
                                 BindingResult bindingResult, Model model) {
