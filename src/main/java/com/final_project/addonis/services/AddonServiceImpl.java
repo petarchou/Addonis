@@ -273,6 +273,7 @@ public class AddonServiceImpl implements AddonService {
         Addon addon = addonRepository.findAddonByIdAndStateNamePending(id)
                 .orElseThrow(() -> new EntityNotFoundException("Addon", id));
         addon.setState(stateRepository.findByName("approved"));
+        addon.setUploadedDate(LocalDateTime.now());
         addon.getCategories().addAll(categories);
         addon = updateGithubDetails(addon);
         return addonRepository.saveAndFlush(addon);

@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<div class="main-wrapper">
+<div class="main-wrapper" id="main-div" th:data-addonId="${addon.id}">
     <!-- partial:partials/_sidebar.html -->
     <nav th:replace="/partials/_sidebar::_sidebar"></nav>
 
@@ -48,15 +48,47 @@
                                                 <div class="item-rating d-inline-new">
                                                     <div data-feather="download" class="icon-sm mb-1">
                                                     </div>
-                                                    <span th:text="' ' + ${addon.downloads} + ' ' + downloads">Downloads</span>
+                                                    <span style="font-size: 15px" class="ms-1"><span id="download-count"
+                                                                             th:text="${addon.downloads}"></span> downloads</span>
+
                                                 </div>
                                                 <span class="divider">|</span>
-                                                <span th:text="${'Rating ' + addon.averageRating + ' from 5 (' + addon.rating.size() +')'}">Rating</span>
+                                                <div class="star-widget">
+                                                    <form th:if="${isAuth}" id="rating"
+                                                          th:data-userId="${loggedUser.id}"
+                                                          th:data-username="${loggedUser.username}">
+                                                        <input onclick="vote(5)" type="radio" name="rate"
+                                                               id="rate-5">
+                                                        <label for="rate-5"
+                                                               class="fa-solid fa-star yellow-color star-rating"></label>
+                                                        <input onclick="vote(4)" type="radio" name="rate"
+                                                               id="rate-4">
+                                                        <label for="rate-4"
+                                                               class="fa-solid fa-star yellow-color star-rating"></label>
+                                                        <input onclick="vote(3)" type="radio" name="rate"
+                                                               id="rate-3">
+                                                        <label for="rate-3"
+                                                               class="fa-solid fa-star yellow-color star-rating"></label>
+                                                        <input onclick="vote(2)" type="radio" name="rate"
+                                                               id="rate-2">
+                                                        <label for="rate-2"
+                                                               class="fa-solid fa-star yellow-color star-rating"></label>
+                                                        <input onclick="vote(1)" type="radio" name="rate"
+                                                               id="rate-1">
+                                                        <label for="rate-1"
+                                                               class="fa-solid fa-star yellow-color star-rating"></label>
+                                                    </form>
+                                                </div>
+                                                <span th:unless="${isAuth}" style="font-size: 16px">Rating </span>
+                                                <span style="font-size: 16px">
+                                                    <span id="rating-average">0</span>/5 (<span
+                                                        id="ratings-total">0</span> votes)</span>
                                             </div>
                                             <div class="empty-row-wrapper"></div>
                                             <div class="list-group-item-action">
                                                 <a th:href="@{'/download?id=' + ${addon.id}}">
-                                                    <button type="button" class="btn btn-primary btn-xs pull-right">
+                                                    <button id="download-addon" type="button"
+                                                            class="btn btn-primary btn-xs pull-right">
                                                         Download
                                                     </button>
                                                 </a>
@@ -99,7 +131,7 @@
                                                         </p>
                                                     </div>
                                                 </div>
-                                                 <div class="itemDetails-right">
+                                                <div class="itemDetails-right">
                                                     <div class="meta-data-async-div">
                                                         <div class="meta-data-list-container">
                                                             <div class="section-meta-data-list">
@@ -181,7 +213,7 @@
                                                                     </td>
                                                                     <td role="definition"
                                                                         aria-labelledby="Last-update-message"
-                                                                        th:text="${addon.lastCommitMessage}">
+                                                                        th:text="${addon.lastCommitMessage.trim()}">
                                                                         Last update message
                                                                     </td>
                                                                 </tr>
@@ -206,7 +238,7 @@
                                                             </table>
                                                         </div>
                                                     </div>
-                                                     <div th:if="${addon.creator.id == loggedUser.id || loggedUser.isAdmin()}" >
+                                                     <div th:if="${isAuth && (addon.creator.id == loggedUser.id || loggedUser.isAdmin())}" >
                                                          <a class="btn btn-primary" th:href="@{/addons/{id}/edit(id=${addon.id})}">Edit Addon</a>
                                                      </div>
                                                  </div>
@@ -258,6 +290,12 @@
     </div>
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
+
+<!-- JS for this page only -->
+<script src="/js/rate_addons.js"></script>
+<!-- End of page JS-->
+
+<!--This should always be the last script insert -->
 <div th:replace="/partials/resources :: js-scripts"></div>
 </body>
 </html>

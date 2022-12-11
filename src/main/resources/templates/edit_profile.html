@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="partials/resources :: resources">
+
+    <title>User Profile</title>
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- partial:partials/_sidebar.html -->
+    <nav th:replace="/partials/_sidebar::_sidebar"></nav>
+    <!-- partial -->
+
+    <div class="page-wrapper">
+
+        <!-- partial:partials/_navbar.html -->
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
+        <!-- partial -->
+
+        <div class="page-content">
+            <section style="background-color: #eee;">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Create addon</h6>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer th:replace="/partials/_footer::_footer"></footer>
+
+    </div>
+</div>
+
+<script>
+    $('#delete').on('click', function () {
+        Swal.fire({
+            title: 'Do you want to DELETE this account?',
+            text: "This is a permanent action.",
+            icon: 'warning',
+            iconColor: '#d33',
+            showCancelButton: true,
+            confirmButtonColor: '#6571ff',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const $btn = $('#delete');
+                const $profileId = $btn.attr('data-profileId');
+                const $loggedId = $btn.attr('data-loggedId');
+
+                if ($profileId === $loggedId) {
+                    window.open(window.location.origin + '/logout','_self');
+                } else {
+                    window.open(window.location.origin, '_self');
+                }
+
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/users/' + $profileId.toString(),
+                })
+            }
+        })
+    });
+</script>
+
+<!--This should always be the last script insert -->
+<div th:replace="/partials/resources :: js-scripts"></div>
+</body>
+</html>
