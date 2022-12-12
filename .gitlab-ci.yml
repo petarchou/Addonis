@@ -22,7 +22,6 @@ variables:
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
-  - apk add --update curl && rm -rf /var/cache/apk/*
 
 
 stages: # List of stages for jobs, and their order of execution
