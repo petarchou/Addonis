@@ -123,7 +123,7 @@
                                                     <tr th:each="addon : ${approvedAddons}">
                                                         <td th:text="${approvedAddons.indexOf(addon)} + 1"></td>
                                                         <td>
-                                                            <a th:href="@{/admin-panel/pending/{id}(id=${addon.id})}">
+                                                            <a th:href="@{/addons/{id}(id=${addon.id})}">
                                                                 <span th:text="${addon.name}">Addon Name</span>
                                                             </a>
                                                         </td>

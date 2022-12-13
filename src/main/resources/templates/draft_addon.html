@@ -40,7 +40,7 @@
                                                 <div class="user-publisher">
                                                     <h4 role="presentation">
                                                         <a class="user-publisher-link d-inline-new"
-                                                           th:href="@{/profile/{username}(username=${draftAddon.creator.username})}">
+                                                           th:href="@{/users/{id}(id=${draftAddon.creator.id})}">
                                                             <i data-feather="user" class="icon-sm mb-1"></i>
                                                             <h6 class="mb-2"
                                                                 th:text="${draftAddon.creator.username}">
@@ -91,9 +91,11 @@
                                                                         Tags</h3>
                                                                     <div class="meta-data-list"
                                                                          role="group">
-                                                                        <a th:each="tag : ${draftAddon.tags}"
-                                                                           class="meta-data-list-link"
-                                                                           th:text="${tag.name}">
+                                                                        <a class="meta-data-list"
+                                                                           th:each="tag : ${draftAddon.tags}"
+                                                                           th:text="${tag.name}"
+                                                                           th:href="@{/addons/tag/{id}(id=${tag.id})}"
+                                                                           role="group">
                                                                         </a>
                                                                     </div>
                                                                 </div>

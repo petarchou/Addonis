@@ -10,11 +10,10 @@
 <div class="main-wrapper">
     <!-- partial:partials/_sidebar.html -->
     <nav th:replace="/partials/_sidebar::_sidebar"></nav>
-
+    <!-- partial:partials/_navbar.html -->
+    <nav th:replace="/partials/_navbar::_navbar"></nav>
+    <!-- partial -->
     <div class="page-wrapper">
-        <!-- partial:partials/_navbar.html -->
-        <nav th:replace="/partials/_navbar::_navbar"></nav>
-        <!-- partial -->
         <div class="main-content item-details-main-content">
             <div class="item-details-control-root">
                 <div class="item-details" role="main">
@@ -40,7 +39,7 @@
                                                 <div class="user-publisher">
                                                     <h4 role="presentation">
                                                         <a class="user-publisher-link d-inline-new"
-                                                           th:href="@{/profile/{username}(username=${pendingAddon.creator.username})}">
+                                                           th:href="@{/users/{id}(id=${pendingAddon.creator.id})}">
                                                             <i data-feather="user" class="icon-sm mb-1"></i>
                                                             <h6 class="mb-2"
                                                                 th:text="${pendingAddon.creator.username}">
@@ -91,9 +90,11 @@
                                                                         Tags</h3>
                                                                     <div class="meta-data-list"
                                                                          role="group">
-                                                                        <a th:each="tag : ${pendingAddon.tags}"
-                                                                           class="meta-data-list-link"
-                                                                           th:text="${tag.name}">
+                                                                        <a class="meta-data-list"
+                                                                           th:each="tag : ${pendingAddon.tags}"
+                                                                           th:text="${tag.name}"
+                                                                           th:href="@{/addons/tag/{id}(id=${tag.id})}"
+                                                                           role="group">
                                                                         </a>
                                                                     </div>
                                                                 </div>
@@ -124,15 +125,13 @@
                                                         </div>
                                                     </div>
                                                     <div class="section-capabilities">
-                                                        <h3 class="section-header right">
+                                                        <h3 class="section-header">
                                                             Action</h3>
                                                         <div th:if="${loggedUser.isAdmin()}">
-                                                            <form style="float: left; padding: 5px;"
-                                                                  method="post" action="#"
+                                                            <form method="post" action="#"
                                                                   th:action="@{/approve/{id}(id=${pendingAddon.id})}">
-                                                                <div class="form-group">
-                                                                    <label for="category">Select
-                                                                        Category</label>
+                                                                <div class="form-group col-10">
+                                                                    <label for="category">Select Category</label>
                                                                     <select class="form-control"
                                                                             name="categoriesIn"
                                                                             id="category"
@@ -143,29 +142,25 @@
                                                                             Categories
                                                                         </option>
                                                                     </select>
+                                                                    <button type="submit"
+                                                                            class="btn btn-success"
+                                                                            style="margin-right: 10px; margin-top: 20px;"
+                                                                            value="Approve">Approve
+                                                                    </button>
                                                                 </div>
-                                                                <button type="submit"
-                                                                        class="btn btn-success"
-                                                                        style="margin-right: 10px; margin-top: 20px;"
-                                                                        value="Approve">Approve
-                                                                </button>
                                                             </form>
-                                                            <form style="float: left; padding: 5px;"
-                                                                  method="post"
+                                                            <hr>
+                                                            <form method="post"
                                                                   th:action="@{/notify/{id}(id=${pendingAddon.id})}">
                                                                 <button type="submit"
                                                                         class="btn btn-danger"
-                                                                        style="margin-right: 10px; margin-top: 20px;"
                                                                         value="Reject">Reject
                                                                 </button>
                                                             </form>
-                                                            <div>
-                                                                <a class="btn btn-primary" style="margin-right: 10px; margin-top: 20px;"
-                                                                   th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit Addon</a>
-                                                            </div>
-                                                        </div>
-                                                        <div th:if="${pendingAddon.creator.id == loggedUser.id}">
-                                                            <a class="btn btn-primary" th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit Addon</a>
+                                                            <hr>
+                                                            <a class="btn btn-primary"
+                                                               th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit
+                                                                Addon</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -180,6 +175,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
 

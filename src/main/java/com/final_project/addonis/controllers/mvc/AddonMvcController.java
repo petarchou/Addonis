@@ -1,7 +1,10 @@
 package com.final_project.addonis.controllers.mvc;
 
 import com.final_project.addonis.models.*;
-import com.final_project.addonis.models.dtos.*;
+import com.final_project.addonis.models.dtos.AddonDtoOut;
+import com.final_project.addonis.models.dtos.AddonFilter;
+import com.final_project.addonis.models.dtos.CreateAddonDto;
+import com.final_project.addonis.models.dtos.UpdateAddonDto;
 import com.final_project.addonis.services.contracts.*;
 import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
@@ -10,6 +13,7 @@ import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException
 import com.final_project.addonis.utils.mappers.AddonMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -24,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -50,16 +55,15 @@ public class AddonMvcController {
         this.targetIdeService = targetIdeService;
         this.categoryService = categoryService;
     }
+
     @ModelAttribute("isAuth")
     private boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
         Authentication authentication = context.getAuthentication();
-        boolean au = authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
-        return au;
+        return authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
 
     @ModelAttribute("loggedUser")
     private User getLoggedUser(Principal principal) {
-
         return principal == null ? null : userService.getByUsername(principal.getName());
     }
 
@@ -74,7 +78,7 @@ public class AddonMvcController {
     }
 
     @ModelAttribute("allCategories")
-    public List<Category> populateCategories(){
+    public List<Category> populateCategories() {
         return categoryService.getAll();
     }
 
@@ -108,15 +112,16 @@ public class AddonMvcController {
     @GetMapping
     public String getAddons(Model model,
                             @ModelAttribute AddonFilter addonFilter) {
-        Page<Addon> addons = addonService.getAllApproved(addonFilter.getSearch(),
-                addonFilter.getTargetIde(),
-                addonFilter.getCategory(),
-                addonFilter.getSortBy(),
-                addonFilter.getOrderBy(),
-                addonFilter.getPage(),
-                addonFilter.getSize());
+        Page<Addon> addons = addonService.getAllApproved(
+                Optional.ofNullable(addonFilter.getSearch()),
+                Optional.ofNullable(addonFilter.getTargetIde()),
+                Optional.ofNullable(addonFilter.getCategory()),
+                Optional.ofNullable(addonFilter.getSortBy()),
+                Optional.ofNullable(addonFilter.getOrder()),
+                Optional.ofNullable(addonFilter.getPage()),
+                Optional.ofNullable(addonFilter.getSize()));
         model.addAttribute("page", addons);
-        model.addAttribute("addonFilterDto", new AddonFilterDto());
+        model.addAttribute("addonFilterDto", addonFilter);
 
         int totalPages = addons.getTotalPages();
         if (totalPages > 0) {
@@ -194,7 +199,7 @@ public class AddonMvcController {
             model.addAttribute("addon", addonToUpdate);
             model.addAttribute("existingAddon", addon);
             return "edit_addon";
-        } catch(EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -205,9 +210,9 @@ public class AddonMvcController {
 
     @PostMapping("/{id}/edit")
     public String editApprovedOrPendingAddon(@PathVariable int id,
-                            @Valid @ModelAttribute("newInput") UpdateAddonDto addonToUpdate,
-                            @RequestParam("binaryContent") MultipartFile binaryContent,
-                            BindingResult bindingResult,
+                                             @Valid @ModelAttribute("newInput") UpdateAddonDto addonToUpdate,
+                                             @RequestParam("binaryContent") MultipartFile binaryContent,
+                                             BindingResult bindingResult,
                                              Principal principal) {
         if (bindingResult.hasErrors()) {
             return "edit_addon";
@@ -224,7 +229,7 @@ public class AddonMvcController {
             } else {
                 return "redirect:/addons/" + addon.getId();
             }
-        } catch(EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -237,7 +242,7 @@ public class AddonMvcController {
 
     @GetMapping("/{id}/edit-draft")
     public String showEditDraftAddonView(@PathVariable int id,
-                                                     Model model) {
+                                         Model model) {
         try {
             Addon addon = addonService.getDraftById(id);
             CreateAddonDto draftAddonToUpdate = new CreateAddonDto();
@@ -245,7 +250,7 @@ public class AddonMvcController {
             model.addAttribute("draftAddon", draftAddonToUpdate);
             model.addAttribute("existingDraftAddon", addon);
             return "edit_draft_addon";
-        } catch(EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -260,7 +265,7 @@ public class AddonMvcController {
                                  @RequestParam("binaryContent") MultipartFile binaryContent,
                                  BindingResult bindingResult,
                                  Principal principal) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "edit_draft_addon";
         }
         try {
@@ -271,7 +276,7 @@ public class AddonMvcController {
             addon = addonService.update(addon, binaryContent, user);
 
             return "redirect:/addons/draft/" + addon.getId();
-        } catch(EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -288,7 +293,7 @@ public class AddonMvcController {
                                        @RequestParam("binaryContent") MultipartFile binaryContent,
                                        BindingResult bindingResult,
                                        Principal principal) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "edit_draft_addon";
         }
         try {
@@ -317,5 +322,41 @@ public class AddonMvcController {
         model.addAttribute("user", user);
 
         return "user_addons";
+    }
+
+    @GetMapping("/tag/{tagId}")
+    public String getAddonsByTag(Model model, @PathVariable int tagId) {
+        Tag tag = tagService.getTagById(tagId);
+        List<Addon> addons = tag.getAddons().stream()
+                .filter(addon -> addon.getState().getId() == 3)
+                .collect(Collectors.toList());
+        model.addAttribute("addons", addons);
+        return "tag_addons";
+    }
+
+    @GetMapping("/{id}/featured-add")
+    public String addAddonToFeatured(@PathVariable int id) {
+        try {
+            Addon addon = addonService.getAddonById(id);
+            addonService.addAddonToFeatured(addon);
+            return "redirect:/addons/" + addon.getId();
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/featured-remove")
+    public String removeAddonFromFeatured(@PathVariable int id) {
+        try {
+            Addon addon = addonService.getAddonById(id);
+            addon = addonService.removeAddonFromFeatured(addon);
+            return "redirect:/addons/" + addon.getId();
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
     }
 }

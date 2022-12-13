@@ -6,7 +6,6 @@
     <title>Add-ons Plugins for your IDE</title>
 </head>
 <body>
-
 <div class="main-wrapper" id="main-div" th:data-addonId="${addon.id}">
     <!-- partial:partials/_sidebar.html -->
     <nav th:replace="/partials/_sidebar::_sidebar"></nav>
@@ -37,7 +36,7 @@
                                                 <div class="user-publisher">
                                                     <h4 role="presentation">
                                                         <a class="user-publisher-link d-inline-new"
-                                                           th:href="@{/profile/{username}(username=${addon.creator.username})}">
+                                                           th:href="@{/users/{id}(id=${addon.creator.id})}">
                                                             <i data-feather="user" class="icon-sm mb-1"></i>
                                                             <h6 class="mb-2" th:text="${addon.creator.username}">
                                                                 Creator</h6>
@@ -46,11 +45,9 @@
                                                 </div>
                                                 <span class="divider">|</span>
                                                 <div class="item-rating d-inline-new">
-                                                    <div data-feather="download" class="icon-sm mb-1">
-                                                    </div>
-                                                    <span style="font-size: 15px" class="ms-1"><span id="download-count"
-                                                                             th:text="${addon.downloads}"></span> downloads</span>
-
+                                                    <div data-feather="download" class="icon-sm mb-1"></div>
+                                                    <span id="download-count" style="font-size: 15px" class="ms-1"
+                                                          th:text="${addon.downloads}">downloads</span>
                                                 </div>
                                                 <span class="divider">|</span>
                                                 <div class="star-widget">
@@ -138,23 +135,23 @@
                                                                 <h3 class="section-header right">
                                                                     Categories</h3>
                                                                 <div class="meta-data-list" role="group">
-                                                                    <a th:each="category : ${addon.categories}"
-                                                                       class="meta-data-list-link"
-                                                                       th:text="${category.name}">
-                                                                    </a>
+                                                                    <a class="meta-data-list"
+                                                                       th:each="category : ${addon.categories}"
+                                                                       th:text="${category.name}"
+                                                                       th:href="@{/addons(category=${category.name})}"
+                                                                       role="group"></a>
                                                                 </div>
                                                             </div>
                                                             <div class="meta-data-list-container">
                                                                 <div class="section-meta-data-list">
                                                                     <h3 class="section-header right">
                                                                         Tags</h3>
-                                                                    <div class="meta-data-list"
-                                                                         role="group">
-                                                                        <a th:each="tag : ${addon.tags}"
-                                                                           class="meta-data-list-link"
-                                                                           th:text="${tag.name}">
-                                                                        </a>
-                                                                    </div>
+                                                                    <a class="meta-data-list"
+                                                                       th:each="tag : ${addon.tags}"
+                                                                       th:text="${tag.name}"
+                                                                       th:href="@{/addons/tag/{id}(id=${tag.id})}"
+                                                                       role="group">
+                                                                    </a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -238,10 +235,22 @@
                                                             </table>
                                                         </div>
                                                     </div>
-                                                     <div th:if="${isAuth && (addon.creator.id == loggedUser.id || loggedUser.isAdmin())}" >
-                                                         <a class="btn btn-primary" th:href="@{/addons/{id}/edit(id=${addon.id})}">Edit Addon</a>
-                                                     </div>
-                                                 </div>
+                                                    <div th:if="${isAuth && (addon.creator.id == loggedUser.id || loggedUser.isAdmin())}">
+                                                        <a class="btn btn-primary"
+                                                           th:href="@{/addons/{id}/edit(id=${addon.id})}">Edit Addon</a>
+                                                    </div>
+                                                    <hr>
+                                                    <div th:if="${isAuth && loggedUser.isAdmin() && !addon.featured}">
+                                                        <a class="btn btn-inverse-primary" methods="post" type="submit"
+                                                           th:href="@{/addons/{id}/featured-add(id=${addon.id})}">
+                                                            Add to Featured</a>
+                                                    </div>
+                                                    <div th:if="${isAuth && loggedUser.isAdmin() && addon.featured}">
+                                                        <a class="btn btn-outline-primary"
+                                                           th:href="@{/addons/{id}/featured-remove(id=${addon.id})}">
+                                                            Remove from Featured</a>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade"

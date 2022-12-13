@@ -4,7 +4,6 @@ import com.final_project.addonis.models.Addon;
 import com.final_project.addonis.models.Category;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.dtos.UsersFilter;
-import com.final_project.addonis.models.dtos.UsersFilterDto;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.CategoryService;
 import com.final_project.addonis.services.contracts.UserService;
@@ -24,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -43,11 +43,11 @@ public class AdminPanelMvcController {
         this.categoryHelper = categoryHelper;
         this.categoryService = categoryService;
     }
+
     @ModelAttribute("isAuth")
     private boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
         Authentication authentication = context.getAuthentication();
-        boolean au = authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
-        return au;
+        return authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
 
     @ModelAttribute("loggedUser")
@@ -76,14 +76,14 @@ public class AdminPanelMvcController {
     public String getUsers(Model model,
                            @ModelAttribute UsersFilter usersFilter) {
 
-        Page<User> users = userService.getAll(usersFilter.getSearch(),
-                usersFilter.getFilterByField(),
-                usersFilter.getSortByField(),
-                usersFilter.getOrder(),
-                usersFilter.getPage(),
-                usersFilter.getSize());
+        Page<User> users = userService.getAll(Optional.ofNullable(usersFilter.getSearch()),
+                Optional.ofNullable(usersFilter.getFilter()),
+                Optional.ofNullable(usersFilter.getSort()),
+                Optional.ofNullable(usersFilter.getOrder()),
+                Optional.ofNullable(usersFilter.getPage()),
+                Optional.ofNullable(usersFilter.getSize()));
         model.addAttribute("usersPage", users);
-        model.addAttribute("userFilter",new UsersFilterDto());
+        model.addAttribute("userFilter", usersFilter);
 
         int totalPages = users.getTotalPages();
         if (totalPages > 0) {

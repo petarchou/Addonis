@@ -13,86 +13,82 @@
     <!-- partial -->
 
     <div class="page-wrapper">
-        <nav th:replace="/partials/_navbar::_navbar"></nav>
         <section class="py-7">
             <form th:action="@{/users}" th:object="${userFilter}"
                   method="get">
-                <div style="margin-bottom: 30px;">
-                    <div class="row">
-                        <table class="table table-borderless text-center">
-                            <div class="input-group mb-2">
-                                <input th:field="${userFilter.search}" type="text"
-                                       class="form-control"
-                                       placeholder="Search..."
-                                       aria-label="Search"
-                                       aria-describedby="button-addon2">
-                                <button class="btn btn-outline-secondary" type="submit"
-                                        id="button-addon2">Search
-                                </button>
-                            </div>
-                            <td>
-                                <label>
-                                    <select class="btn btn-primary dropdown-toggle text-center"
-                                            th:field="${userFilter.filterByField}"
-                                            style="width: 150px; height: 38px;
-                                                    font-size: smaller">
-                                        <option th:value="null"
-                                                class="dropdown-item">Filter
-                                        </option>
-                                        <option th:value="username"
-                                                class="dropdown-item">Username
-                                        </option>
-                                        <option th:value="email"
-                                                class="dropdown-item">Email
-                                        </option>
-                                        <option th:value="phoneNumber"
-                                                class="dropdown-item">Phone
-                                        </option>
-                                    </select>
-                                </label>
-                            </td>
-                            <td>
-                                <label>
-                                    <select class="btn btn-primary dropdown-toggle text-center"
-                                            th:field="${userFilter.sortByField}"
-                                            style="width: 150px; height: 38px;
-                                                    font-size: smaller">
-                                        <option th:value="null"
-                                                class="dropdown-item">Sort
-                                        </option>
-                                        <option th:value="username"
-                                                class="dropdown-item">Username
-                                        </option>
-                                        <option th:value="email"
-                                                class="dropdown-item">Email
-                                        </option>
-                                        <option th:value="phoneNumber"
-                                                class="dropdown-item">Phone
-                                        </option>
-                                    </select>
-                                </label>
-                            </td>
-                            <td>
-                                <label>
-                                    <select class="btn btn-primary dropdown-toggle text-center"
-                                            th:field="${userFilter.order}"
-                                            style="width: 150px; height: 38px;
-                                                    font-size: smaller">
-                                        <option th:value="false"
-                                                class="dropdown-item">Order
-                                        </option>
-                                        <option th:value="true"
-                                                class="dropdown-item">Ascending
-                                        </option>
-                                        <option th:value="false"
-                                                class="dropdown-item">Descending
-                                        </option>
-                                    </select>
-                                </label>
-                            </td>
-                        </table>
-                    </div>
+                <div class="input-group-text">
+                    <input th:field="${userFilter.search}" type="text"
+                           class="form-control "
+                           placeholder="Search..."
+                           aria-label="Search"
+                           aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search
+                    </button>
                 </div>
+                <table class="table table-borderless text-center">
+                    <tr>
+                        <td>
+                            <label>
+                                <select class="btn btn-primary dropdown-toggle"
+                                        th:field="${userFilter.filter}"
+                                        style="width: 150px; height: 38px;
+                                                    font-size: smaller">
+                                    <option th:value="null"
+                                            class="dropdown-item">Filter
+                                    </option>
+                                    <option th:value="username"
+                                            class="dropdown-item">Username
+                                    </option>
+                                    <option th:value="email"
+                                            class="dropdown-item">Email
+                                    </option>
+                                    <option th:value="phoneNumber"
+                                            class="dropdown-item">Phone
+                                    </option>
+                                </select>
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <select class="btn btn-primary dropdown-toggle text-center"
+                                        th:field="${userFilter.sort}"
+                                        style="width: 150px; height: 38px;
+                                                    font-size: smaller">
+                                    <option th:value="null"
+                                            class="dropdown-item">Sort
+                                    </option>
+                                    <option th:value="username"
+                                            class="dropdown-item">Username
+                                    </option>
+                                    <option th:value="email"
+                                            class="dropdown-item">Email
+                                    </option>
+                                    <option th:value="phoneNumber"
+                                            class="dropdown-item">Phone
+                                    </option>
+                                </select>
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <select class="btn btn-primary dropdown-toggle text-center"
+                                        th:field="${userFilter.order}"
+                                        style="width: 150px; height: 38px;
+                                                    font-size: smaller">
+                                    <option th:value="false"
+                                            class="dropdown-item">Order
+                                    </option>
+                                    <option th:value="true"
+                                            class="dropdown-item">Ascending
+                                    </option>
+                                    <option th:value="false"
+                                            class="dropdown-item">Descending
+                                    </option>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
             </form>
             <div class="card-body px-4 px-lg-5 mt-5">
                 <div class="d-flex justify-content-center align-items-baseline mb-7">
@@ -113,7 +109,7 @@
                             <td colspan="7">No Records found.</td>
                         </tr>
                         <tr th:each="user : ${usersPage.content}">
-                            <td th:text="${usersPage.getContent().indexOf(user)+1 + usersPage.getNumber()*10}"></td>
+                            <td th:text="${usersPage.getContent().indexOf(user)+1 + (usersPage.getNumber() * usersPage.size)}"></td>
                             <td>
                                 <a th:href="@{/users/{id}(id=${user.id})}">
                                     <span th:text="${user.username}">Username</span>
@@ -136,9 +132,15 @@
                         <li class="page-item"
                             th:each="pageNumber : ${userPages}"
                             th:class="${pageNumber==usersPage.number + 1} ? active"
-                            th:if="${usersPage.totalPages > 1}">
+                            th:if="${usersPage.totalPages >1}">
                             <a class="page-link"
-                               th:href="@{/users(size=${usersPage.size}, page=${pageNumber})}"
+                               th:href="@{/users(
+                               search=${userFilter.search},
+                               filter=${userFilter.filter},
+                               sort=${userFilter.sort},
+                               order=${userFilter.order},
+                               size=${usersPage.size},
+                               page=${pageNumber})}"
                                th:text="${pageNumber}">
                             </a>
                         </li>

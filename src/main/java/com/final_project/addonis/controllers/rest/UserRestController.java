@@ -11,6 +11,7 @@ import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.PasswordNotMatchException;
 import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
+import com.final_project.addonis.utils.helpers.EmailHelper;
 import com.final_project.addonis.utils.mappers.AddonMapper;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
 import com.final_project.addonis.utils.mappers.UserMapper;
@@ -37,17 +38,22 @@ public class UserRestController {
     private final AddonService addonService;
 
     private final AddonMapper addonMapper;
+    private final EmailHelper emailHelper;
 
     public UserRestController(UserService service,
                               UserMapper mapper,
                               InvitedUserMapper invitedUserMapper,
-                              EmailService emailService, AddonService addonService, AddonMapper addonMapper) {
+                              EmailService emailService,
+                              AddonService addonService,
+                              AddonMapper addonMapper,
+                              EmailHelper emailHelper) {
         this.service = service;
         this.mapper = mapper;
         this.invitedUserMapper = invitedUserMapper;
         this.emailService = emailService;
         this.addonService = addonService;
         this.addonMapper = addonMapper;
+        this.emailHelper = emailHelper;
     }
 
     @Secured("ROLE_ADMIN")
@@ -85,7 +91,7 @@ public class UserRestController {
                           HttpServletRequest request) {
         try {
             User user = mapper.fromCreateDto(createUserDto);
-            user = service.create(user, getSiteUrl(request));
+            user = service.create(user, emailHelper.getSiteUrl(request));
             return mapper.toDto(user);
         } catch (DuplicateEntityException | PasswordNotMatchException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
@@ -221,7 +227,7 @@ public class UserRestController {
         try {
             User user = service.getById(id);
             InvitedUser invitedUser = invitedUserMapper.fromEmail(toEmail);
-            emailService.sendInvitationEmail(user, getSiteUrl(request), invitedUser);
+            emailService.sendInvitationEmail(user, emailHelper.getSiteUrl(request), invitedUser);
             return "Invitation successful! An invitation email was  sent to " + toEmail;
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
@@ -251,11 +257,6 @@ public class UserRestController {
         return addonService.getDraftAddonsByUser(userId).stream()
                 .map(addonMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    private String getSiteUrl(HttpServletRequest request) {
-        String siteUrl = request.getRequestURL().toString();
-        return siteUrl.replace(request.getServletPath(), "");
     }
 
 }
