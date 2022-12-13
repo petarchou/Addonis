@@ -114,24 +114,24 @@ public class UserServiceImplTests {
         // Arrange
         User mockUser = new User();
         mockUser.setId(1);
-        when(mockUserRepository.findById(anyInt())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
 
         //Act, Assert
         assertEquals(userService.getById(1).getId(), 1);
         verify(mockUserRepository, times(1))
-                .findById(anyInt());
+                .findByIdAndIsDeletedFalse(anyInt());
 
     }
 
     @Test
     public void getById_should_throwsException_when_userNotExist() {
         // Arrange
-        when(mockUserRepository.findById(anyInt())).thenReturn(Optional.empty());
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.empty());
 
         //Act, Assert
         assertThrows(EntityNotFoundException.class, () -> userService.getById(anyInt()));
         verify(mockUserRepository, times(1))
-                .findById(anyInt());
+                .findByIdAndIsDeletedFalse(anyInt());
 
     }
 
@@ -270,7 +270,7 @@ public class UserServiceImplTests {
         User clone = mockUser.toBuilder().build();
         clone.setBlocked(true);
         when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
 
         // Act
         mockUser = userService.changeBlockedStatus(anyInt(), "block");
@@ -283,7 +283,7 @@ public class UserServiceImplTests {
     public void changeBlockStatus_should_throwsException_when_userIsBlockedAndActionIsBlock() {
         // Arrange
         mockUser.setBlocked(true);
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
 
         // Act, Assert
         assertThrows(DuplicateEntityException.class,
@@ -296,7 +296,7 @@ public class UserServiceImplTests {
         User clone = mockUser.toBuilder().build();
         mockUser.setBlocked(true);
         when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
 
         // Act
         mockUser = userService.changeBlockedStatus(anyInt(), "unblock");
@@ -309,7 +309,7 @@ public class UserServiceImplTests {
     public void changeBlockStatus_should_throwsException_when_userIsUnblockedAndActionIsUnblock() {
         // Arrange
         mockUser.setBlocked(false);
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
 
         // Act, Assert
         assertThrows(DuplicateEntityException.class,
@@ -319,7 +319,7 @@ public class UserServiceImplTests {
     @Test
     public void changeBlockStatus_should_throwsException_when_actionIsInvalid() {
         // Arrange
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
 
         // Act, Assert
         assertThrows(UnsupportedOperationException.class,
@@ -333,7 +333,7 @@ public class UserServiceImplTests {
         mockRole.setName("testRole");
         User clone = mockUser.toBuilder().roles(new HashSet<>(mockUser.getRoles())).build();
         clone.addRole(mockRole);
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.of(mockRole));
         when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
 
@@ -350,7 +350,7 @@ public class UserServiceImplTests {
         Role mockRole = new Role();
         mockRole.setName("testRole");
         mockUser.getRoles().add(mockRole);
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.of(mockRole));
 
         // Act, Assert
@@ -365,7 +365,7 @@ public class UserServiceImplTests {
         mockRole.setName("testRole");
         User clone = mockUser.toBuilder().roles(new HashSet<>(mockUser.getRoles())).build();
         mockUser.getRoles().add(mockRole);
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.of(mockRole));
         when(mockUserRepository.saveAndFlush(any())).thenReturn(clone);
 
@@ -381,7 +381,7 @@ public class UserServiceImplTests {
         // Arrange
         Role mockRole = new Role();
         mockRole.setName("testRole");
-        when(mockUserRepository.findById(any())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.of(mockRole));
 
         // Act, Assert
@@ -392,7 +392,7 @@ public class UserServiceImplTests {
     @Test
     public void changeUserRole_should_throwsException_when_roleIsInvalid() {
         // Arrange
-        when(mockUserRepository.findById(anyInt())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.empty());
 
         // Act, Arrange
@@ -405,7 +405,7 @@ public class UserServiceImplTests {
     public void changeUserRole_should_throwsException_when_actionIsInvalid() {
         // Arrange
         Role mockRole = new Role();
-        when(mockUserRepository.findById(anyInt())).thenReturn(Optional.of(mockUser));
+        when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
         when(mockRoleRepository.findByName(any())).thenReturn(Optional.of(mockRole));
 
         // Act, Arrange
