@@ -63,15 +63,11 @@ public class AddonRepositoryImpl implements CustomAddonRepository {
         }
 
         TypedQuery<Addon> query = entityManager.createQuery(criteriaQuery)
-                .setFirstResult((page-1) * size)
+                .setFirstResult((page - 1) * size)
                 .setMaxResults(size);
 
-        long totalCount = 0;
-        List<Addon> resultList = entityManager.createQuery(criteriaQuery).getResultList();
-        if(resultList != null) {
-            totalCount = resultList.size();
-        }
+        long totalCount = entityManager.createQuery(criteriaQuery).getResultList().size();
 
-        return new PageImpl<>(query.getResultList(), PageRequest.of(page-1, size), totalCount);
+        return new PageImpl<>(query.getResultList(), PageRequest.of(page - 1, size), totalCount);
     }
 }

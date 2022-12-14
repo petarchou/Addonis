@@ -19,14 +19,21 @@
                 <div class="auth-form-wrapper px-4 py-5">
                   <a href="#" th:href="@{/}" class="noble-ui-logo d-block mb-2">Addonis</a>
                   <h5 class="text-muted fw-normal mb-4">Invite Friend</h5>
-                  <form name="log-form" class="forms-sample"
+                  <form name="log-form" class="forms-sample" th:object="${email}"
                         th:action="@{/users/{id}/invite(id=${loggedUser.id})}"
                         method="post">
-                    <label>Friend email</label>
+                    <label>Friends email</label>
                     <div class="mb-3">
                       <label><input type="text" class="form-control"
                                     th:field="${email.email}"
                                     required="required"/></label>
+                    </div>
+                    <div th:if="${#fields.hasErrors('email')}"
+                         class="alert alert-danger mt-1" role="alert">
+                      <div class="mb-1" th:each="err : ${#fields.errors('email')}">
+                        <i data-feather="alert-circle"></i>
+                        <span th:text="${err}"></span>
+                      </div>
                     </div>
                     <div>
                       <input type="submit" name="submit" value="Invite"
