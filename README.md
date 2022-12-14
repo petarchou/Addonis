@@ -44,7 +44,7 @@ Our backend generates user passwords and encrypts them before saving them in the
 which is why we are providing here details you can use to login.
 
 - Admin: username - `ppetrov12`,  password - `TestPass1!`
-- User: username - `atanas_yovchev`,  password - `TestPass1`
+- User: username - `atanas_yovchev`,  password - `TestPass1!`
 
 ## Technologies
 

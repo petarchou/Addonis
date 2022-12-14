@@ -20,14 +20,14 @@
             <nav class="page-breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/addons">Addons</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Create addon</li>
+                    <li class="breadcrumb-item active" aria-current="page">Upload addon</li>
                 </ol>
             </nav>
             <div class="row">
                 <div class="col-md-12 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title">Create addon</h6>
+                            <h6 class="card-title">Upload addon</h6>
                             <form th:object="${addon}" enctype="multipart/form-data"
                                   th:action="@{__${#httpServletRequest.requestURI}__}"
                                   method="post">
@@ -117,7 +117,7 @@
                                         <span th:text="${err}"></span>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="action" value="publish">Create
+                                <button class="btn btn-primary" type="submit" name="action" value="publish">Upload
                                     Addon
                                 </button>
                                 <button class="btn btn-primary" type="submit" name="action" value="save">Upload as

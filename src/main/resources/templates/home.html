@@ -45,7 +45,7 @@
                     <label id="Most-popular" class="section-header gallery-element-focus-style-light name">
                         Most popular
                     </label>
-                    <a class="see-more" th:href="@{/addons/most-downloaded}">
+                    <a class="see-more" th:href="@{/addons(sortBy=downloads)}">
                         <span>See more</span>
                     </a>
                 </h4>
@@ -69,7 +69,7 @@
                     <label id="Recently-added" class="section-header gallery-element-focus-style-light name">
                         Recently added
                     </label>
-                    <a class="see-more" th:href="@{/addons/newest-addons}">
+                    <a class="see-more" th:href="@{/addons(sortBy=uploadedDate)}">
                         <span>See more</span>
                     </a>
                 </h4>

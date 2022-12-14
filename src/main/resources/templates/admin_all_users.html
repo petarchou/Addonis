@@ -11,13 +11,10 @@
     <!-- partial:partials/_sidebar.html -->
     <nav th:replace="/partials/_sidebar::_sidebar"></nav>
     <!-- partial -->
-
     <div class="page-wrapper">
-
         <!-- partial:partials/_navbar.html -->
         <nav th:replace="/partials/_navbar::_navbar"></nav>
         <!-- partial -->
-
         <section class="py-7">
             <form th:action="@{/users}" th:object="${userFilter}"
                   method="get">
@@ -34,7 +31,8 @@
                     <tr>
                         <td>
                             <label>
-                                <select class="btn btn-primary dropdown-toggle"
+                                <select class="btn btn-inverse-primary dropdown-toggle"
+                                        type="button"
                                         th:field="${userFilter.filter}"
                                         style="width: 150px; height: 38px;
                                                     font-size: smaller">
@@ -55,7 +53,8 @@
                         </td>
                         <td>
                             <label>
-                                <select class="btn btn-primary dropdown-toggle text-center"
+                                <select class="btn btn-inverse-primary dropdown-toggle"
+                                        type="button"
                                         th:field="${userFilter.sort}"
                                         style="width: 150px; height: 38px;
                                                     font-size: smaller">
@@ -76,7 +75,8 @@
                         </td>
                         <td>
                             <label>
-                                <select class="btn btn-primary dropdown-toggle text-center"
+                                <select class="btn btn-inverse-primary dropdown-toggle items-center"
+                                        type="button"
                                         th:field="${userFilter.order}"
                                         style="width: 150px; height: 38px;
                                                     font-size: smaller">

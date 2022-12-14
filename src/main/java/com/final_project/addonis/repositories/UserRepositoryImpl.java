@@ -68,12 +68,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .setFirstResult((page-1) * size)
                 .setMaxResults(size);
 
-        long totalCount = 0;
-        List<User> resultList = entityManager.createQuery(criteriaQuery).getResultList();
-        if(resultList != null) {
-            totalCount = resultList.size();
-        }
-
+        long totalCount = entityManager.createQuery(criteriaQuery).getResultList().size();
         return new PageImpl<>(query.getResultList(), PageRequest.of(page-1, size), totalCount);
     }
 }

@@ -9,7 +9,6 @@ import com.final_project.addonis.models.dtos.UpdateUserDto;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
-import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
 import com.final_project.addonis.utils.exceptions.*;
 import com.final_project.addonis.utils.helpers.EmailHelper;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
@@ -46,12 +45,7 @@ public class UserMvcController {
     private final EmailHelper emailHelper;
 
     @Autowired
-    public UserMvcController(UserService userService,
-                             AddonService addonService,
-                             UserMapper mapper,
-                             InvitedUserMapper invitedUserMapper,
-                             EmailService emailService,
-                             EmailHelper emailHelper) {
+    public UserMvcController(UserService userService, AddonService addonService, UserMapper mapper, InvitedUserMapper invitedUserMapper, EmailService emailService, EmailHelper emailHelper) {
         this.userService = userService;
         this.addonService = addonService;
         this.mapper = mapper;
@@ -61,10 +55,8 @@ public class UserMvcController {
     }
 
 
-
     @GetMapping("/{id}/edit")
-    public String editUserView(@PathVariable int id,
-                               Model model) {
+    public String editUserView(@PathVariable int id, Model model) {
         try {
             User profile = userService.getById(id);
             model.addAttribute("userDto", mapper.toUpdateDto(profile));
@@ -76,12 +68,8 @@ public class UserMvcController {
     }
 
     @PostMapping("/{id}/edit")
-    public String editUser(@PathVariable int id,
-                           @RequestParam("image") MultipartFile image,
-                           @Valid @ModelAttribute("userDto") UpdateUserDto userDto,
-                           BindingResult bindingResult,
-                           Model model) {
-        if(bindingResult.hasErrors()) {
+    public String editUser(@PathVariable int id, @RequestParam("image") MultipartFile image, @Valid @ModelAttribute("userDto") UpdateUserDto userDto, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
             return "edit_profile";
         }
 
@@ -97,18 +85,16 @@ public class UserMvcController {
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DuplicateEmailException e) {
-            bindingResult.rejectValue("email","duplicate_email",
-                    e.getMessage());
+            bindingResult.rejectValue("email", "duplicate_email", e.getMessage());
         } catch (DuplicatePhoneException e) {
-            bindingResult.rejectValue("phoneNumber","duplicate_phone",
-                    e.getMessage());
+            bindingResult.rejectValue("phoneNumber", "duplicate_phone", e.getMessage());
         }
 
         if (bindingResult.hasErrors()) {
             return "edit_profile";
         }
 
-        return "redirect:/users/"+id+"/edit";
+        return "redirect:/users/" + id;
     }
 
     @GetMapping("/verify")
@@ -153,64 +139,87 @@ public class UserMvcController {
     }
 
 
-
     @GetMapping("/{id}/change-password")
-    public String changePasswordView(Model model,
-                                     @PathVariable int id) {
+    public String changePasswordView(Model model, @PathVariable int id) {
         model.addAttribute("password", new PasswordDto());
         return "change_password";
     }
 
     @PostMapping("/{id}/change-password")
-    public String changePassword(@PathVariable int id,
-                                 @Valid @ModelAttribute PasswordDto passwordDto,
-                                 BindingResult bindingResult,
-                                 Model model) {
+    public String changePassword(@PathVariable int id, @Valid @ModelAttribute("password") PasswordDto passwordDto, BindingResult bindingResult, Model model) {
         try {
             User user = userService.getById(id);
             mapper.fromPasswordDto(user, passwordDto);
             userService.update(user);
         } catch (PasswordNotMatchException e) {
-            bindingResult.rejectValue("confirmNewPassword", "password_error",
-                    "Confirm password did not match.");
+            bindingResult.rejectValue("confirmNewPassword", "password_error", e.getMessage());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
         if (bindingResult.hasErrors()) {
-            model.addAttribute("password", new PasswordDto());
+            model.addAttribute("password", passwordDto);
             return "change_password";
         }
         return "redirect:/";
     }
 
     @GetMapping("/{id}/invite")
-    public String inviteFriendView(Model model,
-                                   @PathVariable int id) {
+    public String inviteFriendView(Model model, @PathVariable int id) {
         model.addAttribute("email", new EmailDto());
         return "invite_friend";
     }
 
     @PostMapping("/{id}/invite")
-    public String inviteFriend(@Valid @ModelAttribute(name = "email") EmailDto toEmail,
-                               @PathVariable int id, HttpServletRequest request) {
+    public String inviteFriend(@Valid @ModelAttribute(name = "email") EmailDto toEmail, BindingResult bindingResult, Model model, @PathVariable int id, HttpServletRequest request) {
         try {
             User user = userService.getById(id);
             InvitedUser invitedUser = invitedUserMapper.fromEmail(toEmail.getEmail());
             emailService.sendInvitationEmail(user, emailHelper.getSiteUrl(request), invitedUser);
-            return "redirect:/";
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException | IllegalStateException e) {
+            bindingResult.rejectValue("email", "email_error", e.getMessage());
+        }
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("email", toEmail);
+            return "invite_friend";
+        }
+
+        return "redirect:/";
+    }
+
+    @RequestMapping(value = "/{id}/promote-demote", method = RequestMethod.POST, params = "action=Promote")
+    public String addRole(@PathVariable int id) {
+        try {
+            User promotedUser = userService.changeUserRole(id, "admin", "promote");
+            return "redirect:/users/" + id;
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/{id}/promote-demote", method = RequestMethod.POST, params = "action=Demote")
+    public String removeRole(@PathVariable int id) {
+        try {
+            User promotedUser = userService.changeUserRole(id, "admin", "demote");
+            return "redirect:/users/" + id;
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (DuplicateEntityException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
 
     @ModelAttribute("isAuth")
     public boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
         Authentication authentication = context.getAuthentication();
-        return authentication != null
-                && !(authentication instanceof AnonymousAuthenticationToken)
-                && authentication.isAuthenticated();
+        return authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
 
     @ModelAttribute("loggedUser")
