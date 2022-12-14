@@ -35,12 +35,16 @@
                                             <div class="item-second-row-wrapper">
                                                 <div class="user-publisher">
                                                     <h4 role="presentation">
-                                                        <a class="user-publisher-link d-inline-new"
+                                                        <a th:unless="${addon.creator.deleted}"
+                                                           class="user-publisher-link d-inline-new"
                                                            th:href="@{/users/{id}(id=${addon.creator.id})}">
                                                             <i data-feather="user" class="icon-sm mb-1"></i>
                                                             <h6 class="mb-2" th:text="${addon.creator.username}">
                                                                 Creator</h6>
                                                         </a>
+                                                        <span th:if="${addon.creator.deleted}">
+                                                            <h5>Deleted</h5>
+                                                        </span>
                                                     </h4>
                                                 </div>
                                                 <span class="divider">|</span>

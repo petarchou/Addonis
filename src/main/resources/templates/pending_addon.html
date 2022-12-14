@@ -38,13 +38,19 @@
                                             <div class="item-second-row-wrapper">
                                                 <div class="user-publisher">
                                                     <h4 role="presentation">
-                                                        <a class="user-publisher-link d-inline-new"
+                                                        <a th:unless="${pendingAddon.creator.deleted}"
+                                                           class="user-publisher-link d-inline-new"
                                                            th:href="@{/users/{id}(id=${pendingAddon.creator.id})}">
                                                             <i data-feather="user" class="icon-sm mb-1"></i>
                                                             <h6 class="mb-2"
                                                                 th:text="${pendingAddon.creator.username}">
                                                                 Creator</h6>
                                                         </a>
+                                                        <span th:if="${pendingAddon.creator.deleted}">
+                                                            <i data-feather="user" class="icon-sm mb-1"></i>
+                                                            <h6 class="mb-2" th:text="DeletedUser">
+                                                                Creator</h6>
+                                                        </span>
                                                     </h4>
                                                 </div>
                                             </div>
