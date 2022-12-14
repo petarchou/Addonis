@@ -134,24 +134,29 @@
                                                         <h3 class="section-header">
                                                             Action</h3>
                                                         <div th:if="${loggedUser.isAdmin()}">
-                                                            <form method="post" action="#"
+                                                            <form id="category-form" method="post" action="#"
                                                                   th:action="@{/approve/{id}(id=${pendingAddon.id})}">
                                                                 <div class="form-group col-10">
                                                                     <label for="category">Select Category</label>
                                                                     <select class="form-control"
                                                                             name="categoriesIn"
                                                                             id="category"
-                                                                            multiple="multiple">
+                                                                            multiple="multiple"
+                                                                            oninput="requiredField();">
                                                                         <option th:each="category : ${allCategories}"
                                                                                 th:text="${category.name}"
                                                                                 th:value="${category.name}">
                                                                             Categories
                                                                         </option>
                                                                     </select>
+                                                                    <hr>
                                                                     <button type="submit"
+                                                                            name="approve"
                                                                             class="btn btn-inverse-success"
-                                                                            style="margin-right: 10px; margin-top: 20px;"
-                                                                            value="Approve">Approve
+                                                                            style="margin-right: 10px;"
+                                                                            value="Approve"
+                                                                            disabled onsubmit="alert('SUBMITTED')">
+                                                                        Approve
                                                                     </button>
                                                                 </div>
                                                             </form>
@@ -164,24 +169,10 @@
                                                                 </button>
                                                             </form>
                                                             <hr>
-                                                            <div>
-                                                                <form style="float: left; padding: 0;"
-                                                                      method="post"
-                                                                      th:action="@{/addons/{id}/delete(id=${pendingAddon.id})}">
-                                                                    <button type="submit"
-                                                                            class="btn btn-outline-danger"
-                                                                            style="margin-right: 10px;"
-                                                                            value="Delete">Delete
-                                                                    </button>
-                                                                </form>
-                                                                <a class="btn btn-primary" style="margin-right: 10px;"
-                                                                   th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit
-                                                                    Addon</a>
-                                                            </div>
                                                         </div>
-                                                        <div th:if="${pendingAddon.creator.id == loggedUser.id}">
+                                                        <div th:if="${isAuth && (pendingAddon.creator.id == loggedUser.id || loggedUser.isAdmin())}">
                                                             <a class="btn btn-primary"
-                                                               style="margin-right: 10px; margin-top: 20px;"
+                                                               style="margin-right: 10px;"
                                                                th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit
                                                                 Addon</a>
                                                             <form style="float: left; padding: 0;"
@@ -189,7 +180,7 @@
                                                                   th:action="@{/addons/{id}/delete(id=${pendingAddon.id})}">
                                                                 <button type="submit"
                                                                         class="btn btn-outline-danger"
-                                                                        style="margin-right: 10px; margin-top: 20px;"
+                                                                        style="margin-right: 10px;"
                                                                         value="Delete">Delete
                                                                 </button>
                                                             </form>
@@ -213,11 +204,15 @@
 
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        $("#category").select2({
-            tags: true
-        });
+    $("#category").select2({
+        tags: true,
+        theme: 'classic'
     });
+
+    function requiredField() {
+        const categoryForm = document.getElementById('category-form');
+        categoryForm['approve'].disabled = !categoryForm['categoriesIn'].value;
+    }
 </script>
 
 <!--This should always be the last script insert -->
