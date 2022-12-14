@@ -129,9 +129,18 @@
                                                         <h3 class="section-header right">
                                                             Action</h3>
                                                         <div>
-                                                            <div>
+                                                            <div th:if="${isAuth && (loggedUser.id == draftAddon.creator.id)}">
                                                                 <a class="btn btn-primary" style="margin-right: 10px; margin-top: 20px;"
                                                                    th:href="@{/addons/{id}/edit-draft(id=${draftAddon.id})}">Edit Draft</a>
+                                                            <form style="float: left; padding: 0;"
+                                                                  method="post"
+                                                                  th:action="@{/addons/{id}/delete-draft(id=${draftAddon.id})}">
+                                                                <button type="submit"
+                                                                        class="btn btn-danger"
+                                                                        style="margin-right: 10px; margin-top: 20px;"
+                                                                        value="Delete">Delete
+                                                                </button>
+                                                            </form>
                                                             </div>
                                                         </div>
                                                     </div>

@@ -3,10 +3,8 @@ package com.final_project.addonis.controllers.mvc;
 import com.final_project.addonis.models.Addon;
 import com.final_project.addonis.models.BinaryContent;
 import com.final_project.addonis.models.User;
-import com.final_project.addonis.models.dtos.AddonDtoOut;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.UserService;
-import com.final_project.addonis.utils.mappers.AddonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -28,7 +26,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Controller
@@ -52,12 +49,12 @@ public class HomeMvcController {
     }
     @GetMapping("/")
     public String showHomepage(Model model) {
-        List<Addon> mostDownloadedAddons = addonService.getMostDownloadedAddons();
-        List<Addon> newestAddons = addonService.getNewestAddons();
+        List<Addon> topTenDownloadedAddons = addonService.getTopTenDownloadedAddons();
+        List<Addon> topTenNewestAddons = addonService.getTopTenNewestAddons();
         List<Addon> featuredAddons = addonService.getAddonsFeaturedByAdmin();
         model.addAttribute("featuredAddons", featuredAddons);
-        model.addAttribute("mostDownloadedAddons", mostDownloadedAddons);
-        model.addAttribute("newestAddons", newestAddons);
+        model.addAttribute("topTenMostDownloadedAddons", topTenDownloadedAddons);
+        model.addAttribute("topTenNewestAddons", topTenNewestAddons);
         return "home";
     }
 
@@ -65,8 +62,6 @@ public class HomeMvcController {
     public void downloadAddon(@Param("id") int id, HttpServletResponse response) {
         try {
             BinaryContent binaryContent = addonService.downloadContent(id);
-//            Optional<BinaryContent> result = Optional.ofNullable(binaryContent);
-//            binaryContent = result.get();
 
             response.setContentType("application/octet-stream");
             String headerKey = "Content-Disposition";

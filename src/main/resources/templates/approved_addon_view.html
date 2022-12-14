@@ -239,9 +239,22 @@
                                                             </table>
                                                         </div>
                                                     </div>
-                                                    <div th:if="${isAuth && (addon.creator.id == loggedUser.id || loggedUser.isAdmin())}">
-                                                        <a class="btn btn-primary"
-                                                           th:href="@{/addons/{id}/edit(id=${addon.id})}">Edit Addon</a>
+                                                    <div>
+                                                        <div th:if="${isAuth && (addon.creator.id == loggedUser.id || loggedUser.isAdmin())}">
+                                                            <a class="btn btn-primary"
+                                                               style="margin-right: 10px; margin-top: 20px;"
+                                                               th:href="@{/addons/{id}/edit(id=${addon.id})}">Edit
+                                                                Addon</a>
+                                                            <form style="float: left; padding: 0;"
+                                                                  method="post"
+                                                                  th:action="@{/addons/{id}/delete(id=${addon.id})}">
+                                                                <button type="submit"
+                                                                        class="btn btn-danger"
+                                                                        style="margin-right: 10px; margin-top: 20px;"
+                                                                        value="Delete">Delete
+                                                                </button>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                     <hr>
                                                     <div th:if="${isAuth && loggedUser.isAdmin() && !addon.featured}">
@@ -274,7 +287,9 @@
                                                                              src="/assets/others/logo-placeholder.png"
                                                                              th:src="${rating.key.photoUrl}">
                                                                         <div class="ms-2">
-                                                                            <p th:text="${rating.key.username}"></p>
+                                                                            <a th:href="@{/users/{id}(id=${rating.key.id})}">
+                                                                                <p th:text="${rating.key.username}"></p>
+                                                                            </a>
                                                                             <p class="tx-11 text-muted"
                                                                                th:text="${rating.key.email}"></p>
                                                                         </div>

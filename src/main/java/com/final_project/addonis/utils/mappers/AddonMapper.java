@@ -95,6 +95,7 @@ public class AddonMapper {
     }
 
     public void transferData(Addon addon, UpdateAddonDto addonToUpdate) {
+        addonToUpdate.setId(addon.getId());
         addonToUpdate.setName(addon.getName());
         addonToUpdate.setDescription(addon.getDescription());
         addonToUpdate.setTargetIde(addon.getTargetIde().getName());
@@ -102,6 +103,7 @@ public class AddonMapper {
     }
 
     public void transferData(Addon addon, CreateAddonDto addonToUpdate) {
+        addonToUpdate.setId(addon.getId());
         addonToUpdate.setName(addon.getName());
         addonToUpdate.setDescription(addon.getDescription());
         addonToUpdate.setTags(addon.getTags().stream()

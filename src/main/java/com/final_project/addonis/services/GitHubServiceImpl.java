@@ -4,6 +4,7 @@ import com.final_project.addonis.models.GithubCommit;
 import com.final_project.addonis.services.contracts.GitHubService;
 import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
 import com.final_project.addonis.utils.exceptions.GithubApiException;
+import com.final_project.addonis.utils.exceptions.IllegalGithubArgumentException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,13 +46,13 @@ public class    GitHubServiceImpl implements GitHubService {
     public List<String> getRepoDetailsIfValid(String url) {
 
         if (!url.startsWith(GITHUB_PREFIX)) {
-            throw new IllegalArgumentException(INVALID_REPOSITORY);
+            throw new IllegalGithubArgumentException(INVALID_REPOSITORY);
         }
 
         String details = url.substring(GITHUB_PREFIX.length());
         List<String> repoDetails = Arrays.stream(details.split("/")).collect(Collectors.toList());
         if (repoDetails.size() != 2) {
-            throw new IllegalArgumentException(INVALID_REPOSITORY);
+            throw new IllegalGithubArgumentException(INVALID_REPOSITORY);
         }
         return repoDetails;
     }

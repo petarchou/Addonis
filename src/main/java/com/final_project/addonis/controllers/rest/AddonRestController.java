@@ -227,7 +227,7 @@ public class AddonRestController {
         try {
             User user = userService.getByUsername(principal.getName());
             Addon addon = addonService.getAddonById(id);
-            addon = addonService.delete(addon.getId(), user);
+            addon = addonService.delete(addon, user);
             return addonMapper.toDto(addon);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());

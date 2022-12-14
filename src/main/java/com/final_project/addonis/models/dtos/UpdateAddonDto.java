@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class UpdateAddonDto extends BaseAddonDtoIn {
 
-
+    private int id;
 }

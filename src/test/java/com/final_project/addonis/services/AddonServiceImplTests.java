@@ -499,10 +499,29 @@ public class AddonServiceImplTests {
         mockCreator.setBlocked(false);
         mockAddon.setCreator(mockCreator);
         doNothing().when(addonRepository).delete(mockAddon);
-        when(addonRepository.findAddonByIdAndStateNameApproved(anyInt())).thenReturn(Optional.of(mockAddon));
 
         // Act
-        addonService.delete(anyInt(), mockCreator);
+        addonService.delete(mockAddon, mockCreator);
+
+        // Assert
+        verify(addonRepository, times(1)).delete(any());
+    }
+
+    @Test
+    public void deleteDraft_should_deleteDraftAddon_when_detailsIsValid() {
+        // Arrange
+        Addon mockAddon = new Addon();
+        mockAddon.setName("testName");
+        mockAddon.setRating(new HashMap<>());
+        mockAddon.setCategories(new HashSet<>());
+        mockAddon.setTags(new HashSet<>());
+        User mockCreator = mock(User.class);
+        mockCreator.setBlocked(false);
+        mockAddon.setCreator(mockCreator);
+        doNothing().when(addonRepository).delete(mockAddon);
+
+        // Act
+        addonService.delete(mockAddon, mockCreator);
 
         // Assert
         verify(addonRepository, times(1)).delete(any());
