@@ -11,7 +11,6 @@ import com.final_project.addonis.services.contracts.UserService;
 import com.final_project.addonis.utils.exceptions.*;
 import com.final_project.addonis.utils.mappers.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -46,6 +44,21 @@ public class AuthenticationMvcController {
         this.userMapper = userMapper;
     }
 
+    @GetMapping("/verify-success")
+    public String verifySuccess() {
+        return "verify_success";
+    }
+
+    @GetMapping("/verify-fail")
+    public String verifyFail() {
+        return "verify_fail";
+    }
+
+    @GetMapping("/register-success")
+    public String registerSuccess() {
+        return "register_success";
+    }
+
     @GetMapping("/login")
     public String showLoginView(Model model) {
         model.addAttribute("login", new LoginDto());
@@ -56,7 +69,6 @@ public class AuthenticationMvcController {
     @GetMapping("/register")
     public String showRegisterView(Model model  ) {
         model.addAttribute("registerDto", new CreateUserDto());
-        //TODO visible home button - here and in login
         return "register";
     }
 
@@ -88,7 +100,7 @@ public class AuthenticationMvcController {
             return "register";
         }
         //TODO Add a registration successful page with info about verification
-        return "registration_success";
+        return "register_success";
     }
 
     @GetMapping("/forgotten-password")
@@ -100,18 +112,26 @@ public class AuthenticationMvcController {
 
     @PostMapping("/forgotten-password")
     public String sendResetPasswordEmail(@Valid @ModelAttribute("emailDto") EmailDto emailDto,
+                                         BindingResult bindingResult,
                                          HttpServletRequest request,
-                                         BindingResult bindingResult) {
+                                         Model model
+                                         ) {
+
+        if(bindingResult.hasErrors()) {
+            return "forgotten_password";
+        }
+
         try {
             User user = userService.getByEmail(emailDto.getEmail());
             userService.sendResetPasswordRequest(user, getSiteUrl(request));
-            //TODO add home button
-
-            return "forgotten_password";
+            EmailDto newEmailDto = new EmailDto();
+            newEmailDto.setSent(true);
+            model.addAttribute("emailDto", newEmailDto);
         } catch (EntityNotFoundException e) {
-            //create a new error saying the email was not found and redirect/return to same page
-            return "redirect:";
+            bindingResult.rejectValue("email","invalid_email",
+                    "We couldn't find an account associated with this email.");
         }
+        return "forgotten_password";
     }
 
     @GetMapping("/reset-password")

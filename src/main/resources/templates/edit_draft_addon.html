@@ -53,7 +53,7 @@
                                             </div>
                                             <textarea class="form-control"
                                                       th:field="*{description}"
-                                                      type="text"></textarea>
+                                            type="text"></textarea>
                                         </div>
                                         <div th:if="${#fields.hasErrors('description')}"
                                              class="alert alert-danger mt-1" role="alert">
@@ -71,6 +71,7 @@
                                                 th:text="${tag.name}"
                                                 th:value="${tag.name}">Tags
                                         </option>
+
                                     </select>
                                     <div th:if="${#fields.hasErrors('tags')}"
                                          class="alert alert-danger mt-1" role="alert">
@@ -103,8 +104,8 @@
                                             <input class="form-control"
                                                    placeholder="Origin URL"
                                                    th:field="*{originUrl}"
-                                                   type="text">
-                                        </div>
+                                            type="text">
+                                            </div>
                                         <div th:if="${#fields.hasErrors('originUrl')}"
                                              class="alert alert-danger mt-1" role="alert">
                                             <div class="mb-1" th:each="err : ${#fields.errors('originUrl')}">
@@ -127,11 +128,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="action" value="publish">Upload
-                                    Addon
-                                </button>
-                                <button class="btn btn-primary" type="submit" name="action" value="save">Save Draft
-                                </button>
+                                <button class="btn btn-primary" type="submit" name="action" value="publish">Upload Addon</button>
+                                <button class="btn btn-outline-primary" type="submit" name="action" value="save">Save Draft</button>
                             </form>
                         </div>
                     </div>
