@@ -30,16 +30,20 @@
                         <div class="card-body">
                             <h6 class="card-title">Create addon</h6>
                             <form th:object="${addon}" enctype="multipart/form-data"
-                                  th:action="@{__${#httpServletRequest.requestURI}__}"
+                                  th:action="@{/addons/create}"
                                   method="post">
                                 <div class="mb-3">
                                     <label for="addonName" class="form-label">Addon Name</label>
-                                    <input type="text"
-                                           th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
-                                           id="addonName" value="" th:field="*{name}"
+                                    <input type="text" class="form-control"
+                                           id="addonName" value=""
+                                           th:field="*{name}"
                                            placeholder="Write the name of your Addon here">
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
-                                         th:errors="*{name}">Name Error
+                                    <div th:if="${#fields.hasErrors('name')}"
+                                         class="alert alert-danger mt-1" role="alert">
+                                        <div class="mb-1" th:each="err : ${#fields.errors('name')}">
+                                            <i data-feather="alert-circle"></i>
+                                            <span th:text="${err}"></span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -48,10 +52,15 @@
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                             </div>
-                                            <textarea class="form-control"
+                                            <textarea id="description" class="form-control"
                                                       th:field="*{description}" type="text"></textarea>
-                                            <label class="error error-color" th:errors="*{description}">
-                                                Username name error placeholder</label>
+                                        </div>
+                                        <div th:if="${#fields.hasErrors('description')}"
+                                             class="alert alert-danger mt-1" role="alert">
+                                            <div class="mb-1" th:each="err : ${#fields.errors('description')}">
+                                                <i data-feather="alert-circle"></i>
+                                                <span th:text="${err}"></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -91,11 +100,25 @@
                                                    th:field="*{originUrl}"
                                                    type="text">
                                         </div>
+                                        <div th:if="${#fields.hasErrors('originUrl')}"
+                                             class="alert alert-danger mt-1" role="alert">
+                                            <div class="mb-1" th:each="err : ${#fields.errors('originUrl')}">
+                                                <i data-feather="alert-circle"></i>
+                                                <span th:text="${err}"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label" for="formFile">Addon content</label>
                                     <input class="form-control" type="file" name="binaryContent" id="formFile">
+                                </div>
+                                <div th:if="${#fields.hasErrors('dataError')}"
+                                     class="alert alert-danger mt-1" role="alert">
+                                    <div class="mb-1" th:each="err : ${#fields.errors('dataError')}">
+                                        <i data-feather="alert-circle"></i>
+                                        <span th:text="${err}"></span>
+                                    </div>
                                 </div>
                                 <button class="btn btn-primary" type="submit" name="action" value="publish">Create
                                     Addon
@@ -109,6 +132,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>

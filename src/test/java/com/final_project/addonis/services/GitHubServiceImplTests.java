@@ -1,5 +1,6 @@
 package com.final_project.addonis.services;
 
+import com.final_project.addonis.utils.exceptions.IllegalGithubArgumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +43,7 @@ public class GitHubServiceImplTests {
         String mockUrl = "test" + "/test";
 
         // Act, Assert
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalGithubArgumentException.class,
                 () -> gitHubService.getRepoDetailsIfValid(mockUrl));
     }
 
@@ -52,7 +53,7 @@ public class GitHubServiceImplTests {
         String mockUrl = GITHUB_PREFIX + "test" + "/test" + "/test";
 
         // Act, Assert
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalGithubArgumentException.class,
                 () -> gitHubService.getRepoDetailsIfValid(mockUrl));
     }
 

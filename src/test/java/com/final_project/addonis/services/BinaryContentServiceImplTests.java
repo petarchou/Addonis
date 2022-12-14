@@ -1,6 +1,7 @@
 package com.final_project.addonis.services;
 
 import com.final_project.addonis.repositories.contracts.BinaryContentRepository;
+import com.final_project.addonis.utils.exceptions.IllegalBinaryContentException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,7 +41,7 @@ public class BinaryContentServiceImplTests {
         MockMultipartFile mockFile = new MockMultipartFile("test", new byte[0]);
 
         // Act, Assert
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalBinaryContentException.class,
                 () -> service.store(mockFile));
     }
     @Test

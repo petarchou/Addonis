@@ -3,6 +3,7 @@ package com.final_project.addonis.services;
 import com.final_project.addonis.models.BinaryContent;
 import com.final_project.addonis.repositories.contracts.BinaryContentRepository;
 import com.final_project.addonis.services.contracts.BinaryContentService;
+import com.final_project.addonis.utils.exceptions.IllegalBinaryContentException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     @Override
     public BinaryContent store(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("You must add file to your Add-on");
+            throw new IllegalBinaryContentException("You must add file to your Add-on");
         }
         try {
 

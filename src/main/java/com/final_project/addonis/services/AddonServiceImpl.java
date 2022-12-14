@@ -6,10 +6,7 @@ import com.final_project.addonis.repositories.contracts.RatingRepository;
 import com.final_project.addonis.repositories.contracts.StateRepository;
 import com.final_project.addonis.repositories.contracts.TagRepository;
 import com.final_project.addonis.services.contracts.*;
-import com.final_project.addonis.utils.exceptions.BlockedUserException;
-import com.final_project.addonis.utils.exceptions.DuplicateEntityException;
-import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
-import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
+import com.final_project.addonis.utils.exceptions.*;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class AddonServiceImpl implements AddonService {
     private static final String NOT_AUTHORIZED_ERROR = "You are not authorized to modify this addon.";
+    public static final String APPROVED = "approved";
     private final AddonRepository addonRepository;
     private final BinaryContentService binaryContentService;
     private final RatingRepository ratingRepository;
@@ -119,8 +117,18 @@ public class AddonServiceImpl implements AddonService {
     }
 
     @Override
+    public List<Addon> getTopTenDownloadedAddons() {
+        return addonRepository.findTop10ByStateNameOrderByDownloadsDesc(APPROVED);
+    }
+
+    @Override
     public List<Addon> getNewestAddons() {
         return addonRepository.getAllByStateNameApprovedOrderByUploadedDate();
+    }
+
+    @Override
+    public List<Addon> getTopTenNewestAddons() {
+        return addonRepository.findTop10ByStateNameOrderByUploadedDateDesc(APPROVED);
     }
 
     @Override
@@ -211,7 +219,9 @@ public class AddonServiceImpl implements AddonService {
     @Override
     public Addon createFromDraft(Addon addon, MultipartFile file, User user) {
         checkModifyPermissions(addon, user);
+        BinaryContent binaryContent = binaryContentService.store(file);
         Addon clone = addon.toBuilder()
+                .data(binaryContent)
                 .state(stateRepository.findByName("pending"))
                 .uploadedDate(LocalDateTime.now()).build();
         clone = updateGithubDetails(clone);
@@ -228,12 +238,23 @@ public class AddonServiceImpl implements AddonService {
             throw new UnauthorizedOperationException(NOT_AUTHORIZED_ERROR);
         }
         Addon clone = updateFileIfExists(addon, file);
+        clone = updateGithubDetails(clone);
         return addonRepository.saveAndFlush(clone);
     }
 
     @Override
-    public Addon delete(int id, User user) {
-        Addon addon = getAddonById(id);
+    public Addon delete(Addon addon, User user) {
+        checkIfUserIsBlocked(addon);
+        checkModifyPermissions(addon, user);
+        addon.getRating().clear();
+        addon.getCategories().clear();
+        addon.getTags().clear();
+        addonRepository.delete(addon);
+        return addon;
+    }
+
+    @Override
+    public Addon deleteDraft(Addon addon, User user) {
         checkIfUserIsBlocked(addon);
         checkModifyPermissions(addon, user);
         addon.getRating().clear();
@@ -343,7 +364,7 @@ public class AddonServiceImpl implements AddonService {
         Optional<Addon> optional =
                 addonRepository.findByNameAndStateNameIgnoreCaseNot(addon.getName(), "draft");
         if (optional.isPresent() && !optional.get().equals(addon)) {
-            throw new DuplicateEntityException("Addon", "name", addon.getName());
+            throw new DuplicateAddonNameException("Addon", "name", addon.getName());
         }
     }
 

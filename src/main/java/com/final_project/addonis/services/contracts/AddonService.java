@@ -30,7 +30,9 @@ public interface AddonService {
 
     Addon update(Addon addon, MultipartFile file, User user);
 
-    Addon delete(int id, User user);
+    Addon delete(Addon addon, User user);
+
+    Addon deleteDraft(Addon addon, User user);
 
     Addon getByName(String name);
 
@@ -58,7 +60,11 @@ public interface AddonService {
 
     List<Addon> getMostDownloadedAddons();
 
+    List<Addon> getTopTenDownloadedAddons();
+
     List<Addon> getNewestAddons();
+
+    List<Addon> getTopTenNewestAddons();
 
     Addon createFromDraft(Addon addon, MultipartFile file, User user);
 

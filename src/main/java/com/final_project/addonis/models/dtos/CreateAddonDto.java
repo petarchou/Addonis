@@ -11,6 +11,8 @@ import java.util.List;
 @Setter
 public class CreateAddonDto extends BaseAddonDtoIn {
 
+    private int id;
+
     @NotEmpty(message = "Addon must have at least one tag")
     private List<String> tags = new ArrayList<>();
 

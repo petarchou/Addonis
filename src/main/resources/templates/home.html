@@ -45,12 +45,12 @@
                     <label id="Most-popular" class="section-header gallery-element-focus-style-light name">
                         Most popular
                     </label>
-                    <a class="see-more" th:href="@{/addons}">
+                    <a class="see-more" th:href="@{/addons/most-downloaded}">
                         <span>See more</span>
                     </a>
                 </h4>
                 <div class="card-wrapper swiper-wrapper" style="margin-top: 20px">
-                    <div id="mostDownloadedAddons" th:each="addon : ${mostDownloadedAddons}"
+                    <div id="mostDownloadedAddons" th:each="addon : ${topTenMostDownloadedAddons}"
                          class="swiper-slide"
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">
@@ -69,12 +69,12 @@
                     <label id="Recently-added" class="section-header gallery-element-focus-style-light name">
                         Recently added
                     </label>
-                    <a class="see-more" th:href="@{/addons}">
+                    <a class="see-more" th:href="@{/addons/newest-addons}">
                         <span>See more</span>
                     </a>
                 </h4>
                 <div class="card-wrapper swiper-wrapper" style="margin-top: 20px">
-                    <div id="newestAddons" th:each="addon : ${newestAddons}"
+                    <div id="newestAddons" th:each="addon : ${topTenNewestAddons}"
                          class="swiper-slide"
                          data-toggle="modal"
                          th:attr="data-target='addonModal' + ${addon.id}">

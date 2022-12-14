@@ -164,9 +164,35 @@
                                                                 </button>
                                                             </form>
                                                             <hr>
+                                                            <div>
+                                                                <form style="float: left; padding: 0;"
+                                                                      method="post"
+                                                                      th:action="@{/addons/{id}/delete(id=${pendingAddon.id})}">
+                                                                    <button type="submit"
+                                                                            class="btn btn-danger"
+                                                                            style="margin-right: 10px;"
+                                                                            value="Delete">Delete
+                                                                    </button>
+                                                                </form>
+                                                                <a class="btn btn-primary" style="margin-right: 10px;"
+                                                                   th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit
+                                                                    Addon</a>
+                                                            </div>
+                                                        </div>
+                                                        <div th:if="${pendingAddon.creator.id == loggedUser.id}">
                                                             <a class="btn btn-primary"
+                                                               style="margin-right: 10px; margin-top: 20px;"
                                                                th:href="@{/addons/{id}/edit(id=${pendingAddon.id})}">Edit
                                                                 Addon</a>
+                                                            <form style="float: left; padding: 0;"
+                                                                  method="post"
+                                                                  th:action="@{/addons/{id}/delete(id=${pendingAddon.id})}">
+                                                                <button type="submit"
+                                                                        class="btn btn-danger"
+                                                                        style="margin-right: 10px; margin-top: 20px;"
+                                                                        value="Delete">Delete
+                                                                </button>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 </div>

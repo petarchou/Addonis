@@ -2,6 +2,7 @@ package com.final_project.addonis.models.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -22,5 +23,7 @@ public abstract class BaseAddonDtoIn {
     private String description;
 
     private String originUrl;
+
+    private MultipartFile dataError;
 
 }

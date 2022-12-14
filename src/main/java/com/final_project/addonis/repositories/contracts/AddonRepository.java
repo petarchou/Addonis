@@ -38,8 +38,12 @@ public interface AddonRepository extends JpaRepository<Addon, Integer>, CustomAd
     @Query("select a from Addon a where a.state.name like 'approved' order by a.downloads desc")
     List<Addon> getAllByStateNameApprovedOrderByDownloads();
 
+    List<Addon> findTop10ByStateNameOrderByDownloadsDesc(String name);
+
     @Query("select a from Addon a where a.state.name like 'approved' order by a.uploadedDate desc")
     List<Addon> getAllByStateNameApprovedOrderByUploadedDate();
+
+    List<Addon> findTop10ByStateNameOrderByUploadedDateDesc(String name);
 
     @Query("select a from Addon a where a.isFeatured = true")
     List<Addon> getAddonsByFeaturedTrue();
