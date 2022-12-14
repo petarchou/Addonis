@@ -75,8 +75,8 @@
                                             <p class="text-muted mb-0" th:text="${profile.getUsername()}">unnamed</p>
                                         </div>
                                     </div>
-                                    <hr th:if="${profile.equals(loggedUser)}">
-                                    <div th:if="${profile.equals(loggedUser)}" class="row">
+                                    <hr>
+                                    <div class="row">
                                         <div class="col-sm-3">
                                             <p class="mb-0">Email</p>
                                         </div>
@@ -123,7 +123,7 @@
                                                     <tr th:each="addon : ${approvedAddons}">
                                                         <td th:text="${approvedAddons.indexOf(addon)} + 1"></td>
                                                         <td>
-                                                            <a th:href="@{/admin-panel/pending/{id}(id=${addon.id})}">
+                                                            <a th:href="@{/addons/{id}(id=${addon.id})}">
                                                                 <span th:text="${addon.name}">Addon Name</span>
                                                             </a>
                                                         </td>

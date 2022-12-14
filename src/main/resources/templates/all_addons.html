@@ -10,33 +10,33 @@
     <!-- partial:partials/_sidebar.html -->
     <nav th:replace="/partials/_sidebar::_sidebar"></nav>
     <!-- partial -->
+    <!-- partial:partials/_navbar.html -->
+    <nav th:replace="/partials/_navbar::_navbar"></nav>
     <div class="page-wrapper">
-        <!-- partial:partials/_navbar.html -->
-        <nav th:replace="/partials/_navbar::_navbar"></nav>
         <section class="py-4">
             <div class="card-container px-4 px-lg-5 mt-5">
-                <form th:action="@{/addons}" th:object="${addonFilterDto}"
-                      method="get">
-                    <div style="margin-bottom: 30px;">
-                        <div class="row" style="padding-bottom: 50px">
-                            <table class="table table-borderless text-center">
-                                <div class="input-group mb-1">
-                                    <input th:field="${addonFilterDto.search}" type="text"
-                                           class="form-control"
-                                           placeholder="Search..."
-                                           aria-label="Search"
-                                           aria-describedby="button-addon2">
-                                    <button class="btn btn-outline-secondary" type="submit"
-                                            id="button-addon2">Search
-                                    </button>
-                                </div>
+                <div class="mb-7">
+                    <form th:action="@{/addons}"
+                          th:object="${addonFilterDto}"
+                          method="get">
+                        <div class="input-group-text">
+                            <input th:field="${addonFilterDto.search}" type="text"
+                                   class="form-control"
+                                   placeholder="Search..."
+                                   aria-label="Search"
+                                   aria-describedby="button-addon2">
+                            <button class="btn btn-outline-secondary" type="submit"
+                                    id="button-addon2">Search
+                            </button>
+                        </div>
+                        <table class="table table-borderless">
+                            <tr>
                                 <td>
                                     <div class="form-group col-md">
-                                        <select class="btn btn-primary dropdown-toggle text-center"
+                                        <select class="btn btn-inverse-primary dropdown-toggle"
+                                                type="button"
                                                 aria-label="Default select example"
-                                                th:field="${addonFilterDto.targetIde}"
-                                                style="width: 150px; height: 38px;
-                                                        font-size: smaller">
+                                                th:field="${addonFilterDto.targetIde}">
                                             <option selected th:value="null" value="null">Select IDE
                                             </option>
                                             <option th:each="ide : ${allIdes}"
@@ -49,11 +49,10 @@
                                 </td>
                                 <td>
                                     <div class="form-group col-md">
-                                        <select class="btn btn-primary dropdown-toggle text-center"
+                                        <select class="btn btn-inverse-primary dropdown-toggle"
+                                                type="button"
                                                 th:field="${addonFilterDto.category}"
-                                                aria-label="Default select example"
-                                                style="width: 150px; height: 38px;
-                                                        font-size: smaller">
+                                                aria-label="Default select example">
                                             <option selected th:value="null">Select Category</option>
                                             <option th:each="category : ${allCategories}"
                                                     th:value="${category.name}"
@@ -65,10 +64,9 @@
                                 </td>
                                 <td>
                                     <label>
-                                        <select class="btn btn-primary dropdown-toggle text-center"
-                                                th:field="${addonFilterDto.sortBy}"
-                                                style="width: 150px; height: 38px;
-                                                    font-size: smaller">
+                                        <select class="dropdown-center btn btn-inverse-primary dropdown-toggle"
+                                                type="button"
+                                                th:field="${addonFilterDto.sortBy}">
                                             <option th:value="null"
                                                     class="dropdown-item">Sort
                                             </option>
@@ -89,10 +87,9 @@
                                 </td>
                                 <td>
                                     <label>
-                                        <select class="btn btn-primary dropdown-toggle text-center"
-                                                th:field="${addonFilterDto.orderBy}"
-                                                style="width: 150px; height: 38px;
-                                                    font-size: smaller">
+                                        <select class="dropdown-center btn btn-inverse-primary dropdown-toggle "
+                                                type="button"
+                                                th:field="${addonFilterDto.order}">
                                             <option th:value="false"
                                                     class="dropdown-item">Order
                                             </option>
@@ -105,10 +102,10 @@
                                         </select>
                                     </label>
                                 </td>
-                            </table>
-                        </div>
-                    </div>
-                </form>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
                 <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content">
                     <div th:each="addon : ${page.content}" class="col mb-5"
                          data-toggle="modal"
@@ -117,22 +114,28 @@
                     </div>
                 </div>
             </div>
-            <div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item"
-                            th:each="pageNumber : ${pageNumbers}"
-                            th:class="${pageNumber==page.number + 1} ? active"
-                            th:if="${page.totalPages > 1}">
-                            <a class="page-link"
-                               th:href="@{/addons(size=${page.size}, page=${pageNumber})}"
-                               th:text="${pageNumber}">
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
         </section>
+        <div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item"
+                        th:each="pageNumber : ${pageNumbers}"
+                        th:class="${pageNumber==page.number + 1} ? active"
+                        th:if="${page.totalPages > 1}">
+                        <a class="page-link"
+                           th:href="@{/addons(search=${addonFilterDto.getSearch()},
+                               targetIde=${addonFilterDto.targetIde},
+                               category=${addonFilterDto.category},
+                               sortBy=${addonFilterDto.sortBy},
+                               orderBy=${addonFilterDto.order},
+                               size=${page.size},
+                               page=${pageNumber})}"
+                           th:text="${pageNumber}">
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>

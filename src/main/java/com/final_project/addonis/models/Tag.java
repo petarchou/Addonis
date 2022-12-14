@@ -1,5 +1,6 @@
 package com.final_project.addonis.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "tags")
@@ -23,6 +25,9 @@ public class Tag {
 
     @Column(name = "name")
     private String name;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "tags")
+    private Set<Addon> addons;
 
 
     public Tag(String name) {

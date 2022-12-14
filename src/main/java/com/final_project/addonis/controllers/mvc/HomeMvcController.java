@@ -87,13 +87,15 @@ public class HomeMvcController {
     @ModelAttribute("isAuth")
     private boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
         Authentication authentication = context.getAuthentication();
-        boolean au = authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
-        return au;
+        return authentication != null
+                && !(authentication instanceof AnonymousAuthenticationToken)
+                && authentication.isAuthenticated();
     }
 
     @ModelAttribute("loggedUser")
     private User getLoggedUser(Principal principal) {
-
-        return principal == null ? null : userService.getByUsername(principal.getName());
+        return principal == null
+                ? null
+                : userService.getByUsername(principal.getName());
     }
 }

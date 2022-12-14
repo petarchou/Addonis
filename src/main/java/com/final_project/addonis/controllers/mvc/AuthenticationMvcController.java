@@ -38,7 +38,9 @@ public class AuthenticationMvcController {
 
 
     @Autowired
-    public AuthenticationMvcController(UserService userService, PasswordResetTokenService passwordResetTokenService, UserMapper userMapper) {
+    public AuthenticationMvcController(UserService userService,
+                                       PasswordResetTokenService passwordResetTokenService,
+                                       UserMapper userMapper) {
         this.userService = userService;
         this.passwordResetTokenService = passwordResetTokenService;
         this.userMapper = userMapper;
@@ -110,7 +112,9 @@ public class AuthenticationMvcController {
     }
 
     @PostMapping("/forgotten-password")
-    public String sendResetPasswordEmail(@Valid @ModelAttribute("emailDto") EmailDto emailDto, HttpServletRequest request, BindingResult bindingResult) {
+    public String sendResetPasswordEmail(@Valid @ModelAttribute("emailDto") EmailDto emailDto,
+                                         HttpServletRequest request,
+                                         BindingResult bindingResult) {
         try {
             User user = userService.getByEmail(emailDto.getEmail());
             userService.sendResetPasswordRequest(user, getSiteUrl(request));
@@ -177,8 +181,9 @@ public class AuthenticationMvcController {
     @ModelAttribute("isAuth")
     private boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
         Authentication authentication = context.getAuthentication();
-        boolean au = authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
-        return au;
+        return authentication != null
+                && !(authentication instanceof AnonymousAuthenticationToken)
+                && authentication.isAuthenticated();
     }
 
 }

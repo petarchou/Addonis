@@ -76,7 +76,7 @@ public class UserServiceImplTests {
     @Test
     public void getAll_should_callFindAllUsersByFilteringAndSorting_when_parametersIsValid() {
         // Arrange
-        Page<User> repoUserList = new PageImpl<>(List.of(mockUser,mockUser2));
+        Page<User> repoUserList = new PageImpl<>(List.of(mockUser, mockUser2));
         when(mockUserRepository.findAllUsersByFilteringAndSorting(any(),
                 any(),
                 anyString(),
@@ -112,7 +112,6 @@ public class UserServiceImplTests {
     @Test
     public void getById_should_returnUser_when_userExist() {
         // Arrange
-        User mockUser = new User();
         mockUser.setId(1);
         when(mockUserRepository.findByIdAndIsDeletedFalse(anyInt())).thenReturn(Optional.of(mockUser));
 

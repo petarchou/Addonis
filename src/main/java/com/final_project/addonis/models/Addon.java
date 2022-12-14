@@ -76,7 +76,7 @@ public class Addon {
     @JoinTable(name = "addons_ratings",
             joinColumns = @JoinColumn(name = "addon_id"),
             inverseJoinColumns = @JoinColumn(name = "rating_id"))
-    @MapKeyJoinColumn(name = "user_id")
+    @MapKeyJoinColumn(table = "addons_ratings", name = "user_id")
     private Map<User, Rating> rating;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
