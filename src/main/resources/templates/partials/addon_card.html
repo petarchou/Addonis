@@ -29,7 +29,7 @@
         <a th:unless="${addon.creator.deleted}" href="#" th:href="@{/users/{id}(id=${addon.creator.id})}">
             <span class="username-creator" th:text="${addon.creator.username}">Creator</span>
         </a>
-          <span th:if="${addon.creator.deleted}" class="username-creator text-warning">deleted</span>
+          <span th:if="${addon.creator.deleted}" class="username-creator" style="color:#939393">deleted user</span>
       </div>
       <p class="text-success">
         <i data-feather="download" class="icon-sm mb-1"></i>

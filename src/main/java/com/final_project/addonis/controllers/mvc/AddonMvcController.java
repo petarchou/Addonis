@@ -7,6 +7,7 @@ import com.final_project.addonis.utils.exceptions.*;
 import com.final_project.addonis.utils.mappers.AddonMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;

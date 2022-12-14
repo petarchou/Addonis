@@ -9,8 +9,10 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class EmailDto {
-    @NotNull
+
     @Email(message = "Invalid email format", regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:" +
             "[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}")
     private String email;
+
+    private boolean isSent;
 }
