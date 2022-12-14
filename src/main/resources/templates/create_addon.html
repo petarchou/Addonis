@@ -64,13 +64,20 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Tags</label>
+                                    <label class="form-label">Select Tags</label>
                                     <select th:field="*{tags}" id="category" class="form-select" multiple="multiple">
                                         <option th:each="tag : ${allTags}"
                                                 th:text="${tag.name}"
                                                 th:value="${tag.name}">Tags
                                         </option>
                                     </select>
+                                    <div th:if="${#fields.hasErrors('tags')}"
+                                         class="alert alert-danger mt-1" role="alert">
+                                        <div class="mb-1" th:each="err : ${#fields.errors('tags')}">
+                                            <i data-feather="alert-circle"></i>
+                                            <span th:text="${err}"></span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="form-group col-md">

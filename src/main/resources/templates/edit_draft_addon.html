@@ -53,7 +53,7 @@
                                             </div>
                                             <textarea class="form-control"
                                                       th:field="*{description}"
-                                            type="text"></textarea>
+                                                      type="text"></textarea>
                                         </div>
                                         <div th:if="${#fields.hasErrors('description')}"
                                              class="alert alert-danger mt-1" role="alert">
@@ -65,16 +65,20 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label" th:text="#{addon.label.tags}">Tags</label>
-                                    <select class="form-select" id="category" multiple="multiple"
-                                            th:field="*{tags}">
-                                        <option disabled selected value="">Select Tags</option>
+                                    <label class="form-label">Select Tags</label>
+                                    <select th:field="*{tags}" class="form-select" id="category" multiple="multiple">
                                         <option th:each="tag : ${allTags}"
                                                 th:text="${tag.name}"
                                                 th:value="${tag.name}">Tags
                                         </option>
-
                                     </select>
+                                    <div th:if="${#fields.hasErrors('tags')}"
+                                         class="alert alert-danger mt-1" role="alert">
+                                        <div class="mb-1" th:each="err : ${#fields.errors('tags')}">
+                                            <i data-feather="alert-circle"></i>
+                                            <span th:text="${err}"></span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="form-group col-md">
@@ -99,8 +103,8 @@
                                             <input class="form-control"
                                                    placeholder="Origin URL"
                                                    th:field="*{originUrl}"
-                                            type="text">
-                                            </div>
+                                                   type="text">
+                                        </div>
                                         <div th:if="${#fields.hasErrors('originUrl')}"
                                              class="alert alert-danger mt-1" role="alert">
                                             <div class="mb-1" th:each="err : ${#fields.errors('originUrl')}">
@@ -113,16 +117,21 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="formFile">Addon content</label>
                                     <input class="form-control" type="file" name="binaryContent" id="formFile">
-                                    <div th:if="${#fields.hasErrors('dataError')}"
-                                         class="alert alert-danger mt-1" role="alert">
-                                        <div class="mb-1" th:each="err : ${#fields.errors('dataError')}">
-                                            <i data-feather="alert-circle"></i>
-                                            <span th:text="${err}"></span>
+                                    <div th:if="${draftAddon.dataError == null}">
+                                        <div th:if="${#fields.hasErrors('dataError')}"
+                                             class="alert alert-danger mt-1" role="alert">
+                                            <div class="mb-1" th:each="err : ${#fields.errors('dataError')}">
+                                                <i data-feather="alert-circle"></i>
+                                                <span th:text="${err}"></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="action" value="publish">Upload Addon</button>
-                                <button class="btn btn-primary" type="submit" name="action" value="save">Save Draft</button>
+                                <button class="btn btn-primary" type="submit" name="action" value="publish">Upload
+                                    Addon
+                                </button>
+                                <button class="btn btn-primary" type="submit" name="action" value="save">Save Draft
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -132,16 +141,10 @@
     </div>
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
-<script type="text/javascript">
-    $('#tags').tagsInput({
-        'height': '50px',
-        'width': '100%',
-        'placeholderColor': '#666666'
-    });
-    $(document).ready(function () {
-        $("#category").select2({
-            tags: true
-        });
+<script>
+    $("#category").select2({
+        tags: true,
+        theme: 'classic'
     });
 </script>
 <!--This should always be the last script insert -->
