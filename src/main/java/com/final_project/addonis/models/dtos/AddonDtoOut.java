@@ -18,7 +18,7 @@ public class AddonDtoOut extends BaseAddonDtoOut {
 
     private Map<String, Integer> rating;
 
-    private Double averageRating;
+    private String averageRating;
 
     private int pullRequests;
 

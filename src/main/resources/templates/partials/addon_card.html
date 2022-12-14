@@ -21,7 +21,7 @@
         <i class="fa-solid fa-star star-rating"></i>
         <i class="fa-solid fa-star star-rating"></i>
         <i class="fa-solid fa-star star-rating"></i>
-        <span th:text="${addon.averageRating}"></span>
+        <span th:text="${addon.formattedAverageRating}"></span>
     </div>
     <hr>
     <div class="user-downloads">
@@ -29,7 +29,7 @@
         <a th:unless="${addon.creator.deleted}" href="#" th:href="@{/users/{id}(id=${addon.creator.id})}">
             <span class="username-creator" th:text="${addon.creator.username}">Creator</span>
         </a>
-          <span th:if="${addon.creator.deleted}" class="username-creator">Deleted</span>
+          <span th:if="${addon.creator.deleted}" class="username-creator">deleted_user</span>
       </div>
       <p class="text-success">
         <i data-feather="download" class="icon-sm mb-1"></i>
@@ -39,7 +39,7 @@
     <hr>
     <div class="button-layer text-center">
         <a th:href="@{'/download?id=' + ${addon.id}}">
-            <button type="button" class="btn btn-primary btn-xs">Download
+            <button  type="button" class="btn btn-primary btn-xs">Download
             </button>
         </a>
     </div>

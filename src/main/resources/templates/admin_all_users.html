@@ -13,6 +13,11 @@
     <!-- partial -->
 
     <div class="page-wrapper">
+
+        <!-- partial:partials/_navbar.html -->
+        <nav th:replace="/partials/_navbar::_navbar"></nav>
+        <!-- partial -->
+
         <section class="py-7">
             <form th:action="@{/users}" th:object="${userFilter}"
                   method="get">
@@ -126,29 +131,28 @@
                     </table>
                 </div>
             </div>
-            <div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item"
-                            th:each="pageNumber : ${userPages}"
-                            th:class="${pageNumber==usersPage.number + 1} ? active"
-                            th:if="${usersPage.totalPages >1}">
-                            <a class="page-link"
-                               th:href="@{/users(
+        </section>
+        <div class="row gx-12 gx-lg-12 row-cols-12 row-cols-md-12 row-cols-xl-4 justify-content-center">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item"
+                        th:each="pageNumber : ${userPages}"
+                        th:class="${pageNumber==usersPage.number + 1} ? active"
+                        th:if="${usersPage.totalPages >1}">
+                        <a class="page-link"
+                           th:href="@{/users(
                                search=${userFilter.search},
                                filter=${userFilter.filter},
                                sort=${userFilter.sort},
                                order=${userFilter.order},
                                size=${usersPage.size},
                                page=${pageNumber})}"
-                               th:text="${pageNumber}">
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </section>
-        <!-- partial:partials/_navbar.html -->
+                           th:text="${pageNumber}">
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 <!--This should always be the last script insert -->

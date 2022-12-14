@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:insert="/partials/resources::resources">
     <meta charset="UTF-8">
-    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
+    <meta name="devscription" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
     <title>Add-ons Plugins for your IDE</title>
 </head>
 <body>
@@ -14,9 +14,6 @@
     <!-- partial -->
 
     <div class="page-wrapper">
-        <!-- partial:partials/_navbar.html -->
-        <nav th:replace="/partials/_navbar::_navbar"></nav>
-        <!-- partial -->
 
         <section class="py-7">
             <div class="card-body px-4 px-lg-5 mt-5">
@@ -49,7 +46,7 @@
                                     <span th:text="${addon.creator.username}">Creator</span>
                                 </a>
                             </td>
-                            <td th:text="${addon.uploadedDate}"></td>
+                            <td  th:text="${addon.dateToString(addon.uploadedDate)}"></td>
                         </tr>
                         </tbody>
                     </table>

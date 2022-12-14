@@ -6,7 +6,7 @@ $('document').ready(()=> {
         const $stars = $(value).children('i');
 
         $.each($stars,(index,value) => {
-            if($rating > index + 0.5) {
+            if($rating >= index + 0.5) {
                 $(value).addClass('yellow-color');
             }
         })

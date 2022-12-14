@@ -3,7 +3,6 @@
 <head th:insert="/partials/resources::resources">
     <meta charset="UTF-8">
     <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <link rel="stylesheet" href="/vendors/jquery-tags-input/jquery.tagsinput.min.css">
     <title>Add-ons Plugins for your IDE</title>
 </head>
@@ -30,7 +29,7 @@
                         <div class="card-body">
                             <h6 class="card-title">Create addon</h6>
                             <form th:object="${addon}" enctype="multipart/form-data"
-                                  th:action="@{/addons/create}"
+                                  th:action="@{__${#httpServletRequest.requestURI}__}"
                                   method="post">
                                 <div class="mb-3">
                                     <label for="addonName" class="form-label">Addon Name</label>
@@ -52,7 +51,7 @@
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                             </div>
-                                            <textarea id="description" class="form-control"
+                                            <textarea class="form-control ht-100"
                                                       th:field="*{description}" type="text"></textarea>
                                         </div>
                                         <div th:if="${#fields.hasErrors('description')}"
@@ -65,10 +64,8 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label" th:text="#{addon.label.tags}">Tags</label>
-                                    <select class="form-select" id="category" multiple="multiple"
-                                            th:field="*{tags}">
-                                        <option disabled selected value="">Select Tags</option>
+                                    <label class="form-label">Tags</label>
+                                    <select th:field="*{tags}" id="category" class="form-select" multiple="multiple">
                                         <option th:each="tag : ${allTags}"
                                                 th:text="${tag.name}"
                                                 th:value="${tag.name}">Tags
@@ -132,20 +129,14 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
-<script type="text/javascript">
-    $('#tags').tagsInput({
-        'height': '50px',
-        'width': '100%',
-        'placeholderColor': '#666666'
-    });
-    $(document).ready(function () {
-        $("#category").select2({
-            tags: true
-        });
+
+<script>
+    $('#category').select2({
+        tags: true,
+        theme: 'classic'
     });
 </script>
 <!-- End custom js for this page -->

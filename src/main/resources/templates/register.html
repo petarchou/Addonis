@@ -25,12 +25,12 @@
                                                    th:text="#{user.label.username}">Username</label>
                                             <label><input type="text" class="form-control" id="username"
                                                           th:field="*{username}" required="required"/></label>
-                                            <div th:if="${#fields.hasErrors('username')}" class="alert alert-danger mt-1"
-                                                 role="alert">
-                                                <div class="mb-1" th:each="err : ${#fields.errors('username')}">
-                                                    <i data-feather="alert-circle"></i>
-                                                    <span th:text="${err}"></span>
-                                                </div>
+                                                <div th:if="${#fields.hasErrors('username')}" class="alert alert-danger mt-1"
+                                                     role="alert">
+                                                    <div class="mb-1" th:each="err : ${#fields.errors('username')}">
+                                                        <i data-feather="alert-circle"></i>
+                                                        <span th:text="${err}"></span>
+                                                    </div>
                                             </div>
                                         </div>
                                         <div class="mb-3">

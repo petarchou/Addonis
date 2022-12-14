@@ -1,11 +1,15 @@
 package com.final_project.addonis.models;
 
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Entity
@@ -35,7 +39,7 @@ public class Addon {
     @Column(name = "description")
     private String description;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "binary_content_id")
     private BinaryContent data;
 
@@ -101,6 +105,10 @@ public class Addon {
         return avgRating / numberOfRatings;
     }
 
+    public String formattedAverageRating() {
+        return String.format(Locale.US, "%.1f", getAverageRating());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -112,5 +120,9 @@ public class Addon {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public String dateToString(LocalDateTime date) {
+        return date.format(DateTimeFormatter.ofPattern("MMM dd yyyy, hh:mm", new Locale("en")));
     }
 }

@@ -11,7 +11,8 @@ import javax.validation.constraints.Size;
 @Setter
 public class UpdateUserDto {
 
-    @Email
+    @Email(message = "Invalid email format", regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:" +
+            "[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}")
     private String email;
 
     @Size(min = 10, max = 10)

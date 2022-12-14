@@ -51,9 +51,7 @@ const vote = (rating) => {
 
 }
 
-const delay = (time) => {
-    return new Promise(resolve => setTimeout(resolve, time));
-}
+
 
 
 const updateRatingView = (userRating, addonJson) => {
@@ -80,6 +78,10 @@ const updateRatingView = (userRating, addonJson) => {
         const $star = $('#' + starId);
         $star.prop('checked', true);
     }
+}
+
+const delay = (time) => {
+    return new Promise(resolve => setTimeout(resolve, time));
 }
 
 const updateDownloads = () => {

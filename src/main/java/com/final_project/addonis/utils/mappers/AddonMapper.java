@@ -1,18 +1,15 @@
 package com.final_project.addonis.utils.mappers;
 
-import com.final_project.addonis.models.Addon;
-import com.final_project.addonis.models.Category;
-import com.final_project.addonis.models.Tag;
-import com.final_project.addonis.models.TargetIde;
-import com.final_project.addonis.models.User;
+import com.final_project.addonis.models.*;
 import com.final_project.addonis.models.dtos.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.final_project.addonis.utils.helpers.TagHelper;
 import com.final_project.addonis.services.contracts.TargetIdeService;
+import com.final_project.addonis.utils.helpers.TagHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,7 +31,7 @@ public class AddonMapper {
 
     public DraftDtoOut toDraftDto(Addon addon) {
         DraftDtoOut draftDtoOut = new DraftDtoOut();
-        updateBaseDtoOut(draftDtoOut,addon);
+        updateBaseDtoOut(draftDtoOut, addon);
 
         return draftDtoOut;
 
@@ -42,7 +39,7 @@ public class AddonMapper {
 
     public AddonDtoOut toDto(Addon addon) {
         AddonDtoOut addonDtoOut = new AddonDtoOut();
-        updateBaseDtoOut(addonDtoOut,addon);
+        updateBaseDtoOut(addonDtoOut, addon);
         if (addon.getState().getName().equalsIgnoreCase("approved")) {
             addonDtoOut.setCategories(addon.getCategories()
                     .stream().
@@ -55,7 +52,7 @@ public class AddonMapper {
                 .collect(Collectors.toMap(entry -> entry.getKey().getUsername(),
                         entry -> entry.getValue().getId())));
         addonDtoOut.setDownloads(addon.getDownloads());
-        addonDtoOut.setAverageRating(addon.getAverageRating());
+        addonDtoOut.setAverageRating(String.format(Locale.US, "%.1f", addon.getAverageRating()));
         addonDtoOut.setPullRequests(addon.getPullRequests());
         if (addon.getLastCommitDate() != null) {
             addonDtoOut.setLastCommitDate(FORMATTER.format(addon.getLastCommitDate()));
@@ -69,7 +66,7 @@ public class AddonMapper {
 
     public Addon fromDtoCreate(CreateAddonDto addonDto, User loggedUser) {
         Addon addon = new Addon();
-        updateBaseDtoIn(addonDto,addon);
+        updateBaseDtoIn(addonDto, addon);
         addon.setTags(addonDto.getTags().stream()
                 .map(tagHelper::fromTagName)
                 .collect(Collectors.toSet()));
@@ -82,7 +79,7 @@ public class AddonMapper {
     //TODO Why is logged user not being used? - check
     public Addon updateDraft(CreateAddonDto addonDto, User loggedUser, Addon draft) {
 
-        updateBaseDtoIn(addonDto,draft);
+        updateBaseDtoIn(addonDto, draft);
         draft.getTags().addAll(addonDto.getTags().stream()
                 .map(tagHelper::fromTagName)
                 .collect(Collectors.toSet()));
@@ -129,7 +126,7 @@ public class AddonMapper {
         if (originUrl != null) {
             existingAddon.setOriginUrl(addonDto.getOriginUrl());
         }
-        if(ideName != null) {
+        if (ideName != null) {
             TargetIde targetIde = targetIdeService.getByName(ideName);
             existingAddon.setTargetIde(targetIde);
         }
@@ -138,7 +135,7 @@ public class AddonMapper {
     private void updateBaseDtoOut(BaseAddonDtoOut addonDtoOut, Addon addon) {
         addonDtoOut.setId(addon.getId());
         addonDtoOut.setName(addon.getName());
-        if(addon.getTargetIde() != null)
+        if (addon.getTargetIde() != null)
             addonDtoOut.setTargetIde(addon.getTargetIde().getName());
         addonDtoOut.setCreator(userMapper.toDto(addon.getCreator()));
         addonDtoOut.setDescription(addon.getDescription());

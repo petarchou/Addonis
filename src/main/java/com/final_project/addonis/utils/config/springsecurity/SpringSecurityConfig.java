@@ -82,8 +82,6 @@ public class SpringSecurityConfig {
                 .sessionManagement()
                 .maximumSessions(1);
 
-        //make only  single  session possible
-
         return http.build();
     }
 

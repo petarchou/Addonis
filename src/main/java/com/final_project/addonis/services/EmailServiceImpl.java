@@ -94,7 +94,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
 
             content = content.replace("[[name]]", user.getUsername());
-            String verifyUrl = siteUrl + "/users/verify?code=" + token.getToken();
+            String verifyUrl = siteUrl + "/users/verify?token=" + token.getToken();
 
             content = content.replace("[[URL]]", verifyUrl);
 
@@ -130,7 +130,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
 
             content = content.replace("[[name]]", user.getUsername());
-            String verifyUrl = siteUrl + "/reset_password?token=" + token.getToken();
+            String verifyUrl = siteUrl + "/reset-password?token=" + token.getToken();
 
             content = content.replace("[[URL]]", verifyUrl);
 

@@ -5,15 +5,16 @@ import com.final_project.addonis.models.InvitedUser;
 import com.final_project.addonis.models.User;
 import com.final_project.addonis.models.dtos.EmailDto;
 import com.final_project.addonis.models.dtos.PasswordDto;
+import com.final_project.addonis.models.dtos.UpdateUserDto;
 import com.final_project.addonis.services.contracts.AddonService;
 import com.final_project.addonis.services.contracts.EmailService;
 import com.final_project.addonis.services.contracts.UserService;
-import com.final_project.addonis.utils.exceptions.EntityNotFoundException;
-import com.final_project.addonis.utils.exceptions.PasswordNotMatchException;
-import com.final_project.addonis.utils.exceptions.UnauthorizedOperationException;
+import com.final_project.addonis.utils.config.springsecurity.metaannotations.IsHimselfOrAdmin;
+import com.final_project.addonis.utils.exceptions.*;
 import com.final_project.addonis.utils.helpers.EmailHelper;
 import com.final_project.addonis.utils.mappers.InvitedUserMapper;
 import com.final_project.addonis.utils.mappers.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +45,7 @@ public class UserMvcController {
     private final EmailService emailService;
     private final EmailHelper emailHelper;
 
+    @Autowired
     public UserMvcController(UserService userService,
                              AddonService addonService,
                              UserMapper mapper,
@@ -57,15 +60,59 @@ public class UserMvcController {
         this.emailHelper = emailHelper;
     }
 
+
+
     @GetMapping("/{id}/edit")
-    public String editUser(@PathVariable int id, Model model) {
-        User profile = userService.getById(id);
-        model.addAttribute("passwordDto", new PasswordDto());
-        return "edit_profile";
+    public String editUserView(@PathVariable int id,
+                               Model model) {
+        try {
+            User profile = userService.getById(id);
+            model.addAttribute("userDto", mapper.toUpdateDto(profile));
+            model.addAttribute("image", profile.getPhotoUrl());
+            return "edit_profile";
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/edit")
+    public String editUser(@PathVariable int id,
+                           @RequestParam("image") MultipartFile image,
+                           @Valid @ModelAttribute("userDto") UpdateUserDto userDto,
+                           BindingResult bindingResult,
+                           Model model) {
+        if(bindingResult.hasErrors()) {
+            return "edit_profile";
+        }
+
+        try {
+            User profile = userService.getById(id);
+            profile = mapper.fromUpdateDto(userDto, profile);
+            model.addAttribute("image", profile.getPhotoUrl());
+            if (image != null && !image.isEmpty()) {
+                profile = mapper.changePhoto(profile, image);
+            }
+            userService.update(profile);
+
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (DuplicateEmailException e) {
+            bindingResult.rejectValue("email","duplicate_email",
+                    e.getMessage());
+        } catch (DuplicatePhoneException e) {
+            bindingResult.rejectValue("phoneNumber","duplicate_phone",
+                    e.getMessage());
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "edit_profile";
+        }
+
+        return "redirect:/users/"+id+"/edit";
     }
 
     @GetMapping("/verify")
-    public String verifyUser(@RequestParam("code") String tokenStr) {
+    public String verifyUser(@RequestParam("token") String tokenStr) {
         try {
             userService.verifyUser(tokenStr);
             return "verify_success";
@@ -73,6 +120,7 @@ public class UserMvcController {
             return "verify_fail";
         }
     }
+
 
     @GetMapping("/{id}")
     public String userProfileView(@PathVariable int id, Model model) {
@@ -104,13 +152,7 @@ public class UserMvcController {
         }
     }
 
-    @ModelAttribute("isAuth")
-    private boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
-        Authentication authentication = context.getAuthentication();
-        return authentication != null
-                && !(authentication instanceof AnonymousAuthenticationToken)
-                && authentication.isAuthenticated();
-    }
+
 
     @GetMapping("/{id}/change-password")
     public String changePasswordView(Model model,
@@ -149,8 +191,8 @@ public class UserMvcController {
     }
 
     @PostMapping("/{id}/invite")
-    public String inviteFriend(@Valid @ModelAttribute(name = "email") EmailDto toEmail
-            , @PathVariable int id, HttpServletRequest request) {
+    public String inviteFriend(@Valid @ModelAttribute(name = "email") EmailDto toEmail,
+                               @PathVariable int id, HttpServletRequest request) {
         try {
             User user = userService.getById(id);
             InvitedUser invitedUser = invitedUserMapper.fromEmail(toEmail.getEmail());
@@ -163,11 +205,18 @@ public class UserMvcController {
         }
     }
 
+    @ModelAttribute("isAuth")
+    public boolean isAuthenticated(@CurrentSecurityContext SecurityContext context) {
+        Authentication authentication = context.getAuthentication();
+        return authentication != null
+                && !(authentication instanceof AnonymousAuthenticationToken)
+                && authentication.isAuthenticated();
+    }
 
     @ModelAttribute("loggedUser")
     private User getLoggedUser(Principal principal) {
-        return principal == null
-                ? null
-                : userService.getByUsername(principal.getName());
+        return principal == null ? null : userService.getByUsername(principal.getName());
     }
+
+
 }
