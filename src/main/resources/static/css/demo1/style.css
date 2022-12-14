@@ -23235,6 +23235,10 @@ svg.icon-xxl {
     height: 100px;
 }
 
+.ht-150 {
+    height: 150px;
+}
+
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -23701,7 +23705,7 @@ body {
 .item-details-control-root .itemDetails-right {
     display: table-cell;
     max-width: 40%;
-    min-width: 20%;
+    min-width: 30%;
 }
 
 .item-details-control-root .markdown-css {
@@ -27588,6 +27592,10 @@ div.tox .tox-dialog__body {
     display: none;
 }
 
+.star-widget .star-rating {
+    transition: all 0.2s ease;
+}
+
 .star-widget label {
     font-size: 15px;
     color: #444;
@@ -27627,4 +27635,13 @@ div.tox .tox-dialog__body {
 
 .yellow-color {
     color: #f5d647;
+}
+
+.img-account-profile {
+    object-fit: cover;
+    }
+
+.edit-img-width {
+    width: 150px;
+    height: 150px;
 }

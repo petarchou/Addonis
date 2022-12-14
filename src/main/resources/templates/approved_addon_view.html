@@ -43,7 +43,7 @@
                                                                 Creator</h6>
                                                         </a>
                                                         <span th:if="${addon.creator.deleted}">
-                                                            <h5>Deleted</h5>
+                                                            <h6>deleted_user</h6>
                                                         </span>
                                                     </h4>
                                                 </div>
@@ -195,7 +195,7 @@
                                                                     <td id="Released-on">Released on</td>
                                                                     <td role="definition"
                                                                         aria-labelledby="Released-on"
-                                                                        th:text="${addon.uploadedDate}">
+                                                                        th:text="${addon.dateToString(addon.uploadedDate)}">
                                                                         Uploaded date
                                                                     </td>
                                                                 </tr>
@@ -204,7 +204,7 @@
                                                                     </td>
                                                                     <td role="definition"
                                                                         aria-labelledby="Last-update-date"
-                                                                        th:text="${addon.lastCommitDate}">
+                                                                        th:text="${addon.dateToString(addon.lastCommitDate)}">
                                                                         Last updated
                                                                     </td>
                                                                 </tr>
@@ -282,7 +282,7 @@
                                                                 <div class="d-flex justify-content-between mb-2 pb-2 border-bottom"
                                                                      th:each="rating : ${addon.rating}">
                                                                     <div class="d-flex align-items-center hover-pointer">
-                                                                        <img class="img-xs rounded-circle"
+                                                                        <img class="img-xs img-account-profile rounded-circle"
                                                                              alt="user image"
                                                                              src="/assets/others/logo-placeholder.png"
                                                                              th:src="${rating.key.photoUrl}">

@@ -51,7 +51,9 @@
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                             </div>
-                                            <textarea id="description" class="form-control"
+                                            <textarea id="description"
+                                                      class="form-control ht-100"
+                                                      th:value="${addon.description}"
                                                       th:field="*{description}"
                                                       type="text"></textarea>
                                         </div>
@@ -86,6 +88,7 @@
                                             </div>
                                             <input class="form-control"
                                                    placeholder="Origin URL"
+                                                   th:value="${addon.originUrl}"
                                                    th:field="*{originUrl}"
                                                    type="text">
                                         </div>
@@ -119,18 +122,7 @@
     </div>
 </div>
 <footer th:replace="/partials/_footer::_footer"></footer>
-<script type="text/javascript">
-    $('#tags').tagsInput({
-        'height': '50px',
-        'width': '100%',
-        'placeholderColor': '#666666'
-    });
-    $(document).ready(function () {
-        $("#category").select2({
-            tags: true
-        });
-    });
-</script>
+
 <!--This should always be the last script insert -->
 <div th:replace="/partials/resources :: js-scripts"></div>
 </body>

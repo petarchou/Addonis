@@ -53,8 +53,6 @@ public class AuthenticationMvcController {
     }
 
 
-    //TODO Bootstrap style client verification?
-
     @GetMapping("/register")
     public String showRegisterView(Model model  ) {
         model.addAttribute("registerDto", new CreateUserDto());
@@ -91,17 +89,6 @@ public class AuthenticationMvcController {
         }
         //TODO Add a registration successful page with info about verification
         return "registration_success";
-    }
-
-    //TODO delete verifySuccess and verifyFail
-    @GetMapping("/verify-success")
-    public String showVerifiedPage() {
-        return "verify_success";
-    }
-
-    @GetMapping("/verify-fail")
-    public String showVerifyFailedPage() {
-        return "verify_fail";
     }
 
     @GetMapping("/forgotten-password")
@@ -144,8 +131,6 @@ public class AuthenticationMvcController {
     public String resetPassword(@RequestParam(name = "token") String tokenStr,
                                 @Valid @ModelAttribute(name = "passwordDto") ForgottenPasswordDto passwordDto,
                                 BindingResult bindingResult, Model model) {
-
-        //TODO How do i redirect to the same page without losing the tokenStr attribute :(
         if(bindingResult.hasErrors()) {
             model.addAttribute("token", tokenStr);
             return "create_password";
@@ -159,7 +144,7 @@ public class AuthenticationMvcController {
             userService.update(user);
             passwordResetTokenService.delete(token);
             //TODO Create view which tells you password reset was successfully and has home button
-            return "home";
+            return "redirect:/";
         }catch (PasswordNotMatchException e) {
             bindingResult.rejectValue("confirmNewPassword", "password_error",
                     "Confirm password did not match.");

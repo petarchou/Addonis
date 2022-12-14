@@ -72,7 +72,7 @@
                                                             <span th:text="${addon.name}">Addon Name</span>
                                                         </a>
                                                     </td>
-                                                    <td th:text="${addon.uploadedDate}"></td>
+                                                    <td th:text="${addon.dateToString(addon.uploadedDate)}"></td>
                                                     <td th:text="${addon.targetIde.name}">
                                                     </td>
                                                     <td th:text="${addon.downloads}"></td>
@@ -110,7 +110,7 @@
                                                             <span th:text="${addon.name}">Addon Name</span>
                                                         </a>
                                                     </td>
-                                                    <td th:text="${addon.uploadedDate}"></td>
+                                                    <td th:text="${addon.dateToString(addon.uploadedDate)}"></td>
                                                     <td th:text="${addon.targetIde.name}">
                                                     </td>
                                                 </tr>
@@ -145,7 +145,7 @@
                                                                 <span th:text="${addon.name}">Addon Name</span>
                                                             </a>
                                                         </td>
-                                                        <td th:text="${addon.uploadedDate}"></td>
+                                                        <td th:text="${addon.dateToString(addon.uploadedDate)}"></td>
                                                         <td th:text="${addon.targetIde.name}">
                                                         </td>
                                                     </tr>

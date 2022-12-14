@@ -38,6 +38,14 @@ public class UserMapper {
         return userDto;
     }
 
+    public UpdateUserDto toUpdateDto(User user) {
+        UpdateUserDto userDto = new UpdateUserDto();
+        userDto.setEmail(user.getEmail());
+        userDto.setPhoneNumber(user.getPhoneNumber());
+
+        return userDto;
+    }
+
     public User fromCreateDto(CreateUserDto createUserDto) {
 
         if (!createUserDto.getPassword()
