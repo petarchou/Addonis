@@ -23496,7 +23496,7 @@ body {
 }
 
 .item-details-control-root .item-details-left {
-    /* TODO This was edited by us */
+
     flex: 1;
     vertical-align: top;
     font-size: 14px;

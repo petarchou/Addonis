@@ -121,8 +121,6 @@ public class UserMvcController {
         }
     }
 
-//    @Secured("ROLE_ADMIN")
-
 
     @PostMapping("/{id}/block-unblock")
     public String blockUnblock(@PathVariable int id) {
