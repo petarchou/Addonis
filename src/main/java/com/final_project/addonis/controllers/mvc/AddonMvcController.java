@@ -144,7 +144,6 @@ public class AddonMvcController {
 
     @GetMapping("/create")
     public String createAddon(Model model) {
-//        TODO add User
         model.addAttribute("addon", new CreateAddonDto());
         return "create_addon";
     }

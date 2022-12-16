@@ -44,20 +44,6 @@ public class AuthenticationMvcController {
         this.userMapper = userMapper;
     }
 
-    @GetMapping("/verify-success")
-    public String verifySuccess() {
-        return "verify_success";
-    }
-
-    @GetMapping("/verify-fail")
-    public String verifyFail() {
-        return "verify_fail";
-    }
-
-    @GetMapping("/register-success")
-    public String registerSuccess() {
-        return "register_success";
-    }
 
     @GetMapping("/login")
     public String showLoginView(Model model) {
@@ -99,7 +85,6 @@ public class AuthenticationMvcController {
         if (bindingResult.hasErrors()) {
             return "register";
         }
-        //TODO Add a registration successful page with info about verification
         return "register_success";
     }
 
@@ -142,7 +127,6 @@ public class AuthenticationMvcController {
             model.addAttribute("token", tokenStr);
             return "create_password";
         } catch (EntityNotFoundException | ExpiredTokenException e) {
-            //TODO create page which tells you your token is invalid or expired. Also has home button
             return "invalid_password_token";
         }
     }
@@ -163,7 +147,6 @@ public class AuthenticationMvcController {
             user = userMapper.setNewPassword(user, passwordDto);
             userService.update(user);
             passwordResetTokenService.delete(token);
-            //TODO Create view which tells you password reset was successfully and has home button
             return "redirect:/";
         }catch (PasswordNotMatchException e) {
             bindingResult.rejectValue("confirmNewPassword", "password_error",
@@ -172,8 +155,7 @@ public class AuthenticationMvcController {
             return "create_password";
         }
         catch (EntityNotFoundException e) {
-            //TODO redirect to the page with invalid token message.
-            return "create_password";
+            return "invalid_password_token";
         }
     }
 

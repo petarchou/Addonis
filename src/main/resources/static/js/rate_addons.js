@@ -12,13 +12,12 @@ const getInitialInfo = () => {
             let userRating = 0;
             let ratings = Object(json.rating);
             if (ratings.hasOwnProperty($username)) {
-                console.log('we reach here');
                 userRating = Object.getOwnPropertyDescriptor(ratings, $username).value;
             }
-            console.log(userRating);
             updateRatingView(userRating, json);
         })
 }
+
 
 getInitialInfo();
 
@@ -61,13 +60,9 @@ const updateRatingView = (userRating, addonJson) => {
 
     $average.text(addonJson.averageRating);
     $total.text(Object.keys(addonJson.rating).length);
-    console.log(userRating + ' userR');
-    console.log(currentRating + ' currR');
 
     if (userRating === 0 && currentRating !== 0) {
-        console.log('we reach here');
         const $star = $('#rate-' + currentRating);
-        console.log($star);
         $star.prop('checked', false);
         currentRating = userRating;
 

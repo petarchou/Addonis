@@ -32,14 +32,17 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST,"/api/users")
+                .antMatchers("/api/**")
                 .permitAll()
                 .antMatchers("/",
                         "/login",
+                        "/register",
                         "/error",
                         "/reset-password",
                         "/forgotten-password",
                         "/swagger-ui/",
+                        "/about-us",
+                        "/users/verify",
                         "/about-us",
                         "/download/**",
                         "/addons/**",
@@ -62,8 +65,7 @@ public class SpringSecurityConfig {
                 )
                 .permitAll()
                 .anyRequest()
-                //TODO specify which endpoints are authenticated
-                .permitAll()
+                .authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")

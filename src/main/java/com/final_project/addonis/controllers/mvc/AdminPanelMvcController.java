@@ -66,7 +66,6 @@ public class AdminPanelMvcController {
         return addonService.getAllPendingAddons();
     }
 
-    // TODO restrict only for admins
     @GetMapping("/addons/pending-addons")
     public String getPendingAddons() {
         return "admin_pending_addons";
@@ -95,7 +94,6 @@ public class AdminPanelMvcController {
         return "admin_all_users";
     }
 
-    // TODO restrict only for admins and creators
     @GetMapping("/addons/pending/{id}")
     public String getPendingAddon(@PathVariable int id, Model model) {
         try {
