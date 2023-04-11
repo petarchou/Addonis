@@ -1,4 +1,3 @@
-
 - **Petar Petrov: [GitLab](https://gitlab.com/petarchou)**
 - **Atanas Yovchev: [GitLab](https://gitlab.com/atanas-yovchev)** 
 - **Stefan Stefanov: [GitLab](https://gitlab.com/shmyrtzzz)**
@@ -21,7 +20,6 @@
 
 - **Disclaimer:** The majority of our authentication tokens, API keys, passwords and secrets are stored in environment variables
   and outside the source code. This will unfortunately prevent you from running the code locally if you copy this project.
-  However, you can find all our functionality on our deployed version, and we have provided log in details below.
 
 ## Installation
 
