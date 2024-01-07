@@ -1,7 +1,3 @@
-- **Petar Petrov**
-- **Atanas Yovchev**
-- **Stefan Stefanov**
-
 # Final Project - Addonis
 
 **Project Description:**
