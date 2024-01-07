@@ -1,6 +1,6 @@
-- **Petar Petrov: [GitLab](https://gitlab.com/petarchou)**
-- **Atanas Yovchev: [GitLab](https://gitlab.com/atanas-yovchev)** 
-- **Stefan Stefanov: [GitLab](https://gitlab.com/shmyrtzzz)**
+- **Petar Petrov**
+- **Atanas Yovchev**
+- **Stefan Stefanov**
 
 # Final Project - Addonis
 
