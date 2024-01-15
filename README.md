@@ -26,11 +26,9 @@ The following list of software should be installed on your computer:
 
 ### Clone
 - Clone or download the project on your local machine using `https://gitlab.com/group-061/addonis`
-- All the `code` required to get started
 
 ### Database Replication
 - Run the scripts in the `DB folder` in the project
-- All the `code` required to get started
 
 
 ### Login Details
