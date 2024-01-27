@@ -17,6 +17,8 @@
 - **Disclaimer:** The majority of our authentication tokens, API keys, passwords and secrets are stored in environment variables
   and outside the source code. This will unfortunately prevent you from running the code locally if you copy this project.
 
+  ![home_page](https://i.postimg.cc/66Gw51k2/Screenshot-2024-01-27-194207.png)
+
 ## Installation
 
 ### Prerequisites
