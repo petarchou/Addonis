@@ -24,9 +24,6 @@ The following list of software should be installed on your computer:
 - [Java 11](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html)
 - [MariaDB](https://mariadb.org/)
 
-### Clone
-- Clone or download the project on your local machine using `https://gitlab.com/group-061/addonis`
-
 ### Database Replication
 - Run the scripts in the `DB folder` in the project
 
